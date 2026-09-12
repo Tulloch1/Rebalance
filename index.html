@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio Rebalancer</title>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --danger-color: #dc2626;
+            --danger-hover: #b91c1c;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --border-color: #cbd5e1;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding: 24px 16px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 580px;
+            width: 100%;
+            background: var(--card-bg);
+            padding: 28px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: var(--text-main);
+        }
+
+        .deposit-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .deposit-section label {
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        input[type="text"], input[type="number"] {
+            padding: 7px 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.15s ease;
+        }
+
+        input[type="text"]:focus, input[type="number"]:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+        }
+
+        .deposit-input {
+            width: 120px;
+        }
+
+        .table-header {
+            display: flex;
+            flex-direction: row;
+            gap: 8px;
+            align-items: center;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .col-num { width: 28px; text-align: right; }
+        .col-ticker { width: 110px; }
+        .col-val { width: 110px; }
+        .col-weight { width: 95px; }
+        .col-action { width: 34px; }
+
+        .input-row {
+            display: flex;
+            flex-direction: row;
+            gap: 8px;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .row-number {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-muted);
+            width: 28px;
+            text-align: right;
+        }
+
+        .input-row input {
+            width: 110px;
+        }
+
+        .input-row .weight-input {
+            width: 95px;
+        }
+
+        .btn-delete {
+            width: 28px;
+            height: 28px;
+            border: none;
+            background: #fee2e2;
+            color: var(--danger-color);
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.15s ease;
+        }
+
+        .btn-delete:hover {
+            background: #fecaca;
+        }
+
+        .weight-summary {
+            font-size: 13px;
+            margin: 6px 0 18px 36px;
+            color: var(--text-muted);
+        }
+
+        .weight-summary.warning {
+            color: #d97706;
+            font-weight: 500;
+        }
+
+        .weight-summary.success {
+            color: #16a34a;
+            font-weight: 500;
+        }
+
+        .button-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        button.btn {
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 6px;
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-secondary {
+            background-color: #f1f5f9;
+            color: var(--text-main);
+            border-color: var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: #e2e8f0;
+        }
+
+        .btn-reset {
+            background-color: #f8fafc;
+            color: var(--text-muted);
+            border-color: var(--border-color);
+            margin-left: auto;
+        }
+
+        .btn-reset:hover {
+            background-color: #fee2e2;
+            color: var(--danger-color);
+            border-color: #fca5a5;
+        }
+
+        .output-container {
+            position: relative;
+            margin-top: 15px;
+        }
+
+        pre#outputArea {
+            background: #0f172a;
+            color: #38bdf8;
+            padding: 16px;
+            border-radius: 8px;
+            font-family: "Courier New", Courier, monospace;
+            font-size: 13px;
+            line-height: 1.4;
+            white-space: pre;
+            overflow-x: auto;
+            min-height: 40px;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        pre#outputArea:empty {
+            display: none;
+        }
+
+        .btn-copy {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(255, 255, 255, 0.15);
+            color: #f8fafc;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            display: none;
+        }
+
+        .btn-copy:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .error-message {
+            color: var(--danger-color);
+            font-size: 13px;
+            margin-bottom: 12px;
+            display: none;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 16px;
+            }
+            .input-row input {
+                width: 75px;
+            }
+            .input-row .weight-input {
+                width: 65px;
+            }
+            .col-ticker { width: 75px; }
+            .col-val { width: 75px; }
+            .col-weight { width: 65px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Portfolio Rebalancer</h1>
+
+        <div class="deposit-section">
+            <label for="deposit">Deposit Amount ($):</label>
+            <input type="number" step="any" min="0" class="deposit-input" id="deposit" placeholder="e.g. 100" oninput="saveFormData()">
+        </div>
+
+        <div class="table-header">
+            <div class="col-num">#</div>
+            <div class="col-ticker">Ticker</div>
+            <div class="col-val">Value ($)</div>
+            <div class="col-weight">Target (%)</div>
+            <div class="col-action"></div>
+        </div>
+
+        <div id="portfolioContainer">
+            <!-- Rows dynamically added here -->
+        </div>
+
+        <div id="weightSummary" class="weight-summary"></div>
+
+        <div id="errorMessage" class="error-message"></div>
+
+        <div class="button-bar">
+            <button class="btn btn-secondary" onclick="addHolding()">+ Add Holding</button>
+            <button class="btn btn-primary" onclick="calculateRebalance()">Calculate</button>
+            <button class="btn btn-reset" onclick="resetPage()">Reset</button>
+        </div>
+
+        <div class="output-container">
+            <button id="copyBtn" class="btn-copy" onclick="copyOutput()">Copy</button>
+            <pre id="outputArea"></pre>
+        </div>
+    </div>
+
+    <script>
+        let holdingsData = [];
+
+        // Initial setup on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            loadFormData();
+        });
+
+        function renderRows() {
+            const container = document.getElementById("portfolioContainer");
+            container.innerHTML = "";
+
+            holdingsData.forEach((holding, index) => {
+                const rowNum = index + 1;
+                const row = document.createElement("div");
+                row.className = "input-row";
+                row.id = `row_${rowNum}`;
+
+                row.innerHTML = `
+                    <span class="row-number">${rowNum}.</span>
+                    <input type="text" id="ticker_${rowNum}" placeholder="e.g. AAPL" value="${holding.t || ''}" oninput="updateHolding(${index}, 't', this.value)">
+                    <input type="number" step="any" min="0" id="value_${rowNum}" placeholder="e.g. 150" value="${holding.v || ''}" oninput="updateHolding(${index}, 'v', this.value)">
+                    <input type="number" step="any" min="0" max="100" class="weight-input" id="weight_${rowNum}" placeholder="e.g. 30" value="${holding.w || ''}" oninput="updateHolding(${index}, 'w', this.value)">
+                    <button class="btn-delete" title="Remove row" onclick="removeHolding(${index})">&times;</button>
+                `;
+                container.appendChild(row);
+            });
+
+            updateWeightSummary();
+        }
+
+        function updateHolding(index, field, value) {
+            holdingsData[index][field] = value;
+            saveFormData();
+            updateWeightSummary();
+        }
+
+        function addHolding(ticker = "", value = "", weight = "") {
+            holdingsData.push({ t: ticker, v: value, w: weight });
+            renderRows();
+            saveFormData();
+        }
+
+        function removeHolding(index) {
+            if (holdingsData.length <= 1) {
+                // Clear row if it's the only one
+                holdingsData[0] = { t: "", v: "", w: "" };
+            } else {
+                holdingsData.splice(index, 1);
+            }
+            renderRows();
+            saveFormData();
+        }
+
+        function updateWeightSummary() {
+            let totalWeight = 0;
+            let count = 0;
+
+            holdingsData.forEach(h => {
+                const w = parseFloat(h.w);
+                if (!isNaN(w)) {
+                    totalWeight += w;
+                    count++;
+                }
+            });
+
+            const summaryEl = document.getElementById("weightSummary");
+            if (count > 0) {
+                const rounded = Math.round(totalWeight * 100) / 100;
+                if (Math.abs(rounded - 100) < 0.01) {
+                    summaryEl.className = "weight-summary success";
+                    summaryEl.innerText = `Total Target Weight: ${rounded}% ✓`;
+                } else {
+                    summaryEl.className = "weight-summary warning";
+                    summaryEl.innerText = `Total Target Weight: ${rounded}% (Target should equal 100%)`;
+                }
+            } else {
+                summaryEl.innerText = "";
+            }
+        }
+
+        // --- LocalStorage Persistence ---
+        function saveFormData() {
+            const deposit = document.getElementById("deposit").value;
+            const payload = {
+                deposit: deposit,
+                holdings: holdingsData
+            };
+            localStorage.setItem("rebalancer_state", JSON.stringify(payload));
+        }
+
+        function loadFormData() {
+            const saved = localStorage.getItem("rebalancer_state");
+            if (saved) {
+                try {
+                    const data = JSON.parse(saved);
+                    document.getElementById("deposit").value = data.deposit || "";
+                    if (Array.isArray(data.holdings) && data.holdings.length > 0) {
+                        holdingsData = data.holdings;
+                    } else {
+                        initDefaultHoldings();
+                    }
+                } catch (e) {
+                    initDefaultHoldings();
+                }
+            } else {
+                initDefaultHoldings();
+            }
+            renderRows();
+        }
+
+        function initDefaultHoldings() {
+            holdingsData = [
+                { t: "", v: "", w: "" }
+            ];
+        }
+
+        function resetPage() {
+            document.getElementById("deposit").value = "";
+            document.getElementById("outputArea").innerText = "";
+            document.getElementById("outputArea").style.display = "none";
+            document.getElementById("copyBtn").style.display = "none";
+            document.getElementById("errorMessage").style.display = "none";
+            localStorage.removeItem("rebalancer_state");
+            initDefaultHoldings();
+            renderRows();
+        }
+
+        function showError(msg) {
+            const errEl = document.getElementById("errorMessage");
+            errEl.innerText = msg;
+            errEl.style.display = "block";
+        }
+
+        function clearError() {
+            const errEl = document.getElementById("errorMessage");
+            errEl.innerText = "";
+            errEl.style.display = "none";
+        }
+
+        function copyOutput() {
+            const text = document.getElementById("outputArea").innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = document.getElementById("copyBtn");
+                const prev = btn.innerText;
+                btn.innerText = "Copied!";
+                setTimeout(() => { btn.innerText = prev; }, 1500);
+            });
+        }
+
+        // --- Core Algorithm (Ported directly from dynaReb.c) ---
+        function calculateRebalance() {
+            clearError();
+
+            const depositInput = document.getElementById("deposit").value.trim();
+            const added = parseFloat(depositInput);
+
+            if (depositInput === "" || isNaN(added) || added < 0) {
+                showError("Please enter a valid deposit amount.");
+                return;
+            }
+
+            // Gather and validate holdings
+            let validHoldings = [];
+            for (let i = 0; i < holdingsData.length; i++) {
+                const h = holdingsData[i];
+                const ticker = (h.t || "").trim();
+                const value = parseFloat(h.v);
+                const weight = parseFloat(h.w);
+
+                if (ticker === "" && isNaN(value) && isNaN(weight)) {
+                    continue; // Skip entirely blank rows
+                }
+
+                if (ticker === "" || isNaN(value) || isNaN(weight) || value < 0 || weight < 0) {
+                    showError(`Please fill in valid values for holding #${i + 1}.`);
+                    return;
+                }
+
+                validHoldings.push({
+                    name: ticker,
+                    value: value,
+                    targ_weight: weight / 100.0 // Decimal 0-1 for algorithm
+                });
+            }
+
+            if (validHoldings.length === 0) {
+                showError("Please add at least one holding with ticker, value, and target weight.");
+                return;
+            }
+
+            // Execute algorithm
+            const resultText = runDynaRebAlgorithm(added, validHoldings);
+
+            const outputEl = document.getElementById("outputArea");
+            outputEl.innerText = resultText;
+            outputEl.style.display = "block";
+            document.getElementById("copyBtn").style.display = "block";
+        }
+
+        function runDynaRebAlgorithm(added, holdings) {
+            const MIN_BUY = 10;
+            const LENIENCY = 15;
+            const NEWLINE = "                                   |\n";
+
+            function calc_upper_bound(weight) {
+                return weight * (1 + LENIENCY / 100.0);
+            }
+            function calc_lower_bound(weight) {
+                return weight * (1 - LENIENCY / 100.0);
+            }
+
+            let assets = holdings.map(h => ({
+                name: h.name,
+                value: h.value,
+                targ_weight: h.targ_weight,
+                dollars_to_targ: 0,
+                cut: 0,
+                up_bound: calc_upper_bound(h.targ_weight),
+                low_bound: calc_lower_bound(h.targ_weight)
+            }));
+
+            let curr_folio_value = 0;
+            for (let a of assets) {
+                curr_folio_value += a.value;
+                a.cut = 0;
+            }
+
+            let new_folio_value = curr_folio_value + added;
+
+            // goal()
+            for (let a of assets) {
+                a.dollars_to_targ = (a.targ_weight * new_folio_value) - a.value;
+            }
+
+            function total_gap() {
+                let folio_gap = 0;
+                for (let a of assets) {
+                    if (a.dollars_to_targ > 0) {
+                        folio_gap += a.dollars_to_targ;
+                    }
+                }
+                return folio_gap;
+            }
+
+            function most_overweight() {
+                let max_holding = assets[0];
+                for (let a of assets) {
+                    if (a.dollars_to_targ < max_holding.dollars_to_targ) {
+                        max_holding = a;
+                    }
+                }
+                return max_holding;
+            }
+
+            function most_underweight() {
+                let min_holding = assets[0];
+                for (let a of assets) {
+                    if (a.dollars_to_targ > min_holding.dollars_to_targ) {
+                        min_holding = a;
+                    }
+                }
+                return min_holding;
+            }
+
+            function first_pass_through(folio_gap, addedBudget) {
+                let budget = addedBudget;
+                let curr_gap = folio_gap;
+
+                for (let a of assets) {
+                    let pot_cut;
+                    if (folio_gap > 0) {
+                        pot_cut = (a.dollars_to_targ / folio_gap) * addedBudget;
+                        if (a.dollars_to_targ < 0) {
+                            a.cut = 0;
+                        } else if (pot_cut >= MIN_BUY) {
+                            if (pot_cut > a.dollars_to_targ) {
+                                pot_cut = a.dollars_to_targ;
+                            }
+                            a.cut += pot_cut;
+                            a.dollars_to_targ -= pot_cut;
+                            budget -= pot_cut;
+                            curr_gap -= pot_cut;
+                        }
+                    } else {
+                        pot_cut = addedBudget * a.targ_weight;
+                        a.cut += pot_cut;
+                        budget -= pot_cut;
+                        curr_gap -= pot_cut;
+                    }
+                }
+                return budget;
+            }
+
+            function second_pass_through(folio_gap, budget) {
+                let moneyLeft = budget;
+                let curr_gap = folio_gap;
+
+                for (let a of assets) {
+                    let pot_cut;
+                    if (folio_gap > 0) {
+                        pot_cut = (a.dollars_to_targ / folio_gap) * budget;
+                        if ((pot_cut >= 0 && a.cut > 0) || pot_cut >= MIN_BUY) {
+                            if (pot_cut > a.dollars_to_targ) {
+                                pot_cut = a.dollars_to_targ;
+                            }
+                            a.cut += pot_cut;
+                            a.dollars_to_targ -= pot_cut;
+                            moneyLeft -= pot_cut;
+                            curr_gap -= pot_cut;
+                        }
+                    } else {
+                        pot_cut = budget * a.targ_weight;
+                        a.cut += pot_cut;
+                        moneyLeft -= pot_cut;
+                        curr_gap -= pot_cut;
+                    }
+                }
+
+                let underweight = most_underweight();
+                if (moneyLeft > 0.005) {
+                    underweight.cut += moneyLeft;
+                }
+            }
+
+            let folio_gap = total_gap();
+            let budget = first_pass_through(folio_gap, added);
+            let curr_gap = total_gap();
+            second_pass_through(curr_gap, budget);
+
+            function padLeft(str, len) {
+                str = String(str);
+                while (str.length < len) str = " " + str;
+                return str;
+            }
+            function padRight(str, len) {
+                str = String(str);
+                while (str.length < len) str = str + " ";
+                return str;
+            }
+
+            let underweight = most_underweight();
+            let overweight = most_overweight();
+
+            let out = "";
+            out += "___________________________________\n";
+            out += "       Rebalancing Calculator\n";
+            out += "___________________________________\n";
+            out += `Initial Portfolio Value: ${padLeft(curr_folio_value.toFixed(2), 10)}|\n`;
+            out += `Deposit Value:           ${padLeft(added.toFixed(2), 10)}|\n`;
+            out += `New Portfolio Value:     ${padLeft(new_folio_value.toFixed(2), 10)}|\n`;
+            out += "___________________________________|\n";
+            out += "Deposit Allocation:                |\n";
+
+            if (Math.abs(underweight.cut - added) < 0.0001 && assets.length > 0) {
+                out += NEWLINE;
+                out += "-----------------------------------|\n";
+                out += "             WARNING:              |\n";
+                out += "All Holdings Below Purchase        |\n";
+                out += `Threshold. Allocate $${underweight.cut.toFixed(2)} To: ${underweight.name}|\n`;
+                out += "-----------------------------------|\n";
+                out += NEWLINE;
+            }
+
+            for (let a of assets) {
+                out += `${padRight(a.name, 4)}: allocate $${padLeft(a.cut.toFixed(2), 8)}           |\n`;
+            }
+
+            out += "-----------------------------------|\n";
+            out += `Most Underweight Holding: ${underweight.name}     |\n`;
+            out += `Most Overweight Holding: ${overweight.name}       |\n`;
+
+            // complete_rebalance
+            let max_holding = most_overweight();
+            let next_deposit = (max_holding.value / max_holding.targ_weight) - new_folio_value;
+            if (next_deposit > 0) {
+                out += "Amount Extra Needed to be Balanced:| \n";
+                out += `               $${padLeft(next_deposit.toFixed(2), 8)}           |\n`;
+            } else {
+                out += "Portfolio is Balanced              |\n";
+                out += NEWLINE;
+            }
+            out += "-----------------------------------\n";
+
+            return out;
+        }
+    </script>
+</body>
+</html>
+
