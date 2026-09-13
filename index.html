@@ -293,6 +293,8 @@
             justify-content: space-between;
             margin-bottom: 12px;
             padding: 0 4px;
+            flex-wrap: wrap;
+            gap: 10px;
         }
 
         .section-title {
@@ -301,6 +303,69 @@
             text-transform: uppercase;
             letter-spacing: 0.06em;
             color: var(--text-secondary);
+        }
+
+        /* Minimum Purchase Input Box (Right-anchored) */
+        .min-buy-well {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--surface-input);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-input);
+            padding: 4px 10px;
+            transition: all 0.2s ease;
+        }
+
+        .min-buy-well:focus-within {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px var(--accent-glow);
+        }
+
+        .min-buy-well label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .min-buy-input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .min-buy-currency {
+            position: absolute;
+            left: 8px;
+            color: var(--accent);
+            font-family: var(--font-mono);
+            font-size: 12px;
+            font-weight: 600;
+            pointer-events: none;
+        }
+
+        .min-buy-input {
+            width: 75px;
+            background: var(--surface-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            padding: 5px 8px 5px 20px;
+            color: var(--text-primary);
+            font-family: var(--font-mono);
+            font-size: 13px;
+            font-weight: 600;
+            text-align: right;
+            outline: none;
+            transition: all 0.15s ease;
+        }
+
+        .min-buy-input:focus {
+            background: var(--surface-elevated);
+            border-color: var(--accent);
         }
 
         .table-headers {
@@ -945,6 +1010,14 @@
             <!-- Holdings Section -->
             <div class="section-header">
                 <span class="section-title">Portfolio Holdings</span>
+                <!-- Right-anchored Minimum Purchase Input -->
+                <div class="min-buy-well">
+                    <label for="minBuy">Minimum Purchase</label>
+                    <div class="min-buy-input-wrapper">
+                        <span class="min-buy-currency">$</span>
+                        <input type="number" step="any" min="0" class="min-buy-input" id="minBuy" placeholder="0" value="0" oninput="saveFormData()">
+                    </div>
+                </div>
             </div>
 
             <div class="table-headers">
@@ -1019,7 +1092,7 @@
 
             <!-- Purchase Threshold Warning (Low Deposit) -->
             <div id="thresholdWarning" class="threshold-warning">
-                <strong>Purchase Threshold Notice:</strong> All potential allocations were below the minimum purchase threshold ($10.00). Entire deposit allocated to the most underweight holding.
+                <!-- Dynamically populated with minBuy amount -->
             </div>
 
             <!-- Dynamic Allocation List with Comparative Progress Bars -->
@@ -1198,8 +1271,10 @@
 
         function saveFormData() {
             const deposit = document.getElementById("deposit").value;
+            const minBuy = document.getElementById("minBuy").value;
             const payload = {
                 deposit: deposit,
+                minBuy: minBuy,
                 holdings: holdingsData
             };
             localStorage.setItem("rebalancer_state", JSON.stringify(payload));
@@ -1211,6 +1286,7 @@
                 try {
                     const data = JSON.parse(saved);
                     document.getElementById("deposit").value = data.deposit || "";
+                    document.getElementById("minBuy").value = (data.minBuy !== undefined && data.minBuy !== "") ? data.minBuy : "0";
                     if (Array.isArray(data.holdings) && data.holdings.length > 0) {
                         holdingsData = data.holdings;
                     } else {
@@ -1233,6 +1309,7 @@
 
         function resetPage() {
             document.getElementById("deposit").value = "";
+            document.getElementById("minBuy").value = "0";
             document.getElementById("resultsSection").style.display = "none";
             document.getElementById("errorMessage").style.display = "none";
             localStorage.removeItem("rebalancer_state");
@@ -1274,7 +1351,7 @@
             });
         }
 
-        // --- Core Algorithm (Ported directly from dynaReb.c) ---
+        // --- Core Algorithm (Ported directly from dynaReb.c with dynamic minBuy) ---
         function calculateRebalance() {
             clearError();
 
@@ -1284,6 +1361,12 @@
             if (depositInput === "" || isNaN(added) || added < 0) {
                 showError("Please enter a valid deposit amount.");
                 return;
+            }
+
+            const minBuyInput = document.getElementById("minBuy").value.trim();
+            let minBuy = parseFloat(minBuyInput);
+            if (minBuyInput === "" || isNaN(minBuy) || minBuy < 0) {
+                minBuy = 0;
             }
 
             let validHoldings = [];
@@ -1314,7 +1397,7 @@
                 return;
             }
 
-            const res = runDynaRebAlgorithm(added, validHoldings);
+            const res = runDynaRebAlgorithm(added, validHoldings, minBuy);
 
             // Populate Graphical Dashboard
             document.getElementById("statInitial").innerText = `$${res.curr_folio_value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -1324,12 +1407,13 @@
             // Threshold warning
             const warnEl = document.getElementById("thresholdWarning");
             if (res.isThresholdWarning) {
+                warnEl.innerHTML = `<strong>Purchase Threshold Notice:</strong> All potential allocations were below your minimum purchase threshold ($${res.minBuy.toFixed(2)}). Entire deposit allocated to the most underweight holding.`;
                 warnEl.style.display = "block";
             } else {
                 warnEl.style.display = "none";
             }
 
-            // Allocation Cards with Comparative Progress Bars (Kept intact)
+            // Allocation Cards with Comparative Progress Bars
             const allocList = document.getElementById("allocationList");
             allocList.innerHTML = "";
             res.assets.forEach(a => {
@@ -1394,8 +1478,8 @@
             document.getElementById("resultsSection").scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
-        function runDynaRebAlgorithm(added, holdings) {
-            const MIN_BUY = 10;
+        function runDynaRebAlgorithm(added, holdings, minBuy = 0) {
+            const MIN_BUY = typeof minBuy === 'number' && !isNaN(minBuy) ? minBuy : 0;
             const LENIENCY = 15;
             const NEWLINE = "                                   |\n";
 
@@ -1466,10 +1550,12 @@
                 for (let a of assets) {
                     let pot_cut;
                     if (folio_gap > 0) {
-                        pot_cut = (a.dollars_to_targ / folio_gap) * addedBudget;
-                        if (a.dollars_to_targ < 0) {
+                        if (a.dollars_to_targ <= 0) {
                             a.cut = 0;
-                        } else if (pot_cut >= MIN_BUY) {
+                            continue;
+                        }
+                        pot_cut = (a.dollars_to_targ / folio_gap) * addedBudget;
+                        if (pot_cut >= MIN_BUY) {
                             if (pot_cut > a.dollars_to_targ) {
                                 pot_cut = a.dollars_to_targ;
                             }
@@ -1495,6 +1581,9 @@
                 for (let a of assets) {
                     let pot_cut;
                     if (folio_gap > 0) {
+                        if (a.dollars_to_targ <= 0) {
+                            continue;
+                        }
                         pot_cut = (a.dollars_to_targ / folio_gap) * budget;
                         if ((pot_cut >= 0 && a.cut > 0) || pot_cut >= MIN_BUY) {
                             if (pot_cut > a.dollars_to_targ) {
@@ -1515,7 +1604,19 @@
 
                 let underweight = most_underweight();
                 if (moneyLeft > 0.005) {
-                    underweight.cut += moneyLeft;
+                    //underweight.cut += moneyLeft;
+                    const activeAssets = assets.filter(a => a.cut > 0);
+                    if (activeAssets.length > 0) {
+                        let best = activeAssets[0];
+                        for (let a of activeAssets) {
+                            if (a.dollars_to_targ > best.dollars_to_targ) {
+                                best = a;
+                            }
+                        }
+                        best.cut += moneyLeft;
+                    } else {
+                        underweight.cut += moneyLeft;
+                    }
                 }
             }
 
@@ -1537,7 +1638,7 @@
 
             let underweight = most_underweight();
             let overweight = most_overweight();
-            let isThresholdWarning = (Math.abs(underweight.cut - added) < 0.0001 && assets.length > 0 && added < MIN_BUY);
+            let isThresholdWarning = (MIN_BUY > 0 && Math.abs(underweight.cut - added) < 0.0001 && assets.length > 0 && added < MIN_BUY);
 
             let out = "";
             out += "___________________________________\n";
@@ -1583,6 +1684,7 @@
                 curr_folio_value,
                 new_folio_value,
                 added,
+                minBuy: MIN_BUY,
                 underweight,
                 overweight,
                 next_deposit,
