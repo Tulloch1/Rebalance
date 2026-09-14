@@ -418,6 +418,7 @@
             filter: grayscale(0.5);
         }
 
+        /* [REDUNDANT/UNUSED]: .min-buy-sub kept for backwards compatibility; status messaging now handled by .calc-error-sub */
         .min-buy-sub {
             font-size: 9.5px;
             font-weight: 500;
@@ -668,10 +669,28 @@
         /* Action Buttons */
         .actions-bar {
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             justify-content: space-between;
             gap: 12px;
             margin-top: 8px;
+        }
+
+        .calc-btn-container {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 4px;
+        }
+
+        .calc-error-sub {
+            font-size: 9.5px;
+            font-weight: 500;
+            color: #FF7B7B;
+            letter-spacing: 0.02em;
+            line-height: 1.2;
+            white-space: nowrap;
+            padding-left: 2px;
+            text-align: left;
         }
 
         .btn-left-group {
@@ -735,6 +754,13 @@
 
         .btn-calc:active {
             transform: translateY(0);
+        }
+
+        .btn-calc.disabled, .btn-calc:disabled {
+            opacity: 0.45;
+            pointer-events: none;
+            filter: grayscale(0.5);
+            cursor: not-allowed;
         }
 
         /* Error Banner */
@@ -1066,6 +1092,78 @@
             background: rgba(255, 255, 255, 0.18);
         }
 
+        /* Feedback Footer */
+        .feedback-footer {
+            text-align: center;
+            font-size: 13px;
+            font-weight: 500;
+            color: #FFFFFF;
+            padding: 8px 16px 28px;
+            line-height: 1.6;
+        }
+
+        :root[data-theme="light"] .feedback-footer {
+            color: var(--text-secondary);
+        }
+
+        .email-copy-btn {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            color: var(--accent);
+            cursor: pointer;
+            font-weight: 600;
+            text-decoration: underline;
+            text-underline-offset: 3px;
+            text-decoration-color: rgba(36, 219, 161, 0.4);
+            transition: all 0.2s ease;
+            user-select: all;
+            word-break: break-all;
+        }
+
+        .email-copy-btn:hover {
+            color: var(--accent-hover);
+            text-decoration-color: var(--accent);
+        }
+
+        .email-copy-icon {
+            display: inline-flex;
+            align-items: center;
+            opacity: 0.85;
+            transition: transform 0.15s ease;
+        }
+
+        .email-copy-btn:hover .email-copy-icon {
+            transform: scale(1.1);
+            opacity: 1;
+        }
+
+        .email-toast {
+            position: absolute;
+            bottom: calc(100% + 6px);
+            left: 50%;
+            transform: translateX(-50%) translateY(4px);
+            background: var(--surface-card);
+            color: var(--accent);
+            border: 1px solid var(--accent-badge-border);
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: var(--radius-pill);
+            box-shadow: var(--card-shadow);
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            z-index: 10;
+        }
+
+        .email-toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
         @media (max-width: 500px) {
             body {
                 padding: 16px 8px;
@@ -1120,8 +1218,8 @@
             <!-- Deposit Well -->
             <div class="deposit-well">
                 <div class="deposit-label-wrap">
-                    <label for="deposit">Deposit Capital</label>
-                    <span>Funds available to allocate</span>
+                    <label for="deposit">Deposit/ Withdraw Capital</label>
+                    <span>Funds available to allocate, enter negative value for withdrawal</span>
                 </div>
                 <div class="deposit-input-wrapper">
                     <span class="deposit-currency">$</span>
@@ -1144,14 +1242,15 @@
             <!-- Holdings Section -->
             <div class="section-header">
                 <span class="section-title">Portfolio Holdings</span>
-                <!-- Right-anchored Minimum Purchase Input -->
+                <!-- Right-anchored Minimum Transaction Input -->
                 <div class="min-buy-container">
-                    <span class="min-buy-sub" id="minBuyNotice" style="display: none;">Unavailable while Complete Rebalance is ON</span>
+                    <!-- [REDUNDANT/UNUSED]: Kept for backwards compatibility; Minimum Transaction is always available -->
+                    <span class="min-buy-sub" id="minBuyNotice" style="display: none;"></span>
                     <div class="min-buy-well" id="minBuyWell">
-                        <label for="minBuy">Minimum Purchase</label>
+                        <label for="minBuy">Minimum Transaction</label>
                         <div class="min-buy-input-wrapper">
                             <span class="min-buy-currency">$</span>
-                            <input type="number" step="any" min="0" class="min-buy-input" id="minBuy" placeholder="0" value="0" oninput="saveFormData()">
+                            <input type="number" step="any" min="0" class="min-buy-input" id="minBuy" placeholder="0" value="0" oninput="onMinBuyInput(); saveFormData()">
                         </div>
                     </div>
                 </div>
@@ -1194,13 +1293,16 @@
                     <button class="btn btn-reset" onclick="resetPage()">Reset</button>
                 </div>
 
-                <button class="btn btn-calc" onclick="calculateRebalance()">
-                    Calculate Allocation
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="5" y1="12" x2="19" y2="12"></line>
-                        <polyline points="12 5 19 12 12 19"></polyline>
-                    </svg>
-                </button>
+                <div class="calc-btn-container">
+                    <button class="btn btn-calc" id="btnCalc" onclick="calculateRebalance()">
+                        Calculate Allocation
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                            <polyline points="12 5 19 12 12 19"></polyline>
+                        </svg>
+                    </button>
+                    <span class="calc-error-sub" id="calcNotice" style="display: none;">Please enter a deposit/withdrawal amount</span>
+                </div>
             </div>
         </div>
 
@@ -1246,7 +1348,7 @@
                     <span>Most Overweight:</span> <strong id="valOverweight">-</strong>
                 </div>
                 <div class="info-pill" id="pillBalanced">
-                    <span id="valBalanced">-</span>
+                    <span>-</span>
                 </div>
             </div>
 
@@ -1263,6 +1365,21 @@
             </div>
 
         </div>
+
+        <!-- Feedback Footer -->
+        <footer class="feedback-footer">
+            <span>Have feedback? Please send any thoughts or bugs you find to </span>
+            <span class="email-copy-btn" onclick="copyFeedbackEmail(event)" title="Click to copy email">
+                <span id="feedbackEmail">williambatulloch@gmail.com</span>
+                <span class="email-copy-icon">
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                </span>
+                <span class="email-toast" id="emailToast">Copied!</span>
+            </span>
+        </footer>
 
     </div>
 
@@ -1406,6 +1523,10 @@
             }
         }
 
+        function onMinBuyInput() {
+            updateMinBuyState();
+        }
+
         function updateMinBuyState() {
             const isComplete = document.getElementById("completeRebalance") ? document.getElementById("completeRebalance").checked : false;
             const depositInput = document.getElementById("deposit") ? document.getElementById("deposit").value.trim() : "";
@@ -1414,23 +1535,50 @@
 
             const minBuyWell = document.getElementById("minBuyWell");
             const minBuyNotice = document.getElementById("minBuyNotice");
+            const minBuyInput = document.getElementById("minBuy") ? document.getElementById("minBuy").value.trim() : "";
+            const minBuyVal = parseFloat(minBuyInput);
             const depositEl = document.getElementById("deposit");
+            const btnCalc = document.getElementById("btnCalc");
+            const calcNotice = document.getElementById("calcNotice");
+
+            // [REDUNDANT/UNUSED with Minimum Transaction]: Minimum Transaction is now active during withdrawals.
+            // minBuyWell is no longer disabled on withdrawals, and minBuyNotice ("Unavailable while only making a withdrawal") is no longer displayed.
+            if (minBuyNotice) minBuyNotice.style.display = "none";
+            if (minBuyWell) minBuyWell.classList.remove("disabled");
 
             if (isComplete) {
-                // Minimum Purchase is available in Complete Rebalance (for both deposits and withdrawals)
-                minBuyWell.classList.remove("disabled");
-                minBuyNotice.style.display = "none";
-                if (depositEl) depositEl.placeholder = "0.00 (Optional)";
-            } else if (isWithdrawal) {
-                // In Dynamic Rebalance, pure withdrawals only sell (no buys), so Minimum Purchase is disabled
-                minBuyWell.classList.add("disabled");
-                minBuyNotice.innerText = "Unavailable while making a withdrawal";
-                minBuyNotice.style.display = "block";
                 if (depositEl) depositEl.placeholder = "0.00";
             } else {
-                minBuyWell.classList.remove("disabled");
-                minBuyNotice.style.display = "none";
                 if (depositEl) depositEl.placeholder = "0.00";
+            }
+
+            // Calculate Allocation button validation:
+            const absDeposit = !isNaN(depositVal) ? Math.abs(depositVal) : NaN;
+            const isDepositEmptyOrZero = !isComplete && (isNaN(depositVal) || depositVal === 0);
+            const isDepositLessThanMinBuy = !isComplete && !isNaN(minBuyVal) && minBuyVal > 0 && (isNaN(absDeposit) || absDeposit < minBuyVal);
+
+            if (btnCalc) {
+                if (isDepositEmptyOrZero) {
+                    // Priority 1: deposit is empty or zero when Complete Rebalance is OFF
+                    btnCalc.classList.add("disabled");
+                    btnCalc.disabled = true;
+                    if (calcNotice) {
+                        calcNotice.innerText = "Please enter a deposit/withdrawal amount";
+                        calcNotice.style.display = "block";
+                    }
+                } else if (isDepositLessThanMinBuy) {
+                    // Priority 2: deposit is non-zero, but minimum transaction exceeds deposit/withdrawal
+                    btnCalc.classList.add("disabled");
+                    btnCalc.disabled = true;
+                    if (calcNotice) {
+                        calcNotice.innerText = isWithdrawal ? "Minimum transaction exceeds withdrawal" : "Minimum transaction exceeds deposit";
+                        calcNotice.style.display = "block";
+                    }
+                } else {
+                    btnCalc.classList.remove("disabled");
+                    btnCalc.disabled = false;
+                    if (calcNotice) calcNotice.style.display = "none";
+                }
             }
         }
 
@@ -1535,8 +1683,35 @@
             });
         }
 
+        function copyFeedbackEmail(e) {
+            if (e) e.preventDefault();
+            const email = "williambatulloch@gmail.com";
+            navigator.clipboard.writeText(email).then(() => {
+                const toast = document.getElementById("emailToast");
+                if (toast) {
+                    toast.classList.add("show");
+                    setTimeout(() => {
+                        toast.classList.remove("show");
+                    }, 1800);
+                }
+            }).catch(() => {
+                const el = document.getElementById("feedbackEmail");
+                if (el) {
+                    const range = document.createRange();
+                    range.selectNodeContents(el);
+                    const sel = window.getSelection();
+                    sel.removeAllRanges();
+                    sel.addRange(range);
+                }
+            });
+        }
+
         // --- Core Algorithm (Ported directly from dynaReb.c with dynamic minBuy) ---
         function calculateRebalance() {
+            const btnCalc = document.getElementById("btnCalc");
+            if (btnCalc && (btnCalc.disabled || btnCalc.classList.contains("disabled"))) {
+                return;
+            }
             clearError();
 
             const isComplete = document.getElementById("completeRebalance") ? document.getElementById("completeRebalance").checked : false;
@@ -1556,8 +1731,12 @@
 
             const minBuyInput = document.getElementById("minBuy").value.trim();
             let minBuy = parseFloat(minBuyInput);
-            if (minBuyInput === "" || isNaN(minBuy) || minBuy < 0 || (!isComplete && added < 0)) {
+            if (minBuyInput === "" || isNaN(minBuy) || minBuy < 0) {
                 minBuy = 0;
+            }
+
+            if (!isComplete && (isNaN(added) || added === 0 || (minBuy > 0 && Math.abs(added) < minBuy))) {
+                return;
             }
 
             let validHoldings = [];
@@ -1629,9 +1808,9 @@
             const warnEl = document.getElementById("thresholdWarning");
             if (res.isThresholdWarning) {
                 if (isComplete) {
-                    warnEl.innerHTML = `<strong>Purchase Threshold Notice:</strong> Due to your minimum purchase threshold ($${res.minBuy.toFixed(2)}), calculations may not lead to perfect portfolio balance, but have been balanced as close as possible given the minimum purchase. All purchase funds were allocated to the most underweight holding.`;
+                    warnEl.innerHTML = `<strong>Transaction Threshold Notice:</strong> Due to your minimum transaction threshold ($${res.minBuy.toFixed(2)}), calculations may not lead to perfect portfolio balance, but have been balanced as close as possible given the minimum transaction.`;
                 } else {
-                    warnEl.innerHTML = `<strong>Purchase Threshold Notice:</strong> All potential allocations were below your minimum purchase threshold ($${res.minBuy.toFixed(2)}). Entire deposit allocated to the most underweight holding.`;
+                    warnEl.innerHTML = `<strong>Transaction Threshold Notice:</strong> All potential allocations were below your minimum transaction threshold ($${res.minBuy.toFixed(2)}). Entire ${res.added < 0 ? "withdrawal taken from" : "deposit allocated to"} the most ${res.added < 0 ? "overweight" : "underweight"} holding.`;
                 }
                 warnEl.style.display = "block";
             } else {
@@ -1746,18 +1925,91 @@
             });
 
             let total_sold = 0;
-            for (let a of assets) {
-                if (a.ideal_cut < -0.005) {
-                    a.cut = a.ideal_cut;
-                    a.action = "SELL";
-                    total_sold += Math.abs(a.cut);
+            let sell_candidates = assets.filter(a => a.ideal_cut < -0.005);
+            let isThresholdWarning = false;
+
+            if (sell_candidates.length > 0) {
+                if (MIN_BUY <= 0) {
+                    for (let a of sell_candidates) {
+                        a.cut = a.ideal_cut;
+                        a.action = "SELL";
+                        total_sold += Math.abs(a.cut);
+                    }
+                } else {
+                    let eligible_sells = sell_candidates.filter(a => Math.abs(a.ideal_cut) >= MIN_BUY);
+                    let ineligible_sells = sell_candidates.filter(a => Math.abs(a.ideal_cut) < MIN_BUY);
+
+                    if (eligible_sells.length === 0) {
+                        // All candidate sells are below MIN_BUY
+                        let total_ideal_sold = sell_candidates.reduce((sum, a) => sum + Math.abs(a.ideal_cut), 0);
+                        let most_overweight_seller = sell_candidates[0];
+                        for (let a of sell_candidates) {
+                            if (a.ideal_cut < most_overweight_seller.ideal_cut) {
+                                most_overweight_seller = a;
+                            }
+                        }
+                        for (let a of sell_candidates) {
+                            a.cut = 0;
+                            a.action = "HOLD";
+                        }
+                        if (total_ideal_sold >= MIN_BUY) {
+                            most_overweight_seller.cut = -total_ideal_sold;
+                            most_overweight_seller.action = "SELL";
+                            total_sold = total_ideal_sold;
+                            isThresholdWarning = true;
+                        } else if (added < 0) {
+                            // Making a withdrawal: total sold must at least fund the withdrawal
+                            const W = Math.abs(added);
+                            const sell_amount = Math.max(MIN_BUY, W);
+                            most_overweight_seller.cut = -sell_amount;
+                            most_overweight_seller.action = "SELL";
+                            total_sold = sell_amount;
+                            isThresholdWarning = true;
+                        } else {
+                            // Candidate sells < MIN_BUY and no withdrawal to force selling:
+                            // Sells cannot reach minimum transaction, so hold
+                            total_sold = 0;
+                            isThresholdWarning = true;
+                        }
+                    } else if (ineligible_sells.length > 0) {
+                        // Some candidate sells are below MIN_BUY
+                        let ineligible_sell_sum = 0;
+                        for (let a of ineligible_sells) {
+                            a.cut = 0;
+                            a.action = "HOLD";
+                            ineligible_sell_sum += Math.abs(a.ideal_cut);
+                        }
+
+                        let most_overweight_eligible_seller = eligible_sells[0];
+                        for (let a of eligible_sells) {
+                            if (a.ideal_cut < most_overweight_eligible_seller.ideal_cut) {
+                                most_overweight_eligible_seller = a;
+                            }
+                        }
+
+                        for (let a of eligible_sells) {
+                            if (a === most_overweight_eligible_seller) {
+                                a.cut = a.ideal_cut - ineligible_sell_sum;
+                            } else {
+                                a.cut = a.ideal_cut;
+                            }
+                            a.action = "SELL";
+                            total_sold += Math.abs(a.cut);
+                        }
+                        isThresholdWarning = true;
+                    } else {
+                        // All candidate sells are >= MIN_BUY
+                        for (let a of sell_candidates) {
+                            a.cut = a.ideal_cut;
+                            a.action = "SELL";
+                            total_sold += Math.abs(a.cut);
+                        }
+                    }
                 }
             }
 
             const total_funds_available = Math.max(0, total_sold + added);
             let candidates = assets.filter(a => a.ideal_cut > 0.005);
-
-            let isThresholdWarning = false;
             let total_bought = 0;
 
             if (candidates.length > 0 && total_funds_available > 0.005) {
@@ -1971,24 +2223,14 @@
 
         function runDynaRebAlgorithm(added, holdings, minBuy = 0) {
             const MIN_BUY = typeof minBuy === 'number' && !isNaN(minBuy) ? minBuy : 0;
-            const LENIENCY = 15;
             const NEWLINE = "                                   |\n";
-
-            function calc_upper_bound(weight) {
-                return weight * (1 + LENIENCY / 100.0);
-            }
-            function calc_lower_bound(weight) {
-                return weight * (1 - LENIENCY / 100.0);
-            }
 
             let assets = holdings.map(h => ({
                 name: h.name,
                 value: h.value,
                 targ_weight: h.targ_weight,
                 dollars_to_targ: 0,
-                cut: 0,
-                up_bound: calc_upper_bound(h.targ_weight),
-                low_bound: calc_lower_bound(h.targ_weight)
+                cut: 0
             }));
 
             let curr_folio_value = 0;
@@ -2029,13 +2271,54 @@
                         const target_at_bal = a.targ_weight * V_bal;
                         const excess = Math.max(0, a.value - target_at_bal);
                         const sell = (excess / W_bal) * W;
-                        a.cut = -sell;
+                        a.cut = sell > 0.00001 ? -sell : 0;
                     }
                 } else {
                     for (let a of assets) {
                         const target_at_new = a.targ_weight * new_folio_value;
                         const sell = Math.max(0, a.value - target_at_new);
-                        a.cut = -sell;
+                        a.cut = sell > 0.00001 ? -sell : 0;
+                    }
+                }
+
+                let isWithdrawalThresholdWarning = false;
+                if (MIN_BUY > 0) {
+                    const candidate_sells = assets.filter(a => Math.abs(a.cut) > 0.005);
+                    if (candidate_sells.length > 0) {
+                        const eligible = candidate_sells.filter(a => Math.abs(a.cut) >= MIN_BUY);
+                        const ineligible = candidate_sells.filter(a => Math.abs(a.cut) < MIN_BUY);
+
+                        if (eligible.length === 0) {
+                            // All candidate sells are below MIN_BUY:
+                            // Consolidate entire withdrawal W into the single most overweight holding
+                            let most_overweight_asset = candidate_sells[0];
+                            for (let a of candidate_sells) {
+                                if (Math.abs(a.cut) > Math.abs(most_overweight_asset.cut)) {
+                                    most_overweight_asset = a;
+                                }
+                            }
+                            for (let a of assets) {
+                                a.cut = 0;
+                            }
+                            most_overweight_asset.cut = -W;
+                            isWithdrawalThresholdWarning = true;
+                        } else if (ineligible.length > 0) {
+                            // Some candidate sells are below MIN_BUY:
+                            // Consolidate into the most overweight eligible holding
+                            let most_overweight_eligible = eligible[0];
+                            for (let a of eligible) {
+                                if (Math.abs(a.cut) > Math.abs(most_overweight_eligible.cut)) {
+                                    most_overweight_eligible = a;
+                                }
+                            }
+                            let ineligible_sum = 0;
+                            for (let a of ineligible) {
+                                ineligible_sum += Math.abs(a.cut);
+                                a.cut = 0;
+                            }
+                            most_overweight_eligible.cut -= ineligible_sum;
+                            isWithdrawalThresholdWarning = true;
+                        }
                     }
                 }
 
@@ -2074,6 +2357,15 @@
                 out += "___________________________________|\n";
                 out += "Withdrawal Orders:                 |\n";
 
+                if (isWithdrawalThresholdWarning) {
+                    out += NEWLINE;
+                    out += "-----------------------------------|\n";
+                    out += "             WARNING:              |\n";
+                    out += "All Sells Below Transaction        |\n";
+                    out += "Threshold. Entire Withdrawal Taken |\n";
+                    out += "From Most Overweight Holding.      |\n";
+                }
+
                 for (let a of assets) {
                     if (a.cut < -0.005) {
                         out += `${padRight(a.name, 4)}: SELL     $${padLeft(Math.abs(a.cut).toFixed(2), 8)}           |\n`;
@@ -2099,11 +2391,11 @@
                     curr_folio_value,
                     new_folio_value,
                     added,
-                    minBuy: 0,
+                    minBuy: MIN_BUY,
                     underweight: min_holding,
                     overweight: max_holding,
                     next_deposit: next_deposit,
-                    isThresholdWarning: false,
+                    isThresholdWarning: isWithdrawalThresholdWarning,
                     rawOutput: out
                 };
             }
@@ -2147,7 +2439,6 @@
 
             function first_pass_through(folio_gap, addedBudget) {
                 let budget = addedBudget;
-                let curr_gap = folio_gap;
 
                 for (let a of assets) {
                     let pot_cut;
@@ -2164,13 +2455,11 @@
                             a.cut += pot_cut;
                             a.dollars_to_targ -= pot_cut;
                             budget -= pot_cut;
-                            curr_gap -= pot_cut;
                         }
                     } else {
                         pot_cut = addedBudget * a.targ_weight;
                         a.cut += pot_cut;
                         budget -= pot_cut;
-                        curr_gap -= pot_cut;
                     }
                 }
                 return budget;
@@ -2178,7 +2467,6 @@
 
             function second_pass_through(folio_gap, budget) {
                 let moneyLeft = budget;
-                let curr_gap = folio_gap;
 
                 for (let a of assets) {
                     let pot_cut;
@@ -2194,13 +2482,11 @@
                             a.cut += pot_cut;
                             a.dollars_to_targ -= pot_cut;
                             moneyLeft -= pot_cut;
-                            curr_gap -= pot_cut;
                         }
                     } else {
                         pot_cut = budget * a.targ_weight;
                         a.cut += pot_cut;
                         moneyLeft -= pot_cut;
-                        curr_gap -= pot_cut;
                     }
                 }
 
@@ -2225,17 +2511,6 @@
             let budget = first_pass_through(folio_gap, added);
             let curr_gap = total_gap();
             second_pass_through(curr_gap, budget);
-
-            function padLeft(str, len) {
-                str = String(str);
-                while (str.length < len) str = " " + str;
-                return str;
-            }
-            function padRight(str, len) {
-                str = String(str);
-                while (str.length < len) str = str + " ";
-                return str;
-            }
 
             let underweight = most_underweight();
             let overweight = most_overweight();
@@ -2269,7 +2544,7 @@
             out += `Most Underweight Holding: ${underweight.name}     |\n`;
             out += `Most Overweight Holding: ${overweight.name}       |\n`;
 
-            let max_holding = most_overweight();
+            let max_holding = overweight;
             let next_deposit = (max_holding.value / max_holding.targ_weight) - new_folio_value;
             if (next_deposit > 0) {
                 out += "Amount Extra Needed to be Balanced:| \n";
