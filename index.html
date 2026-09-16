@@ -205,6 +205,33 @@
             height: 16px;
         }
 
+        /* Info Guide Button */
+        .info-btn {
+            width: 34px;
+            height: 34px;
+            border-radius: var(--radius-pill);
+            background: var(--surface-card);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .info-btn:hover {
+            color: var(--accent);
+            border-color: var(--accent-badge-border);
+            background: var(--accent-badge-bg);
+            transform: scale(1.06);
+        }
+
+        .info-btn svg {
+            width: 17px;
+            height: 17px;
+        }
+
         /* Card Container */
         .card {
             background: var(--surface-card);
@@ -766,6 +793,8 @@
         /* Error Banner */
         .error-banner {
             display: none;
+            flex-direction: column;
+            gap: 6px;
             background: var(--danger-bg);
             border: 1px solid var(--danger-border);
             color: var(--danger);
@@ -774,6 +803,7 @@
             font-size: 13px;
             font-weight: 500;
             margin-top: 16px;
+            line-height: 1.4;
         }
 
         /* Results Display */
@@ -1027,6 +1057,18 @@
             line-height: 1.4;
         }
 
+        .norm-notice {
+            display: none;
+            background: var(--accent-badge-bg);
+            border: 1px solid var(--accent-badge-border);
+            border-radius: var(--radius-card);
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            color: var(--text-primary);
+            line-height: 1.4;
+        }
+
         /* Collapsible ASCII Terminal Area */
         .terminal-accordion {
             border: 1px solid var(--border-subtle);
@@ -1164,6 +1206,180 @@
             transform: translateX(-50%) translateY(0);
         }
 
+        /* Information Modal & Backdrop */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            padding: 20px;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.22s ease, visibility 0.22s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .info-modal-card {
+            background: var(--surface-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-outer);
+            max-width: 600px;
+            width: 100%;
+            max-height: 82vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6), 0 0 0 1px var(--border-subtle);
+            overflow: hidden;
+            padding: 0 !important;
+            transform: scale(0.94) translateY(12px);
+            transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .modal-overlay.active .info-modal-card {
+            transform: scale(1) translateY(0);
+        }
+
+        /* Chrome-style Tab Bar */
+        .chrome-tab-bar {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            background: var(--surface-input);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 10px 10px 0 10px;
+            user-select: none;
+        }
+
+        .chrome-tabs-list {
+            display: flex;
+            align-items: flex-end;
+            gap: 4px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .chrome-tabs-list::-webkit-scrollbar {
+            display: none;
+        }
+
+        .chrome-tab {
+            background: transparent;
+            border: 1px solid transparent;
+            border-bottom: none;
+            border-radius: 9px 9px 0 0;
+            padding: 8px 15px;
+            font-family: var(--font-sans);
+            font-size: 12.5px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+            white-space: nowrap;
+            position: relative;
+            bottom: -1px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .chrome-tab:hover:not(.active) {
+            background: var(--track-bg);
+            color: var(--text-primary);
+        }
+
+        .chrome-tab.active {
+            background: var(--accent);
+            color: var(--accent-on-text);
+            border-color: var(--accent);
+            font-weight: 700;
+            box-shadow: 0 0 12px var(--accent-glow);
+        }
+
+        /* Modal Close Button (Coral Red X) */
+        .modal-close-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: var(--radius-pill);
+            background: transparent;
+            border: 1px solid transparent;
+            color: var(--danger);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            margin-bottom: 4px;
+            margin-left: 8px;
+            flex-shrink: 0;
+            transition: all 0.15s ease;
+        }
+
+        .modal-close-btn:hover {
+            background: var(--danger-bg);
+            border-color: var(--danger-border);
+            transform: scale(1.08);
+        }
+
+        .modal-close-btn svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* Modal Content Body */
+        .info-modal-body {
+            padding: 24px;
+            overflow-y: auto;
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .tab-pane {
+            display: none;
+        }
+
+        .tab-pane.active {
+            display: block;
+            animation: modalContentFade 0.2s ease;
+        }
+
+        .tab-pane h3 {
+            color: var(--text-primary);
+            font-size: 17px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            letter-spacing: -0.01em;
+        }
+
+        .tab-pane p {
+            margin-bottom: 12px;
+        }
+
+        @keyframes modalContentFade {
+            from {
+                opacity: 0;
+                transform: translateY(4px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
         @media (max-width: 500px) {
             body {
                 padding: 16px 8px;
@@ -1205,6 +1421,13 @@
             </div>
             
             <div class="header-controls">
+                <button class="info-btn" id="infoBtn" title="Information Guide" onclick="openInfoModal()" aria-label="Open Information Guide">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="16" x2="12" y2="12"></line>
+                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                    </svg>
+                </button>
                 <button class="theme-toggle-btn" id="themeToggleBtn" title="Toggle Light/Dark Theme" onclick="toggleTheme()">
                     <!-- Sun/Moon SVG icons injected by JS -->
                 </button>
@@ -1334,6 +1557,11 @@
                 <!-- Dynamically populated with minBuy amount -->
             </div>
 
+            <!-- Proportional Normalization Notice (when weights < 100%) -->
+            <div id="normNotice" class="norm-notice">
+                <!-- Dynamically populated with normalization summary -->
+            </div>
+
             <!-- Dynamic Allocation List with Comparative Progress Bars -->
             <div id="allocationList" class="allocation-list">
                 <!-- Allocation items injected dynamically -->
@@ -1381,6 +1609,58 @@
             </span>
         </footer>
 
+    </div>
+
+    <!-- Information Guide Modal -->
+    <div class="modal-overlay" id="infoModalOverlay" onclick="handleModalBackdropClick(event)">
+        <div class="info-modal-card card" role="dialog" aria-modal="true" aria-labelledby="modalTabTitle">
+            <!-- Chrome Tab Bar -->
+            <div class="chrome-tab-bar">
+                <div class="chrome-tabs-list" role="tablist">
+                    <button class="chrome-tab active" id="tab-btn-overview" role="tab" aria-selected="true" onclick="switchInfoTab('overview')">
+                        <span class="tab-title">Overview</span>
+                    </button>
+                    <button class="chrome-tab" id="tab-btn-dynamic" role="tab" aria-selected="false" onclick="switchInfoTab('dynamic')">
+                        <span class="tab-title">Dynamic Rebalance</span>
+                    </button>
+                    <button class="chrome-tab" id="tab-btn-complete" role="tab" aria-selected="false" onclick="switchInfoTab('complete')">
+                        <span class="tab-title">Complete Rebalance</span>
+                    </button>
+                    <button class="chrome-tab" id="tab-btn-thresholds" role="tab" aria-selected="false" onclick="switchInfoTab('thresholds')">
+                        <span class="tab-title">Thresholds &amp; Limits</span>
+                    </button>
+                </div>
+                <button class="modal-close-btn" id="modalCloseBtn" title="Close (Esc)" onclick="closeInfoModal()" aria-label="Close information modal">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Tab Panels Body -->
+            <div class="info-modal-body">
+                <div class="tab-pane active" id="tab-pane-overview" role="tabpanel">
+                    <h3 id="modalTabTitle">Hello World!</h3>
+                    <p>Welcome to the Portfolio Rebalancer. This section provides an overview of how the tool calculates asset weights, optimizes deposit allocations, and minimizes taxable events.</p>
+                </div>
+
+                <div class="tab-pane" id="tab-pane-dynamic" role="tabpanel">
+                    <h3>Hello World!</h3>
+                    <p>Dynamic Rebalance uses incoming deposits to proportionally top up underweight holdings, or directs withdrawals from overweight positions, without forcing unnecessary asset sales.</p>
+                </div>
+
+                <div class="tab-pane" id="tab-pane-complete" role="tabpanel">
+                    <h3>Hello World!</h3>
+                    <p>Complete Rebalance performs simultaneous buys and sells across your holdings to bring each position to its exact target weighting in a single session.</p>
+                </div>
+
+                <div class="tab-pane" id="tab-pane-thresholds" role="tabpanel">
+                    <h3>Hello World!</h3>
+                    <p>Minimum Transaction thresholds prevent tiny, fee-inefficient orders by consolidating sub-threshold amounts into the most underweight eligible asset.</p>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -1433,6 +1713,62 @@
         window.addEventListener('DOMContentLoaded', () => {
             initTheme();
             loadFormData();
+        });
+
+        // Prevent mouse wheel from incrementing/decrementing number inputs when scrolling the page
+        document.addEventListener("wheel", function(e) {
+            if (document.activeElement && document.activeElement.type === "number") {
+                document.activeElement.blur();
+            }
+        });
+
+        // --- Information Guide Modal ---
+        function openInfoModal() {
+            const overlay = document.getElementById("infoModalOverlay");
+            if (overlay) {
+                overlay.classList.add("active");
+                document.body.style.overflow = "hidden";
+            }
+        }
+
+        function closeInfoModal() {
+            const overlay = document.getElementById("infoModalOverlay");
+            if (overlay) {
+                overlay.classList.remove("active");
+                document.body.style.overflow = "";
+            }
+        }
+
+        function handleModalBackdropClick(event) {
+            if (event.target && event.target.id === "infoModalOverlay") {
+                closeInfoModal();
+            }
+        }
+
+        function switchInfoTab(tabId) {
+            const tabs = ['overview', 'dynamic', 'complete', 'thresholds'];
+            tabs.forEach(t => {
+                const btn = document.getElementById(`tab-btn-${t}`);
+                const pane = document.getElementById(`tab-pane-${t}`);
+                if (btn) {
+                    const isActive = (t === tabId);
+                    btn.classList.toggle("active", isActive);
+                    btn.setAttribute("aria-selected", isActive ? "true" : "false");
+                }
+                if (pane) {
+                    pane.classList.toggle("active", t === tabId);
+                }
+            });
+        }
+
+        // Close modal on Escape key
+        document.addEventListener("keydown", function(e) {
+            if (e.key === "Escape" || e.keyCode === 27) {
+                const overlay = document.getElementById("infoModalOverlay");
+                if (overlay && overlay.classList.contains("active")) {
+                    closeInfoModal();
+                }
+            }
         });
 
         function renderRows() {
@@ -1644,6 +1980,8 @@
             onToggleCompleteRebalance();
             document.getElementById("resultsSection").style.display = "none";
             document.getElementById("errorMessage").style.display = "none";
+            const normNotice = document.getElementById("normNotice");
+            if (normNotice) normNotice.style.display = "none";
             localStorage.removeItem("rebalancer_state");
             initDefaultHoldings();
             renderRows();
@@ -1651,13 +1989,17 @@
 
         function showError(msg) {
             const errEl = document.getElementById("errorMessage");
-            errEl.innerText = msg;
-            errEl.style.display = "block";
+            if (Array.isArray(msg)) {
+                errEl.innerHTML = msg.map(m => `<div>${m}</div>`).join("");
+            } else {
+                errEl.innerText = msg;
+            }
+            errEl.style.display = "flex";
         }
 
         function clearError() {
             const errEl = document.getElementById("errorMessage");
-            errEl.innerText = "";
+            errEl.innerHTML = "";
             errEl.style.display = "none";
         }
 
@@ -1740,19 +2082,46 @@
             }
 
             let validHoldings = [];
+            let holdingErrors = [];
+            let totalWeightInput = 0;
             for (let i = 0; i < holdingsData.length; i++) {
                 const h = holdingsData[i];
                 const ticker = (h.t || "").trim();
+                const rawVal = (h.v !== undefined && h.v !== null) ? String(h.v).trim() : "";
+                const rawWeight = (h.w !== undefined && h.w !== null) ? String(h.w).trim() : "";
                 const value = parseFloat(h.v);
                 const weight = parseFloat(h.w);
 
-                if (ticker === "" && isNaN(value) && isNaN(weight)) {
+                if (ticker === "" && (rawVal === "" || isNaN(value)) && (rawWeight === "" || isNaN(weight))) {
                     continue;
                 }
 
-                if (ticker === "" || isNaN(value) || isNaN(weight) || value < 0 || weight < 0) {
-                    showError(`Please fill in valid values for holding #${i + 1}.`);
-                    return;
+                if (!isNaN(weight) && weight > 0) {
+                    totalWeightInput += weight;
+                }
+
+                let invalidFields = [];
+                if (ticker === "") {
+                    invalidFields.push("asset name");
+                }
+                if (rawVal === "" || isNaN(value) || value < 0) {
+                    invalidFields.push("value");
+                }
+                if (rawWeight === "" || isNaN(weight) || weight < 0) {
+                    invalidFields.push("weight");
+                }
+
+                if (invalidFields.length > 0) {
+                    let fieldMsg = "";
+                    if (invalidFields.length === 1) {
+                        fieldMsg = `Please fill in a valid ${invalidFields[0]} for holding #${i + 1}.`;
+                    } else if (invalidFields.length === 2) {
+                        fieldMsg = `Please fill in a valid ${invalidFields[0]} and ${invalidFields[1]} for holding #${i + 1}.`;
+                    } else {
+                        fieldMsg = `Please fill in valid asset name, value and weight values for holding #${i + 1}.`;
+                    }
+                    holdingErrors.push(fieldMsg);
+                    continue;
                 }
 
                 validHoldings.push({
@@ -1760,6 +2129,20 @@
                     value: value,
                     targ_weight: weight / 100.0
                 });
+            }
+
+            let allErrors = [];
+            const roundedWeight = Math.round(totalWeightInput * 10) / 10;
+            if (roundedWeight > 100) {
+                allErrors.push(`Total target weights exceed 100% (currently ${roundedWeight}%). Please adjust weights to 100%.`);
+            }
+            if (holdingErrors.length > 0) {
+                allErrors.push(...holdingErrors);
+            }
+
+            if (allErrors.length > 0) {
+                showError(allErrors);
+                return;
             }
 
             if (validHoldings.length === 0) {
@@ -1785,6 +2168,19 @@
             if (isComplete && Math.abs(totalWeight - 1.0) > 0.005) {
                 showError(`Target weights must sum to 100% to perform a Complete Rebalance (currently ${(totalWeight * 100).toFixed(1)}%).`);
                 return;
+            }
+
+            const isNormalized = !isComplete && totalWeight > 0.001 && totalWeight < 0.995;
+            if (isNormalized) {
+                const normFactor = 1.0 / totalWeight;
+                validHoldings.forEach(h => {
+                    h.raw_targ_weight = h.targ_weight;
+                    h.targ_weight = h.targ_weight * normFactor;
+                });
+            } else {
+                validHoldings.forEach(h => {
+                    h.raw_targ_weight = h.targ_weight;
+                });
             }
 
             const res = isComplete
@@ -1817,6 +2213,17 @@
                 warnEl.style.display = "none";
             }
 
+            // Normalization Notice
+            const normNotice = document.getElementById("normNotice");
+            if (normNotice) {
+                if (isNormalized) {
+                    normNotice.innerHTML = `<strong>Target Weighting Notice:</strong> Target weights sum to ${(totalWeight * 100).toFixed(1)}%. Before and after percentages are displayed relative to your ${(totalWeight * 100).toFixed(1)}% target allocation.`;
+                    normNotice.style.display = "block";
+                } else {
+                    normNotice.style.display = "none";
+                }
+            }
+
             // Allocation Cards with Comparative Progress Bars
             const allocList = document.getElementById("allocationList");
             allocList.innerHTML = "";
@@ -1831,9 +2238,10 @@
                 const initialAssetVal = a.value;
                 const newAssetVal = a.value + a.cut;
 
-                const initialPct = res.curr_folio_value > 0 ? ((initialAssetVal / res.curr_folio_value) * 100) : 0;
-                const newPct = res.new_folio_value > 0 ? ((newAssetVal / res.new_folio_value) * 100) : 0;
-                const targetPct = a.targ_weight * 100;
+                const scaleFactor = isNormalized ? totalWeight : 1.0;
+                const initialPct = res.curr_folio_value > 0 ? ((initialAssetVal / res.curr_folio_value) * 100 * scaleFactor) : 0;
+                const newPct = res.new_folio_value > 0 ? ((newAssetVal / res.new_folio_value) * 100 * scaleFactor) : 0;
+                const targetPct = (a.raw_targ_weight !== undefined ? a.raw_targ_weight : a.targ_weight) * 100;
 
                 let badgeHtml = "";
                 if (isSell) {
@@ -1917,6 +2325,7 @@
                     name: h.name,
                     value: h.value,
                     targ_weight: h.targ_weight,
+                    raw_targ_weight: h.raw_targ_weight !== undefined ? h.raw_targ_weight : h.targ_weight,
                     target_val: target_val,
                     ideal_cut: ideal_cut,
                     cut: 0,
@@ -2229,6 +2638,7 @@
                 name: h.name,
                 value: h.value,
                 targ_weight: h.targ_weight,
+                raw_targ_weight: h.raw_targ_weight !== undefined ? h.raw_targ_weight : h.targ_weight,
                 dollars_to_targ: 0,
                 cut: 0
             }));
