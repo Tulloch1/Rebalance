@@ -178,7 +178,34 @@
             border-radius: var(--radius-pill);
         }
 
-        /* Theme Toggle Button */
+        /* Settings Button */
+        .settings-btn {
+            width: 34px;
+            height: 34px;
+            border-radius: var(--radius-pill);
+            background: var(--surface-card);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+
+        .settings-btn:hover {
+            color: var(--accent);
+            border-color: var(--accent-badge-border);
+            background: var(--accent-badge-bg);
+            transform: rotate(45deg);
+        }
+
+        .settings-btn svg {
+            width: 17px;
+            height: 17px;
+        }
+
+        /* Legacy Theme Toggle Button (backwards-compatibility) */
         .theme-toggle-btn {
             width: 34px;
             height: 34px;
@@ -1574,6 +1601,229 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        /* Settings Modal Styling */
+        .setting-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 14px 16px;
+            background: var(--surface-input);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-card);
+            margin-bottom: 12px;
+            transition: border-color 0.2s ease;
+        }
+
+        .setting-row:hover {
+            border-color: var(--border-hover);
+        }
+
+        .setting-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .setting-title {
+            font-size: 0.92rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .setting-sub {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            line-height: 1.35;
+        }
+
+        .setting-select {
+            background: var(--surface-card);
+            color: var(--text-primary);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-input);
+            padding: 8px 12px;
+            font-family: var(--font-sans);
+            font-size: 0.86rem;
+            font-weight: 500;
+            cursor: pointer;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .setting-select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        .setting-box {
+            background: var(--surface-input);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-card);
+            padding: 14px 16px;
+            margin-bottom: 12px;
+        }
+
+        .setting-label {
+            display: block;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .setting-hint {
+            display: block;
+            font-size: 0.74rem;
+            color: var(--text-muted);
+            margin-top: 6px;
+        }
+
+        .sync-input-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .sync-input-row input {
+            flex: 1;
+            font-family: var(--font-mono);
+            font-size: 0.84rem;
+        }
+
+        .btn-setting-action {
+            background: var(--surface-card);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-primary);
+            padding: 8px 14px;
+            border-radius: var(--radius-btn);
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .btn-setting-action:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: var(--accent-badge-bg);
+        }
+
+        .btn-setting-ping {
+            background: var(--surface-card);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-secondary);
+            padding: 4px 10px;
+            border-radius: var(--radius-pill);
+            font-size: 0.76rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-setting-ping:hover {
+            color: var(--accent);
+            border-color: var(--accent-badge-border);
+        }
+
+        /* Danger Zone Card (Coral Red) */
+        .danger-zone-card {
+            background: var(--danger-bg);
+            border: 1px solid var(--danger-border);
+            border-radius: var(--radius-card);
+            padding: 16px;
+            margin-top: 20px;
+        }
+
+        .danger-zone-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            color: var(--danger);
+            font-weight: 700;
+            font-size: 0.86rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .danger-zone-sub {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 14px;
+            line-height: 1.4;
+        }
+
+        .danger-actions-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn-danger-outline {
+            background: transparent;
+            border: 1px solid var(--danger);
+            color: var(--danger);
+            padding: 8px 14px;
+            border-radius: var(--radius-btn);
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-danger-outline:hover {
+            background: rgba(248, 113, 113, 0.15);
+            transform: translateY(-1px);
+        }
+
+        .btn-danger-filled {
+            background: var(--danger);
+            border: 1px solid var(--danger);
+            color: #FFFFFF;
+            padding: 8px 14px;
+            border-radius: var(--radius-btn);
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-danger-filled:hover {
+            filter: brightness(1.1);
+            transform: translateY(-1px);
+        }
+
+        /* Sync Status Badges */
+        .sync-status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.76rem;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: var(--radius-pill);
+        }
+
+        .sync-status-badge.connected {
+            background: var(--accent-badge-bg);
+            border: 1px solid var(--accent-badge-border);
+            color: var(--accent);
+        }
+
+        .sync-status-badge.offline {
+            background: var(--track-bg);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-muted);
+        }
+
+        .sync-status-badge.error {
+            background: var(--danger-bg);
+            border: 1px solid var(--danger-border);
+            color: var(--danger);
+        }
     </style>
 </head>
 <body>
@@ -1607,8 +1857,11 @@
                         <line x1="12" y1="8" x2="12.01" y2="8"></line>
                     </svg>
                 </button>
-                <button class="theme-toggle-btn" id="themeToggleBtn" title="Toggle Light/Dark Theme" onclick="toggleTheme()">
-                    <!-- Sun/Moon SVG icons injected by JS -->
+                <button class="settings-btn" id="settingsBtn" title="Settings &amp; Preferences" onclick="openSettingsModal()" aria-label="Open Settings">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                    </svg>
                 </button>
                 <span class="brand-tag">v1.2</span>
             </div>
@@ -2002,6 +2255,150 @@
         </div>
     </div>
 
+    <!-- Settings & Preferences Modal Overlay -->
+    <div class="modal-overlay" id="settingsModalOverlay" onclick="handleSettingsBackdropClick(event)">
+        <div class="info-modal-card card" role="dialog" aria-modal="true" aria-labelledby="settingsModalTitle">
+            <!-- Chrome Tab Bar -->
+            <div class="chrome-tab-bar">
+                <div class="chrome-tabs-list" role="tablist">
+                    <button class="chrome-tab active" id="tab-btn-set-pref" role="tab" aria-selected="true" onclick="switchSettingsTab('pref')">
+                        <span class="tab-title">Preferences</span>
+                    </button>
+                    <button class="chrome-tab" id="tab-btn-set-sync" role="tab" aria-selected="false" onclick="switchSettingsTab('sync')">
+                        <span class="tab-title">Cloud Sync</span>
+                    </button>
+                </div>
+                <button class="modal-close-btn" id="settingsModalCloseBtn" title="Close (Esc)" onclick="closeSettingsModal()" aria-label="Close settings modal">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Tab Panels Body -->
+            <div class="info-modal-body">
+                <!-- Preferences Pane -->
+                <div class="info-tab-pane active" id="tab-pane-set-pref">
+                    <div class="modal-pane-header">
+                        <h3 id="settingsModalTitle">Application Preferences</h3>
+                        <p class="modal-pane-desc">Customize theme appearance, currency display, and calculation precision.</p>
+                    </div>
+
+                    <!-- Theme Setting (Toggle Switch) -->
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <span class="setting-title">Dark Theme</span>
+                            <span class="setting-sub">Switch between dark mode and light mode</span>
+                        </div>
+                        <label class="toggle-switch" for="settingThemeToggle" title="Toggle Dark Theme">
+                            <input type="checkbox" id="settingThemeToggle" onchange="onSettingThemeToggle(this.checked)">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <!-- Base Currency Selector -->
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <span class="setting-title">Base Currency</span>
+                            <span class="setting-sub">Set display currency symbol for deposits and holdings</span>
+                        </div>
+                        <select id="settingCurrencySelect" class="setting-select" onchange="onSettingCurrencyChange(this.value)">
+                            <option value="$">$ (USD / AUD / CAD / NZD)</option>
+                            <option value="€">€ (EUR - Euro)</option>
+                            <option value="£">£ (GBP - British Pound)</option>
+                            <option value="¥">¥ (JPY - Japanese Yen)</option>
+                            <option value="CHF">CHF (Swiss Franc)</option>
+                            <option value="₹">₹ (INR - Indian Rupee)</option>
+                        </select>
+                    </div>
+
+                    <!-- Whole Dollar Rounding (Toggle Switch) -->
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <span class="setting-title">Whole Dollar Rounding</span>
+                            <span class="setting-sub">Round trade cuts to whole dollars while strictly preserving total portfolio value</span>
+                        </div>
+                        <label class="toggle-switch" for="settingRoundingToggle" title="Toggle Whole Dollar Rounding">
+                            <input type="checkbox" id="settingRoundingToggle" onchange="onSettingRoundingToggle(this.checked)">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <!-- Danger Zone (Bottom, Coral Red) -->
+                    <div class="danger-zone-card">
+                        <div class="danger-zone-header">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                                <line x1="12" y1="9" x2="12" y2="13"></line>
+                                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                            </svg>
+                            <span>Danger Zone</span>
+                        </div>
+                        <p class="danger-zone-sub">Data operations affect your browser's saved holdings. Please exercise caution.</p>
+                        <div class="danger-actions-row">
+                            <button type="button" class="btn-danger-outline" onclick="handleResetToExample()">Reset to Example Portfolio</button>
+                            <button type="button" class="btn-danger-filled" onclick="handleClearAllHoldings()">Clear All Holdings</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cloud Sync Pane -->
+                <div class="info-tab-pane" id="tab-pane-set-sync">
+                    <div class="modal-pane-header">
+                        <h3>Cloud Synchronization</h3>
+                        <p class="modal-pane-desc">Configure your serverless edge API endpoint for multi-device encrypted backup.</p>
+                    </div>
+
+                    <!-- API Endpoint Setting -->
+                    <div class="setting-box">
+                        <label class="setting-label" for="settingSyncUrl">Cloudflare Worker API Endpoint</label>
+                        <div class="sync-input-row">
+                            <input type="url" class="clean-input" id="settingSyncUrl" placeholder="https://portfolio-rebalancer.wbtulloch.workers.dev" oninput="onSyncUrlInput()">
+                            <button type="button" class="btn-setting-action" id="btnSaveSyncUrl" onclick="saveSyncEndpoint()">Save</button>
+                        </div>
+                        <span class="setting-hint">Direct link to your deployed Cloudflare Worker edge backend.</span>
+                    </div>
+
+                    <!-- Connection Status & Ping -->
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <span class="setting-title">Server Connection Status</span>
+                            <span class="setting-sub" id="settingSyncStatusSub">Offline or unverified</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span id="settingSyncBadge" class="sync-status-badge offline">Offline</span>
+                            <button type="button" class="btn-setting-ping" id="btnPingServer" onclick="pingSyncServer()">Test</button>
+                        </div>
+                    </div>
+
+                    <!-- Auto-Sync Switch -->
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <span class="setting-title">Auto-Sync to Cloud</span>
+                            <span class="setting-sub">Automatically encrypt and synchronize vault on every portfolio change</span>
+                        </div>
+                        <label class="toggle-switch" for="settingAutoSyncToggle" title="Toggle Cloud Auto-Sync">
+                            <input type="checkbox" id="settingAutoSyncToggle" onchange="onSettingAutoSyncToggle(this.checked)">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <!-- Manual Sync Now Action -->
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <span class="setting-title">Manual Cloud Sync</span>
+                            <span class="setting-sub" id="settingLastSyncLabel">Last Synced: Never</span>
+                        </div>
+                        <button type="button" class="btn-primary-action" id="btnSettingSyncNow" onclick="handleManualSyncNow()" style="padding: 6px 14px; font-size: 0.82rem;">Sync Now</button>
+                    </div>
+
+                    <div id="settingSyncFeedback" class="auth-feedback" style="display: none; margin-top: 10px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         let holdingsData = [];
 
@@ -2268,12 +2665,20 @@
             document.documentElement.setAttribute("data-theme", theme);
             localStorage.setItem("rebalancer_theme", theme);
             updateThemeIcon(theme);
+            const themeCheckbox = document.getElementById("settingThemeToggle");
+            if (themeCheckbox) {
+                themeCheckbox.checked = (theme === "dark");
+            }
         }
 
         function toggleTheme() {
             const current = document.documentElement.getAttribute("data-theme") || "dark";
             const next = current === "dark" ? "light" : "dark";
             setTheme(next);
+        }
+
+        function onSettingThemeToggle(isDark) {
+            setTheme(isDark ? "dark" : "light");
         }
 
         function updateThemeIcon(theme) {
@@ -2304,6 +2709,7 @@
 
         window.addEventListener('DOMContentLoaded', () => {
             initTheme();
+            updateCurrencySymbols();
             loadFormData();
         });
 
@@ -3189,6 +3595,356 @@ INSTRUCTIONS:
             }
         }
 
+        // --- Settings & Preferences Management ---
+        function getCurrencySymbol() {
+            try {
+                return (typeof localStorage !== 'undefined' && localStorage.getItem("rebalancer_currency")) || "$";
+            } catch (e) {
+                return "$";
+            }
+        }
+
+        function updateCurrencySymbols() {
+            const sym = getCurrencySymbol();
+            const depCur = document.querySelector(".deposit-currency");
+            if (depCur) depCur.innerText = sym;
+            const minCur = document.querySelector(".min-buy-currency");
+            if (minCur) minCur.innerText = sym;
+            document.querySelectorAll(".input-prefix").forEach(el => {
+                el.innerText = sym;
+            });
+        }
+
+        function onSettingCurrencyChange(newCur) {
+            try {
+                localStorage.setItem("rebalancer_currency", newCur);
+            } catch (e) {}
+            updateCurrencySymbols();
+            const resultsSection = document.getElementById("resultsSection");
+            if (resultsSection && resultsSection.style.display !== "none" && typeof calculateRebalance === 'function') {
+                calculateRebalance();
+            }
+        }
+
+        function isWholeRoundingEnabled() {
+            try {
+                return typeof localStorage !== 'undefined' && localStorage.getItem("rebalancer_rounding") === "whole";
+            } catch (e) {
+                return false;
+            }
+        }
+
+        function onSettingRoundingToggle(isWhole) {
+            try {
+                localStorage.setItem("rebalancer_rounding", isWhole ? "whole" : "cents");
+            } catch (e) {}
+            const resultsSection = document.getElementById("resultsSection");
+            if (resultsSection && resultsSection.style.display !== "none" && typeof calculateRebalance === 'function') {
+                calculateRebalance();
+            }
+        }
+
+        function applyWholeDollarRounding(assets, totalAdded, isComplete) {
+            if (!assets || assets.length === 0) return;
+
+            if (!isComplete) {
+                const isSell = totalAdded < -0.0001;
+                const targetTotal = Math.round(Math.abs(totalAdded));
+                let sumFloored = 0;
+                const remainders = [];
+
+                assets.forEach((a, idx) => {
+                    const absCut = Math.abs(a.cut);
+                    const floored = Math.floor(absCut);
+                    const rem = absCut - floored;
+                    remainders.push({ idx, floored, rem });
+                    sumFloored += floored;
+                });
+
+                let leftover = targetTotal - sumFloored;
+                remainders.sort((a, b) => b.rem - a.rem);
+
+                for (let i = 0; i < remainders.length && leftover > 0; i++) {
+                    remainders[i].floored += 1;
+                    leftover--;
+                }
+
+                remainders.forEach(r => {
+                    assets[r.idx].cut = (isSell ? -1 : 1) * r.floored;
+                });
+            } else {
+                const sells = [];
+                const buys = [];
+                let totalSold = 0;
+                let totalBought = 0;
+
+                assets.forEach((a, idx) => {
+                    if (a.cut < -0.005) {
+                        sells.push({ idx, absVal: Math.abs(a.cut) });
+                        totalSold += Math.abs(a.cut);
+                    } else if (a.cut > 0.005) {
+                        buys.push({ idx, absVal: a.cut });
+                        totalBought += a.cut;
+                    }
+                });
+
+                const targetSold = Math.round(totalSold);
+                const targetBought = targetSold + Math.round(totalAdded);
+
+                let sumSellsFloored = 0;
+                const sellRem = sells.map(s => {
+                    const floored = Math.floor(s.absVal);
+                    sumSellsFloored += floored;
+                    return { idx: s.idx, floored, rem: s.absVal - floored };
+                });
+                let sellLeftover = targetSold - sumSellsFloored;
+                sellRem.sort((a, b) => b.rem - a.rem);
+                for (let i = 0; i < sellRem.length && sellLeftover > 0; i++) {
+                    sellRem[i].floored += 1;
+                    sellLeftover--;
+                }
+                sellRem.forEach(r => {
+                    assets[r.idx].cut = -r.floored;
+                });
+
+                let sumBuysFloored = 0;
+                const buyRem = buys.map(b => {
+                    const floored = Math.floor(b.absVal);
+                    sumBuysFloored += floored;
+                    return { idx: b.idx, floored, rem: b.absVal - floored };
+                });
+                let buyLeftover = Math.max(0, targetBought) - sumBuysFloored;
+                buyRem.sort((a, b) => b.rem - a.rem);
+                for (let i = 0; i < buyRem.length && buyLeftover > 0; i++) {
+                    buyRem[i].floored += 1;
+                    buyLeftover--;
+                }
+                buyRem.forEach(r => {
+                    assets[r.idx].cut = r.floored;
+                });
+            }
+        }
+
+        function formatMoney(amount, showSign = false) {
+            const sym = getCurrencySymbol();
+            const isWhole = isWholeRoundingEnabled();
+            const abs = Math.abs(amount);
+            const numStr = isWhole
+                ? Math.round(abs).toLocaleString('en-US')
+                : abs.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            if (showSign) {
+                const sign = amount < -0.0001 ? "-" : (amount > 0.0001 ? "+" : "");
+                return `${sign}${sym}${numStr}`;
+            }
+            return `${sym}${numStr}`;
+        }
+
+        function openSettingsModal() {
+            const overlay = document.getElementById("settingsModalOverlay");
+            if (overlay) {
+                overlay.classList.add("active");
+                document.body.style.overflow = "hidden";
+
+                const themeToggle = document.getElementById("settingThemeToggle");
+                if (themeToggle) {
+                    const currentTheme = (document.documentElement && typeof document.documentElement.getAttribute === 'function' ? document.documentElement.getAttribute("data-theme") : null) || "dark";
+                    themeToggle.checked = (currentTheme === "dark");
+                }
+
+                const curSelect = document.getElementById("settingCurrencySelect");
+                if (curSelect) {
+                    curSelect.value = getCurrencySymbol();
+                }
+
+                const roundToggle = document.getElementById("settingRoundingToggle");
+                if (roundToggle) {
+                    roundToggle.checked = isWholeRoundingEnabled();
+                }
+
+                const syncInput = document.getElementById("settingSyncUrl");
+                if (syncInput) {
+                    syncInput.value = RebalanceSync.apiBaseUrl || "https://portfolio-rebalancer.wbtulloch.workers.dev";
+                }
+
+                const autoSyncToggle = document.getElementById("settingAutoSyncToggle");
+                if (autoSyncToggle) {
+                    autoSyncToggle.checked = (typeof localStorage !== 'undefined' && localStorage.getItem("rebalance_auto_sync") !== "false");
+                }
+
+                const lastSync = (typeof localStorage !== 'undefined' && localStorage.getItem("rebalance_last_sync")) || null;
+                const lastSyncEl = document.getElementById("settingLastSyncLabel");
+                if (lastSyncEl) {
+                    lastSyncEl.innerText = lastSync ? `Last Synced: Today at ${lastSync}` : "Last Synced: Never";
+                }
+
+                hideFeedback("settingSyncFeedback");
+                pingSyncServer();
+            }
+        }
+
+        function closeSettingsModal() {
+            const overlay = document.getElementById("settingsModalOverlay");
+            if (overlay) {
+                overlay.classList.remove("active");
+                document.body.style.overflow = "";
+            }
+            hideFeedback("settingSyncFeedback");
+        }
+
+        function handleSettingsBackdropClick(event) {
+            if (event.target && event.target.id === "settingsModalOverlay") {
+                closeSettingsModal();
+            }
+        }
+
+        function switchSettingsTab(tabId) {
+            const tabs = ['pref', 'sync'];
+            tabs.forEach(t => {
+                const btn = document.getElementById(`tab-btn-set-${t}`);
+                const pane = document.getElementById(`tab-pane-set-${t}`);
+                if (btn) {
+                    const isActive = (t === tabId);
+                    btn.classList.toggle("active", isActive);
+                    btn.setAttribute("aria-selected", isActive ? "true" : "false");
+                }
+                if (pane) {
+                    pane.classList.toggle("active", t === tabId);
+                }
+            });
+            hideFeedback("settingSyncFeedback");
+        }
+
+        function onSyncUrlInput() {
+            const btn = document.getElementById("btnSaveSyncUrl");
+            if (btn) btn.innerText = "Save";
+        }
+
+        function saveSyncEndpoint() {
+            const input = document.getElementById("settingSyncUrl");
+            const val = input ? input.value.trim() : "";
+            RebalanceSync.setApiBaseUrl(val);
+            const btn = document.getElementById("btnSaveSyncUrl");
+            if (btn) btn.innerText = "Saved ✓";
+            showFeedback("settingSyncFeedback", `Backend API endpoint saved to: ${val || "(Offline / Local Storage)"}`, false);
+            pingSyncServer();
+        }
+
+        async function pingSyncServer() {
+            const badge = document.getElementById("settingSyncBadge");
+            const sub = document.getElementById("settingSyncStatusSub");
+            if (badge) {
+                badge.className = "sync-status-badge offline";
+                badge.innerText = "Pinging...";
+            }
+            const startTime = Date.now();
+            const health = await RebalanceSync.checkServerHealth();
+            const latency = Date.now() - startTime;
+
+            if (health.online) {
+                if (badge) {
+                    badge.className = "sync-status-badge connected";
+                    badge.innerText = "Connected";
+                }
+                if (sub) {
+                    sub.innerHTML = `Connected to edge (${latency}ms) &bull; D1: <strong style="color: var(--accent);">${health.d1 || 'active'}</strong>`;
+                }
+            } else {
+                if (badge) {
+                    badge.className = "sync-status-badge offline";
+                    badge.innerText = "Offline";
+                }
+                if (sub) {
+                    sub.innerText = health.reason === "offline_mode"
+                        ? "Local browser storage only (No API endpoint configured)"
+                        : `Unreachable (${health.reason || health.error || 'Check URL'})`;
+                }
+            }
+        }
+
+        function onSettingAutoSyncToggle(checked) {
+            try {
+                localStorage.setItem("rebalance_auto_sync", checked ? "true" : "false");
+            } catch (e) {}
+            showFeedback("settingSyncFeedback", `Auto-Sync ${checked ? "enabled" : "disabled"}.`, false);
+        }
+
+        async function handleManualSyncNow() {
+            const btn = document.getElementById("btnSettingSyncNow");
+            const origText = btn ? btn.innerText : "Sync Now";
+            if (btn) {
+                btn.disabled = true;
+                btn.innerText = "Syncing...";
+            }
+
+            try {
+                if (!currentAccount || !currentAccount.email) {
+                    showFeedback("settingSyncFeedback", "Guest Mode: Portfolio is securely saved locally. Sign in under Account & Security to enable cross-device cloud sync.", false);
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.innerText = origText;
+                    }
+                    return;
+                }
+
+                const payload = getCurrentPortfolioState();
+                const vault = await RebalanceCrypto.encryptPortfolio(payload, currentAccount.keys.encryptionKey);
+                await RebalanceSync.syncVault(currentAccount.email, vault);
+
+                const now = new Date();
+                const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                try {
+                    localStorage.setItem("rebalance_last_sync", timeStr);
+                } catch (e) {}
+                const lastSyncEl = document.getElementById("settingLastSyncLabel");
+                if (lastSyncEl) lastSyncEl.innerText = `Last Synced: Today at ${timeStr}`;
+
+                showFeedback("settingSyncFeedback", "Cloud vault successfully synchronized to Cloudflare D1!", false);
+            } catch (err) {
+                console.error("Manual sync failed:", err);
+                showFeedback("settingSyncFeedback", "Sync failed: " + err.message, true);
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerText = origText;
+                }
+            }
+        }
+
+        function handleResetToExample() {
+            if (typeof confirm === 'function' && !confirm("Reset portfolio to example assets? This will overwrite your current holdings.")) {
+                return;
+            }
+            holdingsData = [
+                { t: "VOO", v: "5000", w: "50" },
+                { t: "VXUS", v: "3000", w: "30" },
+                { t: "BND", v: "2000", w: "20" }
+            ];
+            if (document.getElementById("deposit")) {
+                document.getElementById("deposit").value = "1000";
+            }
+            if (document.getElementById("minBuy")) {
+                document.getElementById("minBuy").value = "0";
+            }
+            if (document.getElementById("completeRebalance")) {
+                document.getElementById("completeRebalance").checked = false;
+            }
+            onToggleCompleteRebalance();
+            saveFormData();
+            renderRows();
+            closeSettingsModal();
+            if (typeof calculateRebalance === 'function') {
+                calculateRebalance();
+            }
+        }
+
+        function handleClearAllHoldings() {
+            if (typeof confirm === 'function' && !confirm("Are you sure you want to clear all holdings? This will delete all rows from your portfolio.")) {
+                return;
+            }
+            resetPage();
+            closeSettingsModal();
+        }
+
         // Close active modals on Escape key
         document.addEventListener("keydown", function(e) {
             if (e.key === "Escape" || e.keyCode === 27) {
@@ -3199,6 +3955,10 @@ INSTRUCTIONS:
                 const accOverlay = document.getElementById("accountModalOverlay");
                 if (accOverlay && accOverlay.classList.contains("active")) {
                     closeAccountModal();
+                }
+                const setOverlay = document.getElementById("settingsModalOverlay");
+                if (setOverlay && setOverlay.classList.contains("active")) {
+                    closeSettingsModal();
                 }
             }
         });
@@ -3219,7 +3979,7 @@ INSTRUCTIONS:
                         <input type="text" class="clean-input input-ticker" id="ticker_${rowNum}" placeholder="e.g. AAPL" value="${holding.t || ''}" oninput="updateHolding(${index}, 't', this.value)">
                     </div>
                     <div class="input-group">
-                        <span class="input-prefix">$</span>
+                        <span class="input-prefix">${getCurrencySymbol()}</span>
                         <input type="number" step="any" min="0" class="clean-input input-value" id="value_${rowNum}" placeholder="0.00" value="${holding.v || ''}" oninput="updateHolding(${index}, 'v', this.value)">
                     </div>
                     <div class="input-group">
@@ -3636,26 +4396,36 @@ INSTRUCTIONS:
                 ? runCompleteRebalanceAlgorithm(added, validHoldings, minBuy)
                 : runDynaRebAlgorithm(added, validHoldings, minBuy);
 
+            if (isWholeRoundingEnabled()) {
+                applyWholeDollarRounding(res.assets, added, isComplete);
+            }
+
             // Populate Graphical Dashboard
-            document.getElementById("statInitial").innerText = `$${res.curr_folio_value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            const sym = getCurrencySymbol();
+            const isWhole = isWholeRoundingEnabled();
+            const fmtMoneyVal = (v) => isWhole
+                ? `${sym}${Math.round(Math.abs(v)).toLocaleString('en-US')}`
+                : `${sym}${Math.abs(v).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+            document.getElementById("statInitial").innerText = fmtMoneyVal(res.curr_folio_value);
             const depositStatLabel = document.getElementById("statDepositLabel");
             if (depositStatLabel) {
                 depositStatLabel.innerText = res.added < 0 ? "Withdrawal" : "Deposit";
             }
             if (res.added < 0) {
-                document.getElementById("statDeposit").innerText = `-$${Math.abs(res.added).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+                document.getElementById("statDeposit").innerText = `-${fmtMoneyVal(res.added)}`;
             } else {
-                document.getElementById("statDeposit").innerText = `$${res.added.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+                document.getElementById("statDeposit").innerText = fmtMoneyVal(res.added);
             }
-            document.getElementById("statNewTotal").innerText = `$${res.new_folio_value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            document.getElementById("statNewTotal").innerText = fmtMoneyVal(res.new_folio_value);
 
             // Threshold warning
             const warnEl = document.getElementById("thresholdWarning");
             if (res.isThresholdWarning) {
                 if (isComplete) {
-                    warnEl.innerHTML = `<strong>Transaction Threshold Notice:</strong> Due to your minimum transaction threshold ($${res.minBuy.toFixed(2)}), calculations may not lead to perfect portfolio balance, but have been balanced as close as possible given the minimum transaction.`;
+                    warnEl.innerHTML = `<strong>Transaction Threshold Notice:</strong> Due to your minimum transaction threshold (${sym}${res.minBuy.toFixed(2)}), calculations may not lead to perfect portfolio balance, but have been balanced as close as possible given the minimum transaction.`;
                 } else {
-                    warnEl.innerHTML = `<strong>Transaction Threshold Notice:</strong> All potential allocations were below your minimum transaction threshold ($${res.minBuy.toFixed(2)}). Entire ${res.added < 0 ? "withdrawal taken from" : "deposit allocated to"} the most ${res.added < 0 ? "overweight" : "underweight"} holding.`;
+                    warnEl.innerHTML = `<strong>Transaction Threshold Notice:</strong> All potential allocations were below your minimum transaction threshold (${sym}${res.minBuy.toFixed(2)}). Entire ${res.added < 0 ? "withdrawal taken from" : "deposit allocated to"} the most ${res.added < 0 ? "overweight" : "underweight"} holding.`;
                 }
                 warnEl.style.display = "block";
             } else {
@@ -3692,13 +4462,17 @@ INSTRUCTIONS:
                 const newPct = res.new_folio_value > 0 ? ((newAssetVal / res.new_folio_value) * 100 * scaleFactor) : 0;
                 const targetPct = (a.raw_targ_weight !== undefined ? a.raw_targ_weight : a.targ_weight) * 100;
 
+                const fmtCutStr = isWhole ? Math.round(Math.abs(a.cut)).toLocaleString('en-US') : Math.abs(a.cut).toFixed(2);
+                const fmtInitStr = isWhole ? Math.round(initialAssetVal).toLocaleString('en-US') : initialAssetVal.toFixed(2);
+                const fmtNewStr = isWhole ? Math.round(newAssetVal).toLocaleString('en-US') : newAssetVal.toFixed(2);
+
                 let badgeHtml = "";
                 if (isSell) {
-                    badgeHtml = `<span class="cut-badge sell">SELL -$${Math.abs(a.cut).toFixed(2)}</span>`;
+                    badgeHtml = `<span class="cut-badge sell">SELL -${sym}${fmtCutStr}</span>`;
                 } else if (isBuy) {
-                    badgeHtml = `<span class="cut-badge">${isComplete ? 'BUY ' : ''}+$${a.cut.toFixed(2)}</span>`;
+                    badgeHtml = `<span class="cut-badge">${isComplete ? 'BUY ' : ''}+${sym}${fmtCutStr}</span>`;
                 } else {
-                    badgeHtml = `<span class="cut-badge zero">${isComplete ? 'HOLD ' : ''}$0.00</span>`;
+                    badgeHtml = `<span class="cut-badge zero">${isComplete ? 'HOLD ' : ''}${sym}${isWhole ? '0' : '0.00'}</span>`;
                 }
 
                 const legendColor = isSell ? '#FF7B7B' : 'var(--accent)';
@@ -3708,7 +4482,7 @@ INSTRUCTIONS:
                         <div class="asset-identity">
                             <span class="ticker-badge">${a.name}</span>
                             <div class="asset-details">
-                                <span class="asset-val-preview">$${initialAssetVal.toFixed(2)} → <strong>$${newAssetVal.toFixed(2)}</strong></span>
+                                <span class="asset-val-preview">${sym}${fmtInitStr} → <strong>${sym}${fmtNewStr}</strong></span>
                             </div>
                         </div>
                         <div class="allocation-tag-wrap">
@@ -3749,7 +4523,7 @@ INSTRUCTIONS:
                 document.getElementById("valUnderweight").innerText = res.underweight ? res.underweight.name : "-";
                 document.getElementById("valOverweight").innerText = res.overweight ? res.overweight.name : "-";
                 pillBalanced.className = "info-pill";
-                pillBalanced.innerHTML = `<span>Needed to Balance:</span> <strong>$${res.next_deposit.toFixed(2)}</strong>`;
+                pillBalanced.innerHTML = `<span>Needed to Balance:</span> <strong>${sym}${isWhole ? Math.round(res.next_deposit).toLocaleString('en-US') : res.next_deposit.toFixed(2)}</strong>`;
             }
 
             // Raw ASCII Output
@@ -4450,6 +5224,24 @@ INSTRUCTIONS:
             window.handleRecoverAccount = handleRecoverAccount;
             window.getStoredAccounts = getStoredAccounts;
             window.setStoredAccounts = setStoredAccounts;
+            window.openSettingsModal = openSettingsModal;
+            window.closeSettingsModal = closeSettingsModal;
+            window.switchSettingsTab = switchSettingsTab;
+            window.handleSettingsBackdropClick = handleSettingsBackdropClick;
+            window.onSettingThemeToggle = onSettingThemeToggle;
+            window.onSettingCurrencyChange = onSettingCurrencyChange;
+            window.onSettingRoundingToggle = onSettingRoundingToggle;
+            window.saveSyncEndpoint = saveSyncEndpoint;
+            window.pingSyncServer = pingSyncServer;
+            window.onSettingAutoSyncToggle = onSettingAutoSyncToggle;
+            window.handleManualSyncNow = handleManualSyncNow;
+            window.handleResetToExample = handleResetToExample;
+            window.handleClearAllHoldings = handleClearAllHoldings;
+            window.getCurrencySymbol = getCurrencySymbol;
+            window.updateCurrencySymbols = updateCurrencySymbols;
+            window.isWholeRoundingEnabled = isWholeRoundingEnabled;
+            window.formatMoney = formatMoney;
+            window.applyWholeDollarRounding = applyWholeDollarRounding;
         }
     </script>
 </body>
