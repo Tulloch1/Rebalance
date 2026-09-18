@@ -2547,6 +2547,7 @@
                     }
                 } catch (e) {}
                 updateAccountUI();
+                return `Backend API URL set to: ${this.apiBaseUrl || '(offline mode)'}`;
             },
 
             async checkServerHealth() {
