@@ -1,0 +1,11 @@
+# Cloudflare local development & D1 emulator storage
+.wrangler/
+.dev.vars
+
+# Dependencies
+node_modules/
+npm-debug.log*
+
+# OS metadata
+.DS_Store
+Thumbs.db

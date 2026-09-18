@@ -1,0 +1,9 @@
+name = "rebalance-api"
+main = "src/index.js"
+compatibility_date = "2024-09-01"
+
+# Cloudflare D1 Database Binding
+[[d1_databases]]
+binding = "DB"
+database_name = "rebalance_db"
+database_id = "rebalance_db"

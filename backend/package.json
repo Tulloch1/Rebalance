@@ -1,0 +1,21 @@
+{
+  "name": "rebalance-api",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Portfolio Rebalancer Serverless Edge API (Cloudflare Workers + D1)",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "d1:init": "wrangler d1 execute rebalance_db --local --file=./schema.sql"
+  },
+  "keywords": [
+    "cloudflare",
+    "workers",
+    "d1",
+    "zero-knowledge",
+    "rebalance"
+  ],
+  "author": "",
+  "license": "MIT"
+}

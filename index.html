@@ -205,6 +205,52 @@
             height: 16px;
         }
 
+        /* Account & Sync Button */
+        .account-btn {
+            width: 34px;
+            height: 34px;
+            border-radius: var(--radius-pill);
+            background: var(--surface-card);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .account-btn:hover {
+            color: var(--accent);
+            border-color: var(--accent-badge-border);
+            background: var(--accent-badge-bg);
+            transform: scale(1.06);
+        }
+
+        .account-btn svg {
+            width: 17px;
+            height: 17px;
+        }
+
+        .account-btn.logged-in {
+            color: var(--accent);
+            border-color: var(--accent-badge-border);
+            background: var(--accent-badge-bg);
+        }
+
+        .account-btn.logged-in::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            width: 7px;
+            height: 7px;
+            border-radius: var(--radius-pill);
+            background: var(--accent);
+            box-shadow: 0 0 6px var(--accent);
+        }
+
         /* Info Guide Button */
         .info-btn {
             width: 34px;
@@ -1380,6 +1426,133 @@
             }
         }
 
+        /* Account Modal Specifics */
+        .account-field-group {
+            margin-bottom: 16px;
+        }
+
+        .account-label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+
+        .account-input {
+            width: 100%;
+            background: var(--surface-input);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-input);
+            padding: 10px 14px;
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            font-size: 14px;
+            outline: none;
+            transition: all 0.15s ease;
+        }
+
+        .account-input:focus {
+            border-color: var(--accent);
+            background: var(--surface-card);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        .account-notice {
+            background: var(--accent-badge-bg);
+            border: 1px solid var(--accent-badge-border);
+            border-radius: var(--radius-card);
+            padding: 14px 16px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            margin-bottom: 16px;
+        }
+
+        .account-notice.warning {
+            background: var(--warning-bg);
+            border-color: var(--warning-border);
+        }
+
+        .account-status-card {
+            background: var(--surface-input);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-card);
+            padding: 16px 18px;
+            margin-bottom: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .btn-account-primary {
+            width: 100%;
+            background: var(--accent);
+            color: var(--accent-on-text);
+            border: none;
+            border-radius: var(--radius-btn);
+            padding: 12px 18px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-account-primary:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px var(--accent-glow);
+        }
+
+        .btn-account-secondary {
+            background: var(--surface-input);
+            color: var(--text-primary);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-btn);
+            padding: 10px 14px;
+            font-size: 12.5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            text-align: center;
+            user-select: none;
+        }
+
+        .btn-account-secondary:hover {
+            border-color: var(--border-hover);
+            background: var(--surface-elevated);
+            color: var(--accent);
+        }
+
+        .btn-account-danger {
+            background: var(--danger-bg);
+            color: var(--danger);
+            border: 1px solid var(--danger-border);
+            border-radius: var(--radius-btn);
+            padding: 10px 14px;
+            font-size: 12.5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .btn-account-danger:hover {
+            background: var(--danger);
+            color: #FFFFFF;
+        }
+
         @media (max-width: 500px) {
             body {
                 padding: 16px 8px;
@@ -1421,6 +1594,12 @@
             </div>
             
             <div class="header-controls">
+                <button class="account-btn" id="accountBtn" title="Account &amp; Security" onclick="openAccountModal()" aria-label="Open Account &amp; Security Modal">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="7" r="4"></circle>
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    </svg>
+                </button>
                 <button class="info-btn" id="infoBtn" title="Information Guide" onclick="openInfoModal()" aria-label="Open Information Guide">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="12" cy="12" r="10"></circle>
@@ -1663,6 +1842,166 @@
         </div>
     </div>
 
+    <!-- Account & Security Modal Overlay -->
+    <div class="modal-overlay" id="accountModalOverlay" onclick="handleAccountBackdropClick(event)">
+        <div class="info-modal-card card" role="dialog" aria-modal="true" aria-labelledby="accountModalTitle">
+            <!-- Chrome Tab Bar -->
+            <div class="chrome-tab-bar">
+                <div class="chrome-tabs-list" role="tablist">
+                    <button class="chrome-tab active" id="tab-btn-acc-status" role="tab" aria-selected="true" onclick="switchAccountTab('status')">
+                        <span class="tab-title">Status / Guest</span>
+                    </button>
+                    <button class="chrome-tab" id="tab-btn-acc-signin" role="tab" aria-selected="false" onclick="switchAccountTab('signin')">
+                        <span class="tab-title">Sign In</span>
+                    </button>
+                    <button class="chrome-tab" id="tab-btn-acc-signup" role="tab" aria-selected="false" onclick="switchAccountTab('signup')">
+                        <span class="tab-title">Create Account</span>
+                    </button>
+                </div>
+                <button class="modal-close-btn" id="accountModalCloseBtn" title="Close (Esc)" onclick="closeAccountModal()" aria-label="Close account modal">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Tab Panels Body -->
+            <div class="info-modal-body">
+                <!-- Status / Guest Pane -->
+                <div class="tab-pane active" id="tab-pane-acc-status" role="tabpanel">
+                    <h3 id="accountModalTitle">Account &amp; Vault Security</h3>
+                    
+                    <div class="account-status-card">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted);">Current Mode</span>
+                            <div style="display: flex; gap: 6px; align-items: center;">
+                                <span class="brand-tag" id="accTierBadge" style="display: none; margin: 0; background: var(--accent-badge-bg); border-color: var(--accent-badge-border); color: var(--accent);">Free Plan</span>
+                                <span class="brand-tag" id="accSyncBadge" style="margin: 0; font-size: 11px;">Offline First</span>
+                                <span class="brand-tag" id="accStatusBadge" style="margin: 0;">Guest (Local)</span>
+                            </div>
+                        </div>
+                        <div id="accUserDisplay" style="font-size: 15px; font-weight: 600; color: var(--text-primary);">Guest Mode (Browser Storage)</div>
+                        <p id="accStatusDesc" style="margin: 0; font-size: 13px; color: var(--text-secondary); line-height: 1.45;">
+                            Your portfolio data is stored locally in unencrypted browser storage. Create an account or sign in to encrypt your vault end-to-end with PBKDF2 + AES-GCM (256-bit).
+                        </p>
+
+                        <!-- Emergency Recovery Key Card -->
+                        <div id="recoveryKeyDisplayBox" style="display: none; margin-top: 6px; padding: 12px; background: var(--surface-card); border: 1px solid var(--accent-badge-border); border-radius: var(--radius-card);">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                                <span style="font-size: 11px; font-weight: 700; color: var(--text-primary); text-transform: uppercase; letter-spacing: 0.04em;">Emergency Recovery Key</span>
+                                <span style="font-size: 10.5px; color: var(--accent); font-weight: 600;">Saved</span>
+                            </div>
+                            <code id="recoveryKeyCode" style="display: block; font-family: var(--font-mono); font-size: 12px; color: var(--accent); padding: 4px 0 8px 0; word-break: break-all; letter-spacing: 0.05em;"></code>
+                            <div style="display: flex; gap: 8px;">
+                                <button type="button" class="btn-account-secondary" style="flex: 1; padding: 6px 10px; font-size: 11.5px;" onclick="copyRecoveryKey()">
+                                    Copy Key
+                                </button>
+                                <button type="button" class="btn-account-secondary" style="flex: 1; padding: 6px 10px; font-size: 11.5px;" onclick="downloadRecoveryKit()">
+                                    Download (.txt)
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <button type="button" class="btn-account-secondary" id="btnGenRecoveryKey" style="display: none; width: 100%;" onclick="handleGenerateRecoveryKey()">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                            Generate Emergency Recovery Key
+                        </button>
+                        <input type="file" id="importBackupInput" accept=".json,.enc.json" style="display: none;" onchange="handleBackupFileSelect(event)">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                            <button type="button" class="btn-account-secondary" id="btnExportBackup" onclick="exportEncryptedBackup()" title="Download an AES-256 encrypted JSON copy of your portfolio">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                                Export Backup
+                            </button>
+                            <button type="button" class="btn-account-secondary" id="btnImportBackup" onclick="document.getElementById('importBackupInput').click()" title="Restore portfolio from an encrypted JSON backup">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                                Import Backup
+                            </button>
+                        </div>
+                        <button type="button" class="btn-account-danger" id="btnSignOut" style="display: none; width: 100%;" onclick="handleSignOut()">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                            Sign Out of Vault
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Sign In Pane -->
+                <div class="tab-pane" id="tab-pane-acc-signin" role="tabpanel">
+                    <h3>Unlock Encrypted Vault</h3>
+                    <div class="account-notice">
+                        Zero-Knowledge Security: Decryption keys are derived in browser memory. Your master password is never sent anywhere in plaintext.
+                    </div>
+                    <form id="signInForm" onsubmit="handleSignInSubmit(event)">
+                        <div class="account-field-group">
+                            <label class="account-label" for="signInEmail">Email Address</label>
+                            <input type="email" class="account-input" id="signInEmail" placeholder="you@example.com" autocomplete="username" required>
+                        </div>
+                        <div class="account-field-group">
+                            <label class="account-label" for="signInPassword">Master Password</label>
+                            <input type="password" class="account-input" id="signInPassword" placeholder="••••••••••••" autocomplete="current-password" required>
+                        </div>
+                        <div style="display: flex; justify-content: flex-end; margin-top: -6px; margin-bottom: 12px;">
+                            <button type="button" onclick="toggleRecoverySection()" id="btnForgotPass" style="background: none; border: none; padding: 0; color: var(--accent); font-size: 11.5px; cursor: pointer; text-decoration: underline;">
+                                Forgot Master Password?
+                            </button>
+                        </div>
+                        <div id="signInFeedback" style="display: none; padding: 8px 12px; border-radius: var(--radius-sm); font-size: 12px; margin-bottom: 12px;"></div>
+                        <button type="submit" class="btn-account-primary" id="btnSignInSubmit">
+                            Unlock &amp; Sign In
+                        </button>
+
+                        <!-- Collapsible Emergency Recovery Section -->
+                        <div id="recoverySection" style="display: none; margin-top: 14px; padding-top: 14px; border-top: 1px dashed var(--border-subtle);">
+                            <div style="font-size: 12px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px;">Recover with Emergency Key</div>
+                            <p style="font-size: 11.5px; color: var(--text-secondary); margin: 0 0 10px 0; line-height: 1.4;">
+                                Enter your 24-character Emergency Recovery Key to reset your master password and unlock your portfolio:
+                            </p>
+                            <div class="account-field-group">
+                                <label class="account-label" for="recoveryKeyInput">Emergency Recovery Key</label>
+                                <input type="text" class="account-input" id="recoveryKeyInput" placeholder="XXXX-XXXX-XXXX-XXXX-XXXX-XXXX" style="font-family: var(--font-mono); letter-spacing: 0.04em;">
+                            </div>
+                            <div class="account-field-group">
+                                <label class="account-label" for="recoveryNewPassword">New Master Password (min. 8 characters)</label>
+                                <input type="password" class="account-input" id="recoveryNewPassword" placeholder="••••••••••••" minlength="8">
+                            </div>
+                            <button type="button" class="btn-account-secondary" onclick="handleRecoverAccount()" style="width: 100%;">
+                                Restore Vault with Recovery Key
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Create Account Pane -->
+                <div class="tab-pane" id="tab-pane-acc-signup" role="tabpanel">
+                    <h3>Create End-to-End Encrypted Account</h3>
+                    <div class="account-notice">
+                        PBKDF2 SHA-256 (100,000 iterations) + AES-GCM 256-bit encryption protects your holdings. Because encryption is zero-knowledge, lost passwords cannot be reset.
+                    </div>
+                    <form id="signUpForm" onsubmit="handleSignUpSubmit(event)">
+                        <div class="account-field-group">
+                            <label class="account-label" for="signUpEmail">Email Address</label>
+                            <input type="email" class="account-input" id="signUpEmail" placeholder="you@example.com" autocomplete="username" required>
+                        </div>
+                        <div class="account-field-group">
+                            <label class="account-label" for="signUpPassword">Master Password (min. 8 characters)</label>
+                            <input type="password" class="account-input" id="signUpPassword" placeholder="••••••••••••" autocomplete="new-password" minlength="8" required>
+                        </div>
+                        <div class="account-field-group">
+                            <label class="account-label" for="signUpConfirmPassword">Confirm Master Password</label>
+                            <input type="password" class="account-input" id="signUpConfirmPassword" placeholder="••••••••••••" autocomplete="new-password" minlength="8" required>
+                        </div>
+                        <div id="signUpFeedback" style="display: none; padding: 8px 12px; border-radius: var(--radius-sm); font-size: 12px; margin-bottom: 12px;"></div>
+                        <button type="submit" class="btn-account-primary" id="btnSignUpSubmit">
+                            Create Vault &amp; Sign In
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         let holdingsData = [];
 
@@ -1839,6 +2178,80 @@
                 } catch (err) {
                     throw new Error("Decryption failed: incorrect key, tampered data, or corrupted envelope.");
                 }
+            },
+
+            /**
+             * Generate 24-character high-entropy Emergency Recovery Key (formatted in blocks of 4)
+             * e.g., "7K9M-P3W8-X2R4-B5Y7-C9D2-H4F8"
+             * @returns {string}
+             */
+            generateRecoveryKey() {
+                const charset = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ";
+                const cryptoObj = this.getCrypto();
+                const bytes = cryptoObj.getRandomValues(new Uint8Array(24));
+                let key = '';
+                for (let i = 0; i < 24; i++) {
+                    key += charset[bytes[i] % charset.length];
+                    if ((i + 1) % 4 === 0 && i < 23) {
+                        key += '-';
+                    }
+                }
+                return key;
+            },
+
+            /**
+             * Derive AES-GCM 256-bit encryption key from an Emergency Recovery Key
+             * @param {string} email
+             * @param {string} recoveryKey
+             * @param {number} [iterations=100000]
+             * @returns {Promise<CryptoKey>}
+             */
+            async deriveRecoveryEncryptionKey(email, recoveryKey, iterations = 100000) {
+                if (!email || typeof email !== 'string') throw new Error("A valid email is required.");
+                if (!recoveryKey || typeof recoveryKey !== 'string') throw new Error("A valid recovery key is required.");
+                const cleanKey = recoveryKey.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+                if (cleanKey.length < 16) throw new Error("Recovery key is too short.");
+
+                const cryptoObj = this.getCrypto();
+                const subtle = cryptoObj.subtle;
+                const encoder = new TextEncoder();
+                const normalizedEmail = email.toLowerCase().trim();
+
+                const baseKey = await subtle.importKey(
+                    'raw',
+                    encoder.encode(cleanKey),
+                    { name: 'PBKDF2' },
+                    false,
+                    ['deriveKey']
+                );
+
+                const recSalt = encoder.encode(normalizedEmail + ':rebalance:recovery');
+                return await subtle.deriveKey(
+                    {
+                        name: 'PBKDF2',
+                        salt: recSalt,
+                        iterations: iterations,
+                        hash: 'SHA-256'
+                    },
+                    baseKey,
+                    { name: 'AES-GCM', length: 256 },
+                    false,
+                    ['encrypt', 'decrypt']
+                );
+            },
+
+            /**
+             * Check if platform biometrics / WebAuthn Passkeys are supported on the client
+             * @returns {Promise<boolean>}
+             */
+            async isPasskeySupported() {
+                if (typeof window === 'undefined' || !window.PublicKeyCredential) return false;
+                if (typeof window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable !== 'function') return false;
+                try {
+                    return await window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+                } catch (e) {
+                    return false;
+                }
             }
         };
         if (typeof window !== 'undefined') {
@@ -1940,12 +2353,851 @@
             });
         }
 
-        // Close modal on Escape key
+        // --- Account & Vault Security Modal ---
+        let currentAccount = null;
+
+        function openAccountModal() {
+            const overlay = document.getElementById("accountModalOverlay");
+            if (overlay) {
+                overlay.classList.add("active");
+                document.body.style.overflow = "hidden";
+                updateAccountUI();
+            }
+        }
+
+        function closeAccountModal() {
+            const overlay = document.getElementById("accountModalOverlay");
+            if (overlay) {
+                overlay.classList.remove("active");
+                document.body.style.overflow = "";
+            }
+            const signInForm = document.getElementById("signInForm");
+            if (signInForm && typeof signInForm.reset === 'function') signInForm.reset();
+            const signUpForm = document.getElementById("signUpForm");
+            if (signUpForm && typeof signUpForm.reset === 'function') signUpForm.reset();
+            const recSection = document.getElementById("recoverySection");
+            if (recSection) recSection.style.display = "none";
+            const recKeyInput = document.getElementById("recoveryKeyInput");
+            if (recKeyInput) recKeyInput.value = "";
+            const recNewPass = document.getElementById("recoveryNewPassword");
+            if (recNewPass) recNewPass.value = "";
+            hideFeedback("signInFeedback");
+            hideFeedback("signUpFeedback");
+        }
+
+        function handleAccountBackdropClick(event) {
+            if (event.target && event.target.id === "accountModalOverlay") {
+                closeAccountModal();
+            }
+        }
+
+        function switchAccountTab(tabId) {
+            const tabs = ['status', 'signin', 'signup'];
+            tabs.forEach(t => {
+                const btn = document.getElementById(`tab-btn-acc-${t}`);
+                const pane = document.getElementById(`tab-pane-acc-${t}`);
+                if (btn) {
+                    const isActive = (t === tabId);
+                    btn.classList.toggle("active", isActive);
+                    btn.setAttribute("aria-selected", isActive ? "true" : "false");
+                }
+                if (pane) {
+                    pane.classList.toggle("active", t === tabId);
+                }
+            });
+            hideFeedback("signInFeedback");
+            hideFeedback("signUpFeedback");
+        }
+
+        function showFeedback(elementId, message, isError = true) {
+            const el = document.getElementById(elementId);
+            if (!el) return;
+            el.innerText = message;
+            el.style.display = "block";
+            if (isError) {
+                el.style.background = "var(--danger-bg)";
+                el.style.border = "1px solid var(--danger-border)";
+                el.style.color = "var(--danger)";
+            } else {
+                el.style.background = "var(--accent-badge-bg)";
+                el.style.border = "1px solid var(--accent-badge-border)";
+                el.style.color = "var(--accent)";
+            }
+        }
+
+        function hideFeedback(elementId) {
+            const el = document.getElementById(elementId);
+            if (el) {
+                el.style.display = "none";
+                el.innerText = "";
+            }
+        }
+
+        function updateAccountUI() {
+            const accountBtn = document.getElementById("accountBtn");
+            const badge = document.getElementById("accStatusBadge");
+            const tierBadge = document.getElementById("accTierBadge");
+            const syncBadge = document.getElementById("accSyncBadge");
+            const userDisplay = document.getElementById("accUserDisplay");
+            const desc = document.getElementById("accStatusDesc");
+            const btnSignOut = document.getElementById("btnSignOut");
+            const btnGenRecovery = document.getElementById("btnGenRecoveryKey");
+            const recBox = document.getElementById("recoveryKeyDisplayBox");
+
+            if (syncBadge) {
+                if (RebalanceSync && RebalanceSync.apiBaseUrl) {
+                    syncBadge.innerText = "Cloud Edge";
+                    syncBadge.style.color = "var(--accent)";
+                    syncBadge.style.borderColor = "var(--accent-badge-border)";
+                } else {
+                    syncBadge.innerText = "Offline First";
+                    syncBadge.style.color = "";
+                    syncBadge.style.borderColor = "";
+                }
+            }
+
+            if (currentAccount && currentAccount.email) {
+                if (accountBtn) accountBtn.classList.add("logged-in");
+                if (badge) {
+                    badge.innerText = "Encrypted Vault";
+                    badge.style.color = "var(--accent)";
+                    badge.style.borderColor = "var(--accent-badge-border)";
+                }
+                if (tierBadge) {
+                    tierBadge.style.display = "inline-flex";
+                    const tierName = (currentAccount.tier || "free").toUpperCase();
+                    tierBadge.innerText = `${tierName} PLAN`;
+                }
+                if (userDisplay) {
+                    userDisplay.innerText = currentAccount.email;
+                }
+                if (desc) {
+                    desc.innerText = "Your portfolio is protected with zero-knowledge PBKDF2 + AES-GCM (256-bit). Local edits will automatically sync to your encrypted vault.";
+                }
+                if (btnSignOut) {
+                    btnSignOut.style.display = "flex";
+                }
+                if (btnGenRecovery) {
+                    btnGenRecovery.style.display = "flex";
+                    const accounts = getStoredAccounts();
+                    const acc = accounts[currentAccount.email];
+                    if (acc && acc.recoveryEnvelope) {
+                        btnGenRecovery.innerText = "Regenerate Emergency Recovery Key";
+                    } else {
+                        btnGenRecovery.innerText = "Generate Emergency Recovery Key";
+                    }
+                }
+            } else {
+                if (accountBtn) accountBtn.classList.remove("logged-in");
+                if (badge) {
+                    badge.innerText = "Guest (Local)";
+                    badge.style.color = "";
+                    badge.style.borderColor = "";
+                }
+                if (tierBadge) {
+                    tierBadge.style.display = "none";
+                }
+                if (userDisplay) {
+                    userDisplay.innerText = "Guest Mode (Browser Storage)";
+                }
+                if (desc) {
+                    desc.innerText = "Your portfolio data is stored locally in unencrypted browser storage. Create an account or sign in to encrypt your vault end-to-end with PBKDF2 + AES-GCM (256-bit).";
+                }
+                if (btnSignOut) {
+                    btnSignOut.style.display = "none";
+                }
+                if (btnGenRecovery) {
+                    btnGenRecovery.style.display = "none";
+                }
+                if (recBox) {
+                    recBox.style.display = "none";
+                }
+            }
+        }
+
+        function getStoredAccounts() {
+            try {
+                return JSON.parse(localStorage.getItem("rebalance_accounts") || "{}");
+            } catch (e) {
+                return {};
+            }
+        }
+
+        function setStoredAccounts(accounts) {
+            try {
+                localStorage.setItem("rebalance_accounts", JSON.stringify(accounts));
+            } catch (e) {
+                console.error("Failed to store accounts:", e);
+            }
+        }
+
+        // --- RebalanceSync Service Adapter ---
+        // Provides a single abstraction point for Account & Vault persistence.
+        // Defaults to offline local storage. Pointing apiBaseUrl to Cloudflare Workers instantly routes all auth and vault operations.
+        const RebalanceSync = {
+            apiBaseUrl: (typeof localStorage !== 'undefined' && localStorage.getItem("rebalance_api_url")) || "",
+
+            setApiBaseUrl(url) {
+                this.apiBaseUrl = (url || "").trim().replace(/\/+$/, "");
+                try {
+                    if (this.apiBaseUrl) {
+                        localStorage.setItem("rebalance_api_url", this.apiBaseUrl);
+                    } else {
+                        localStorage.removeItem("rebalance_api_url");
+                    }
+                } catch (e) {}
+                updateAccountUI();
+            },
+
+            async checkServerHealth() {
+                if (!this.apiBaseUrl) return { online: false, reason: "offline_mode" };
+                try {
+                    const res = await fetch(`${this.apiBaseUrl}/api/health`, { method: "GET" });
+                    if (res.ok) {
+                        const data = await res.json();
+                        return { online: true, d1: data.d1, timestamp: data.timestamp };
+                    }
+                    return { online: false, reason: "server_error", status: res.status };
+                } catch (err) {
+                    return { online: false, reason: "network_unreachable", error: err.message };
+                }
+            },
+
+            async getAccount(email) {
+                if (!email) return null;
+                const normalizedEmail = email.trim().toLowerCase();
+                if (this.apiBaseUrl) {
+                    try {
+                        const res = await fetch(`${this.apiBaseUrl}/api/account?email=${encodeURIComponent(normalizedEmail)}`);
+                        if (res.ok) {
+                            const remoteAcc = await res.json();
+                            const accounts = getStoredAccounts();
+                            accounts[normalizedEmail] = remoteAcc;
+                            setStoredAccounts(accounts);
+                            return remoteAcc;
+                        } else if (res.status === 404) {
+                            return null;
+                        }
+                    } catch (netErr) {
+                        console.warn("Cloud backend unreachable, using local storage mirror:", netErr);
+                    }
+                }
+                const accounts = getStoredAccounts();
+                return accounts[normalizedEmail] || null;
+            },
+
+            async saveAccount(account) {
+                if (!account || !account.email) throw new Error("Invalid account data.");
+                const normalizedEmail = account.email.trim().toLowerCase();
+                // Always persist locally (offline-first guarantee)
+                const accounts = getStoredAccounts();
+                accounts[normalizedEmail] = account;
+                setStoredAccounts(accounts);
+
+                if (this.apiBaseUrl) {
+                    try {
+                        const res = await fetch(`${this.apiBaseUrl}/api/account`, {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify(account)
+                        });
+                        if (res.ok) {
+                            return await res.json();
+                        }
+                    } catch (netErr) {
+                        console.warn("Cloud backend unreachable, saved to local mirror only:", netErr);
+                    }
+                }
+                return account;
+            },
+
+            async syncVault(email, encryptedVault, vaultVersion = null, recoveryEnvelope = undefined) {
+                if (!email) return null;
+                const normalizedEmail = email.trim().toLowerCase();
+                // Always persist locally
+                const accounts = getStoredAccounts();
+                let updatedLocal = null;
+                if (accounts[normalizedEmail]) {
+                    accounts[normalizedEmail].vault = encryptedVault;
+                    if (recoveryEnvelope !== undefined) {
+                        accounts[normalizedEmail].recoveryEnvelope = recoveryEnvelope;
+                    }
+                    if (vaultVersion !== null && vaultVersion !== undefined) {
+                        accounts[normalizedEmail].vaultVersion = vaultVersion;
+                    } else {
+                        accounts[normalizedEmail].vaultVersion = (accounts[normalizedEmail].vaultVersion || 1) + 1;
+                    }
+                    accounts[normalizedEmail].updatedAt = new Date().toISOString();
+                    setStoredAccounts(accounts);
+                    updatedLocal = accounts[normalizedEmail];
+                }
+
+                if (this.apiBaseUrl) {
+                    try {
+                        const payload = { email: normalizedEmail, vault: encryptedVault, vaultVersion };
+                        if (recoveryEnvelope !== undefined) payload.recoveryEnvelope = recoveryEnvelope;
+                        const res = await fetch(`${this.apiBaseUrl}/api/vault`, {
+                            method: "PUT",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify(payload)
+                        });
+                        if (res.ok) {
+                            return await res.json();
+                        }
+                    } catch (netErr) {
+                        console.warn("Cloud backend unreachable, vault synced locally only:", netErr);
+                    }
+                }
+                return updatedLocal;
+            },
+
+            async recoverAccount(email, authHash, vault, vaultVersion = null) {
+                if (!email) return null;
+                const normalizedEmail = email.trim().toLowerCase();
+                if (this.apiBaseUrl) {
+                    try {
+                        const res = await fetch(`${this.apiBaseUrl}/api/recover`, {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ email: normalizedEmail, authHash, vault, vaultVersion })
+                        });
+                        if (res.ok) return await res.json();
+                    } catch (netErr) {
+                        console.warn("Cloud backend unreachable during recovery sync:", netErr);
+                    }
+                }
+                return null;
+            }
+        };
+
+        function getCurrentPortfolioState() {
+            const depositEl = document.getElementById("deposit");
+            const minBuyEl = document.getElementById("minBuy");
+            const completeEl = document.getElementById("completeRebalance");
+            return {
+                deposit: depositEl ? depositEl.value : "",
+                minBuy: (minBuyEl && minBuyEl.value !== undefined && minBuyEl.value !== "") ? minBuyEl.value : "0",
+                completeRebalance: completeEl ? completeEl.checked : false,
+                holdings: Array.isArray(holdingsData) ? holdingsData : []
+            };
+        }
+
+        function loadPortfolioFromState(data) {
+            if (!data) return;
+            const depositEl = document.getElementById("deposit");
+            const minBuyEl = document.getElementById("minBuy");
+            const completeEl = document.getElementById("completeRebalance");
+
+            if (depositEl) depositEl.value = data.deposit || "";
+            if (minBuyEl) minBuyEl.value = (data.minBuy !== undefined && data.minBuy !== "") ? data.minBuy : "0";
+            if (completeEl) completeEl.checked = Boolean(data.completeRebalance);
+            if (Array.isArray(data.holdings) && data.holdings.length > 0) {
+                holdingsData = data.holdings;
+            } else {
+                initDefaultHoldings();
+            }
+            onToggleCompleteRebalance();
+            renderRows();
+            saveFormData();
+        }
+
+        async function handleSignUpSubmit(event) {
+            if (event && event.preventDefault) event.preventDefault();
+            const emailInput = document.getElementById("signUpEmail");
+            const passInput = document.getElementById("signUpPassword");
+            const confirmInput = document.getElementById("signUpConfirmPassword");
+
+            const email = emailInput ? emailInput.value.trim().toLowerCase() : "";
+            const password = passInput ? passInput.value : "";
+            const confirm = confirmInput ? confirmInput.value : "";
+
+            if (!email || !email.includes("@")) {
+                showFeedback("signUpFeedback", "Please enter a valid email address.", true);
+                return;
+            }
+            if (password.length < 8) {
+                showFeedback("signUpFeedback", "Password must be at least 8 characters long.", true);
+                return;
+            }
+            if (password !== confirm) {
+                showFeedback("signUpFeedback", "Passwords do not match.", true);
+                return;
+            }
+
+            const existing = await RebalanceSync.getAccount(email);
+            if (existing) {
+                showFeedback("signUpFeedback", "An account with this email already exists. Please sign in.", true);
+                return;
+            }
+
+            try {
+                const keys = await RebalanceCrypto.deriveKeys(email, password);
+                const currentState = getCurrentPortfolioState();
+                const encryptedVault = await RebalanceCrypto.encryptPortfolio(currentState, keys.encryptionKey);
+
+                // Forward-compatible schema version 2 (Cloudflare D1 ready)
+                const newAccount = {
+                    email: email,
+                    authHash: keys.authHash,
+                    schemaVersion: 2,
+                    vaultVersion: 1,
+                    vault: encryptedVault,
+                    recoveryEnvelope: null,
+                    tier: "free",
+                    stripeCustomerId: null,
+                    subscriptionStatus: "none",
+                    subscriptionExpiresAt: null,
+                    preferences: {
+                        currency: "USD",
+                        theme: "auto",
+                        autoSync: true
+                    },
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                    lastLoginAt: new Date().toISOString()
+                };
+
+                await RebalanceSync.saveAccount(newAccount);
+
+                currentAccount = {
+                    email: email,
+                    tier: newAccount.tier,
+                    schemaVersion: newAccount.schemaVersion,
+                    vaultVersion: newAccount.vaultVersion,
+                    keys: keys
+                };
+
+                updateAccountUI();
+                const signUpForm = document.getElementById("signUpForm");
+                if (signUpForm && typeof signUpForm.reset === 'function') signUpForm.reset();
+                showFeedback("signUpFeedback", "Account created successfully! Vault unlocked.", false);
+
+                setTimeout(() => {
+                    switchAccountTab('status');
+                }, 400);
+            } catch (err) {
+                showFeedback("signUpFeedback", "Error creating account: " + err.message, true);
+            }
+        }
+
+        async function handleSignInSubmit(event) {
+            if (event && event.preventDefault) event.preventDefault();
+            const emailInput = document.getElementById("signInEmail");
+            const passInput = document.getElementById("signInPassword");
+
+            const email = emailInput ? emailInput.value.trim().toLowerCase() : "";
+            const password = passInput ? passInput.value : "";
+
+            if (!email) {
+                showFeedback("signInFeedback", "Please enter your email address.", true);
+                return;
+            }
+            if (!password) {
+                showFeedback("signInFeedback", "Please enter your master password.", true);
+                return;
+            }
+
+            const account = await RebalanceSync.getAccount(email);
+            if (!account) {
+                showFeedback("signInFeedback", "No account found with this email. Please create an account.", true);
+                return;
+            }
+
+            try {
+                const keys = await RebalanceCrypto.deriveKeys(email, password);
+                if (keys.authHash !== account.authHash) {
+                    showFeedback("signInFeedback", "Incorrect master password. Please try again.", true);
+                    return;
+                }
+
+                // Forward-compatible schema normalization
+                let modified = false;
+                if (!account.schemaVersion || account.schemaVersion < 2) {
+                    account.schemaVersion = 2;
+                    account.vaultVersion = account.vaultVersion || 1;
+                    account.tier = account.tier || "free";
+                    account.recoveryEnvelope = account.recoveryEnvelope || null;
+                    account.stripeCustomerId = account.stripeCustomerId || null;
+                    account.subscriptionStatus = account.subscriptionStatus || "none";
+                    account.subscriptionExpiresAt = account.subscriptionExpiresAt || null;
+                    account.preferences = account.preferences || { currency: "USD", theme: "auto", autoSync: true };
+                    modified = true;
+                }
+                account.lastLoginAt = new Date().toISOString();
+                modified = true;
+                if (modified) {
+                    await RebalanceSync.saveAccount(account);
+                }
+
+                currentAccount = {
+                    email: email,
+                    tier: account.tier || "free",
+                    schemaVersion: account.schemaVersion || 2,
+                    vaultVersion: account.vaultVersion || 1,
+                    keys: keys
+                };
+
+                if (account.vault) {
+                    try {
+                        const decrypted = await RebalanceCrypto.decryptPortfolio(account.vault, keys.encryptionKey);
+                        loadPortfolioFromState(decrypted);
+                    } catch (decErr) {
+                        console.error("Failed to decrypt stored vault:", decErr);
+                    }
+                }
+
+                updateAccountUI();
+                const signInForm = document.getElementById("signInForm");
+                if (signInForm && typeof signInForm.reset === 'function') signInForm.reset();
+                showFeedback("signInFeedback", "Vault unlocked successfully!", false);
+
+                setTimeout(() => {
+                    switchAccountTab('status');
+                }, 400);
+            } catch (err) {
+                showFeedback("signInFeedback", "Error signing in: " + err.message, true);
+            }
+        }
+
+        function handleSignOut() {
+            currentAccount = null;
+            const recBox = document.getElementById("recoveryKeyDisplayBox");
+            if (recBox) recBox.style.display = "none";
+            updateAccountUI();
+            switchAccountTab('status');
+        }
+
+        // --- Emergency Recovery Key Handlers ---
+        function toggleRecoverySection() {
+            const sec = document.getElementById("recoverySection");
+            if (!sec) return;
+            const isHidden = sec.style.display === "none" || !sec.style.display;
+            sec.style.display = isHidden ? "block" : "none";
+            if (isHidden) {
+                const recKeyInput = document.getElementById("recoveryKeyInput");
+                if (recKeyInput) recKeyInput.focus();
+            }
+        }
+
+        async function handleGenerateRecoveryKey() {
+            if (!currentAccount || !currentAccount.email) {
+                if (typeof alert === 'function') alert("Please sign in first to generate an Emergency Recovery Key.");
+                return;
+            }
+            try {
+                const recoveryKey = RebalanceCrypto.generateRecoveryKey();
+                const recKeyEl = document.getElementById("recoveryKeyCode");
+                const recBox = document.getElementById("recoveryKeyDisplayBox");
+                if (recKeyEl) recKeyEl.innerText = recoveryKey;
+                if (recBox) recBox.style.display = "block";
+
+                // Derive key & create zero-knowledge recoveryEnvelope of current portfolio state
+                const recEncKey = await RebalanceCrypto.deriveRecoveryEncryptionKey(currentAccount.email, recoveryKey);
+                const currentState = getCurrentPortfolioState();
+                const recoveryEnvelope = await RebalanceCrypto.encryptPortfolio(currentState, recEncKey);
+
+                // Save recoveryEnvelope into account record
+                const account = await RebalanceSync.getAccount(currentAccount.email);
+                if (account) {
+                    account.recoveryEnvelope = recoveryEnvelope;
+                    account.updatedAt = new Date().toISOString();
+                    await RebalanceSync.saveAccount(account);
+                    await RebalanceSync.syncVault(currentAccount.email, account.vault, account.vaultVersion, recoveryEnvelope);
+                }
+
+                const btnGen = document.getElementById("btnGenRecoveryKey");
+                if (btnGen) btnGen.innerText = "Regenerate Emergency Recovery Key";
+
+                if (typeof alert === 'function') {
+                    alert("Emergency Recovery Key generated! Make sure to copy or download it immediately and store it securely.");
+                }
+            } catch (err) {
+                console.error("Failed to generate recovery key:", err);
+                if (typeof alert === 'function') alert("Failed to generate recovery key: " + err.message);
+            }
+        }
+
+        function copyRecoveryKey() {
+            const codeEl = document.getElementById("recoveryKeyCode");
+            const key = codeEl ? codeEl.innerText.trim() : "";
+            if (!key) return;
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(key).then(() => {
+                    if (typeof alert === 'function') alert("Emergency Recovery Key copied to clipboard! Store it in a secure password manager.");
+                }).catch(() => {
+                    if (typeof prompt === 'function') prompt("Copy your Emergency Recovery Key:", key);
+                });
+            } else if (typeof prompt === 'function') {
+                prompt("Copy your Emergency Recovery Key:", key);
+            }
+        }
+
+        function downloadRecoveryKit() {
+            const codeEl = document.getElementById("recoveryKeyCode");
+            const key = codeEl ? codeEl.innerText.trim() : "";
+            if (!key) return;
+            const email = currentAccount ? currentAccount.email : "user";
+            const kitText = 
+`=============================================================
+PORTFOLIO REBALANCER - EMERGENCY RECOVERY KIT
+=============================================================
+Account Email:  ${email}
+Generated:      ${new Date().toISOString()}
+
+EMERGENCY RECOVERY KEY:
+${key}
+
+INSTRUCTIONS:
+1. Store this file or key in a secure location (e.g. 1Password, Bitwarden, or printed safe).
+2. If you forget your Master Password, click "Forgot Master Password?" on the Sign In screen.
+3. Enter your email, this Emergency Recovery Key, and set a new Master Password.
+4. Your portfolio will be restored and re-encrypted with your new master password.
+5. NEVER share this key with anyone. It can decrypt your portfolio holdings without your master password.
+=============================================================
+`;
+            const blob = new Blob([kitText], { type: "text/plain;charset=utf-8" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `rebalance_recovery_key_${email.replace(/[^a-zA-Z0-9]/g, '_')}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        async function handleRecoverAccount() {
+            const emailInput = document.getElementById("signInEmail");
+            const keyInput = document.getElementById("recoveryKeyInput");
+            const passInput = document.getElementById("recoveryNewPassword");
+
+            const email = emailInput ? emailInput.value.trim().toLowerCase() : "";
+            const recoveryKey = keyInput ? keyInput.value.trim() : "";
+            const newPassword = passInput ? passInput.value : "";
+
+            if (!email || !email.includes("@")) {
+                showFeedback("signInFeedback", "Please enter your account email in the Email Address field above.", true);
+                return;
+            }
+            if (!recoveryKey) {
+                showFeedback("signInFeedback", "Please enter your Emergency Recovery Key.", true);
+                return;
+            }
+            if (!newPassword || newPassword.length < 8) {
+                showFeedback("signInFeedback", "New Master Password must be at least 8 characters long.", true);
+                return;
+            }
+
+            const account = await RebalanceSync.getAccount(email);
+            if (!account) {
+                showFeedback("signInFeedback", "No account found with this email.", true);
+                return;
+            }
+            if (!account.recoveryEnvelope) {
+                showFeedback("signInFeedback", "No Emergency Recovery Key has been configured for this account.", true);
+                return;
+            }
+
+            try {
+                // 1. Derive key from recoveryKey + email
+                const recEncKey = await RebalanceCrypto.deriveRecoveryEncryptionKey(email, recoveryKey);
+                
+                // 2. Decrypt the recoveryEnvelope
+                const restoredPortfolio = await RebalanceCrypto.decryptPortfolio(account.recoveryEnvelope, recEncKey);
+
+                // 3. Derive new master keys from the new password
+                const newKeys = await RebalanceCrypto.deriveKeys(email, newPassword);
+
+                // 4. Encrypt portfolio with new master key
+                const newVault = await RebalanceCrypto.encryptPortfolio(restoredPortfolio, newKeys.encryptionKey);
+
+                // 5. Update account record with new credentials & vault
+                account.authHash = newKeys.authHash;
+                account.vault = newVault;
+                account.vaultVersion = (account.vaultVersion || 1) + 1;
+                account.updatedAt = new Date().toISOString();
+                account.lastLoginAt = new Date().toISOString();
+                await RebalanceSync.saveAccount(account);
+                await RebalanceSync.recoverAccount(email, newKeys.authHash, newVault, account.vaultVersion);
+
+                // 6. Sign in with the recovered session
+                currentAccount = {
+                    email: email,
+                    tier: account.tier || "free",
+                    schemaVersion: account.schemaVersion || 2,
+                    vaultVersion: account.vaultVersion,
+                    keys: newKeys
+                };
+
+                loadPortfolioFromState(restoredPortfolio);
+                updateAccountUI();
+
+                const recSec = document.getElementById("recoverySection");
+                if (recSec) recSec.style.display = "none";
+                if (keyInput) keyInput.value = "";
+                if (passInput) passInput.value = "";
+
+                showFeedback("signInFeedback", "Account successfully recovered! New Master Password has been saved.", false);
+                setTimeout(() => {
+                    switchAccountTab('status');
+                }, 600);
+            } catch (err) {
+                showFeedback("signInFeedback", "Recovery failed: invalid key or corrupted recovery data.", true);
+            }
+        }
+
+        async function exportEncryptedBackupData(passwordOverride) {
+            const state = getCurrentPortfolioState();
+            let keyToUse = null;
+            let hint = "";
+
+            if (passwordOverride) {
+                const keys = await RebalanceCrypto.deriveKeys("backup@rebalance.local", passwordOverride);
+                keyToUse = keys.encryptionKey;
+                hint = "password_protected";
+            } else if (currentAccount && currentAccount.keys) {
+                keyToUse = currentAccount.keys.encryptionKey;
+                hint = `account: ${currentAccount.email}`;
+            } else {
+                const pass = typeof prompt === 'function' ? prompt("Enter a password to encrypt your portfolio backup:") : null;
+                if (!pass) return null;
+                if (pass.length < 6) {
+                    if (typeof alert === 'function') alert("Password must be at least 6 characters.");
+                    return null;
+                }
+                const keys = await RebalanceCrypto.deriveKeys("guest_backup@rebalance.local", pass);
+                keyToUse = keys.encryptionKey;
+                hint = "guest_backup";
+            }
+
+            const encrypted = await RebalanceCrypto.encryptPortfolio(state, keyToUse);
+            return {
+                type: "rebalance_encrypted_backup",
+                version: 1,
+                createdAt: new Date().toISOString(),
+                hint: hint,
+                payload: encrypted
+            };
+        }
+
+        async function exportEncryptedBackup() {
+            try {
+                const backupFile = await exportEncryptedBackupData();
+                if (!backupFile) return;
+
+                const blob = new Blob([JSON.stringify(backupFile, null, 2)], { type: "application/json" });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = `rebalance_backup_${new Date().toISOString().slice(0, 10)}.enc.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            } catch (err) {
+                if (typeof alert === 'function') alert("Export failed: " + err.message);
+                else console.error("Export failed:", err);
+            }
+        }
+
+        async function importEncryptedBackupData(backupObj, passwordOverride, emailHintOverride) {
+            if (!backupObj || typeof backupObj !== 'object') {
+                throw new Error("Invalid backup data format.");
+            }
+
+            let envelope = null;
+            if (backupObj.payload && backupObj.payload.iv && backupObj.payload.data) {
+                envelope = backupObj.payload;
+            } else if (backupObj.iv && backupObj.data) {
+                envelope = backupObj;
+            } else {
+                throw new Error("Invalid envelope structure in backup.");
+            }
+
+            let decrypted = null;
+
+            // 1. If password is explicitly provided, verify and decrypt with it directly
+            if (passwordOverride) {
+                let emailGuess = emailHintOverride;
+                if (!emailGuess && backupObj.hint && backupObj.hint.startsWith("account: ")) {
+                    emailGuess = backupObj.hint.replace("account: ", "").trim();
+                } else if (!emailGuess && backupObj.hint === "password_protected") {
+                    emailGuess = "backup@rebalance.local";
+                } else if (!emailGuess) {
+                    emailGuess = "guest_backup@rebalance.local";
+                }
+
+                const keys = await RebalanceCrypto.deriveKeys(emailGuess, passwordOverride);
+                try {
+                    decrypted = await RebalanceCrypto.decryptPortfolio(envelope, keys.encryptionKey);
+                } catch (err1) {
+                    if (emailGuess !== "guest_backup@rebalance.local") {
+                        try {
+                            const guestKeys = await RebalanceCrypto.deriveKeys("guest_backup@rebalance.local", passwordOverride);
+                            decrypted = await RebalanceCrypto.decryptPortfolio(envelope, guestKeys.encryptionKey);
+                        } catch (err2) {
+                            throw new Error("Decryption failed: incorrect password or corrupted backup.");
+                        }
+                    } else {
+                        throw new Error("Decryption failed: incorrect password or corrupted backup.");
+                    }
+                }
+            } else {
+                // 2. No password supplied upfront: if currently signed in, try current session key first
+                if (currentAccount && currentAccount.keys) {
+                    try {
+                        decrypted = await RebalanceCrypto.decryptPortfolio(envelope, currentAccount.keys.encryptionKey);
+                    } catch (e) {
+                        // Key didn't match, prompt user for password
+                    }
+                }
+
+                if (!decrypted) {
+                    const pass = typeof prompt === 'function' ? prompt("Enter the password used to encrypt this backup:") : null;
+                    if (!pass) throw new Error("A password is required to decrypt this backup.");
+                    return await importEncryptedBackupData(backupObj, pass, emailHintOverride);
+                }
+            }
+
+            if (decrypted) {
+                loadPortfolioFromState(decrypted);
+                return decrypted;
+            }
+            throw new Error("Failed to restore portfolio.");
+        }
+
+        async function handleBackupFileSelect(event) {
+            const file = event.target.files && event.target.files[0];
+            if (!file) return;
+            event.target.value = "";
+
+            try {
+                const text = await file.text();
+                const backupObj = JSON.parse(text);
+                await importEncryptedBackupData(backupObj);
+                if (typeof alert === 'function') {
+                    alert("Portfolio successfully restored from encrypted backup!");
+                }
+                closeAccountModal();
+            } catch (err) {
+                if (typeof alert === 'function') {
+                    alert("Import failed: " + err.message);
+                } else {
+                    console.error("Import failed:", err);
+                }
+            }
+        }
+
+        // Close active modals on Escape key
         document.addEventListener("keydown", function(e) {
             if (e.key === "Escape" || e.keyCode === 27) {
-                const overlay = document.getElementById("infoModalOverlay");
-                if (overlay && overlay.classList.contains("active")) {
+                const infoOverlay = document.getElementById("infoModalOverlay");
+                if (infoOverlay && infoOverlay.classList.contains("active")) {
                     closeInfoModal();
+                }
+                const accOverlay = document.getElementById("accountModalOverlay");
+                if (accOverlay && accOverlay.classList.contains("active")) {
+                    closeAccountModal();
                 }
             }
         });
@@ -2107,16 +3359,28 @@
         }
 
         function saveFormData() {
-            const deposit = document.getElementById("deposit").value;
-            const minBuy = document.getElementById("minBuy").value;
-            const completeRebalance = document.getElementById("completeRebalance") ? document.getElementById("completeRebalance").checked : false;
+            const depositEl = document.getElementById("deposit");
+            const minBuyEl = document.getElementById("minBuy");
+            const completeEl = document.getElementById("completeRebalance");
             const payload = {
-                deposit: deposit,
-                minBuy: minBuy,
-                completeRebalance: completeRebalance,
+                deposit: depositEl ? depositEl.value : "",
+                minBuy: (minBuyEl && minBuyEl.value !== undefined && minBuyEl.value !== "") ? minBuyEl.value : "0",
+                completeRebalance: completeEl ? completeEl.checked : false,
                 holdings: holdingsData
             };
             localStorage.setItem("rebalancer_state", JSON.stringify(payload));
+
+            // Auto-sync encrypted vault if user is logged in
+            if (currentAccount && currentAccount.keys && currentAccount.keys.encryptionKey) {
+                const syncEmail = currentAccount.email;
+                RebalanceCrypto.encryptPortfolio(payload, currentAccount.keys.encryptionKey).then(vault => {
+                    if (currentAccount && currentAccount.email === syncEmail) {
+                        RebalanceSync.syncVault(syncEmail, vault);
+                    }
+                }).catch(err => {
+                    console.error("Vault auto-sync error:", err);
+                });
+            }
         }
 
         function loadFormData() {
@@ -2124,8 +3388,12 @@
             if (saved) {
                 try {
                     const data = JSON.parse(saved);
-                    document.getElementById("deposit").value = data.deposit || "";
-                    document.getElementById("minBuy").value = (data.minBuy !== undefined && data.minBuy !== "") ? data.minBuy : "0";
+                    if (document.getElementById("deposit")) {
+                        document.getElementById("deposit").value = data.deposit || "";
+                    }
+                    if (document.getElementById("minBuy")) {
+                        document.getElementById("minBuy").value = (data.minBuy !== undefined && data.minBuy !== "") ? data.minBuy : "0";
+                    }
                     if (document.getElementById("completeRebalance")) {
                         document.getElementById("completeRebalance").checked = Boolean(data.completeRebalance);
                     }
@@ -2142,6 +3410,7 @@
             }
             onToggleCompleteRebalance();
             renderRows();
+            updateAccountUI();
         }
 
         function initDefaultHoldings() {
@@ -3156,6 +4425,30 @@
                 isThresholdWarning,
                 rawOutput: out
             };
+        }
+
+        if (typeof window !== 'undefined') {
+            window.openAccountModal = openAccountModal;
+            window.closeAccountModal = closeAccountModal;
+            window.switchAccountTab = switchAccountTab;
+            window.handleAccountBackdropClick = handleAccountBackdropClick;
+            window.handleSignInSubmit = handleSignInSubmit;
+            window.handleSignUpSubmit = handleSignUpSubmit;
+            window.handleSignOut = handleSignOut;
+            window.updateAccountUI = updateAccountUI;
+            window.exportEncryptedBackupData = exportEncryptedBackupData;
+            window.importEncryptedBackupData = importEncryptedBackupData;
+            window.getCurrentPortfolioState = getCurrentPortfolioState;
+            window.loadPortfolioFromState = loadPortfolioFromState;
+            window.getCurrentAccount = () => currentAccount;
+            window.RebalanceSync = RebalanceSync;
+            window.handleGenerateRecoveryKey = handleGenerateRecoveryKey;
+            window.copyRecoveryKey = copyRecoveryKey;
+            window.downloadRecoveryKit = downloadRecoveryKit;
+            window.toggleRecoverySection = toggleRecoverySection;
+            window.handleRecoverAccount = handleRecoverAccount;
+            window.getStoredAccounts = getStoredAccounts;
+            window.setStoredAccounts = setStoredAccounts;
         }
     </script>
 </body>
