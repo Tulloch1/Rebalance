@@ -2481,6 +2481,17 @@
                 return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
             },
 
+            // Helper: Convert Hex string to Uint8Array
+            hexToBuffer(hex) {
+                if (!hex || typeof hex !== 'string') return new Uint8Array(0);
+                const cleanHex = hex.trim();
+                const bytes = new Uint8Array(cleanHex.length / 2);
+                for (let i = 0; i < bytes.length; i++) {
+                    bytes[i] = parseInt(cleanHex.substr(i * 2, 2), 16);
+                }
+                return bytes;
+            },
+
             // Get Web Crypto instance (window.crypto in browser, globalThis.crypto in Node/workers)
             getCrypto() {
                 if (typeof window !== 'undefined' && window.crypto && window.crypto.subtle) {
@@ -2534,7 +2545,7 @@
 
                 // 3. Derive Data Encryption Key (AES-GCM 256-bit, stays in client memory only)
                 const encSalt = encoder.encode(normalizedEmail + ':rebalance:encrypt');
-                const encryptionKey = await subtle.deriveKey(
+                const encBits = await subtle.deriveBits(
                     {
                         name: 'PBKDF2',
                         salt: encSalt,
@@ -2542,12 +2553,36 @@
                         hash: 'SHA-256'
                     },
                     baseKey,
+                    256
+                );
+                const rawKeyHex = this.bufferToHex(encBits);
+                const encryptionKey = await subtle.importKey(
+                    'raw',
+                    encBits,
                     { name: 'AES-GCM', length: 256 },
                     false,
                     ['encrypt', 'decrypt']
                 );
 
-                return { authHash, encryptionKey };
+                return { authHash, encryptionKey, rawKeyHex };
+            },
+
+            /**
+             * Import Raw Key Hex as CryptoKey (used for persistent session restore)
+             */
+            async importEncryptionKey(rawKeyHex) {
+                if (!rawKeyHex || typeof rawKeyHex !== 'string') {
+                    throw new Error("A valid hex key string is required to import encryption key.");
+                }
+                const cryptoObj = this.getCrypto();
+                const bytes = this.hexToBuffer(rawKeyHex);
+                return await cryptoObj.subtle.importKey(
+                    'raw',
+                    bytes,
+                    { name: 'AES-GCM', length: 256 },
+                    false,
+                    ['encrypt', 'decrypt']
+                );
             },
 
             /**
@@ -2759,6 +2794,7 @@
             initTheme();
             updateCurrencySymbols();
             loadFormData();
+            restoreSession();
         });
 
         // Prevent mouse wheel from incrementing/decrementing number inputs when scrolling the page
@@ -3245,6 +3281,8 @@
                     keys: keys
                 };
 
+                saveSession(email, keys.rawKeyHex, keys.authHash);
+
                 updateAccountUI();
                 const signUpForm = document.getElementById("signUpForm");
                 if (signUpForm && typeof signUpForm.reset === 'function') signUpForm.reset();
@@ -3315,6 +3353,8 @@
                     keys: keys
                 };
 
+                saveSession(email, keys.rawKeyHex, keys.authHash);
+
                 if (account.vault) {
                     try {
                         const decrypted = await RebalanceCrypto.decryptPortfolio(account.vault, keys.encryptionKey);
@@ -3338,11 +3378,102 @@
         }
 
         function handleSignOut() {
+            clearSession();
             currentAccount = null;
             const recBox = document.getElementById("recoveryKeyDisplayBox");
             if (recBox) recBox.style.display = "none";
             updateAccountUI();
             switchAccountTab('status');
+        }
+
+        // --- Persistent Session Management ---
+        function saveSession(email, rawKeyHex, authHash) {
+            try {
+                if (typeof localStorage !== 'undefined') {
+                    localStorage.setItem("rebalance_session", JSON.stringify({
+                        email: email,
+                        rawKeyHex: rawKeyHex,
+                        authHash: authHash,
+                        savedAt: new Date().toISOString()
+                    }));
+                }
+            } catch (e) {
+                console.error("Failed to save session:", e);
+            }
+        }
+
+        function clearSession() {
+            try {
+                if (typeof localStorage !== 'undefined') {
+                    localStorage.removeItem("rebalance_session");
+                }
+            } catch (e) {
+                console.error("Failed to clear session:", e);
+            }
+        }
+
+        function getSession() {
+            try {
+                if (typeof localStorage !== 'undefined') {
+                    const data = localStorage.getItem("rebalance_session");
+                    return data ? JSON.parse(data) : null;
+                }
+            } catch (e) {
+                console.error("Failed to read session:", e);
+            }
+            return null;
+        }
+
+        async function restoreSession() {
+            const session = getSession();
+            if (!session || !session.email || !session.rawKeyHex) {
+                updateAccountUI();
+                return null;
+            }
+            try {
+                const encryptionKey = await RebalanceCrypto.importEncryptionKey(session.rawKeyHex);
+                const keys = {
+                    authHash: session.authHash,
+                    encryptionKey: encryptionKey,
+                    rawKeyHex: session.rawKeyHex
+                };
+                const account = await RebalanceSync.getAccount(session.email);
+                if (!account) {
+                    clearSession();
+                    updateAccountUI();
+                    return null;
+                }
+                if (account.authHash && session.authHash && account.authHash !== session.authHash) {
+                    clearSession();
+                    updateAccountUI();
+                    return null;
+                }
+
+                currentAccount = {
+                    email: account.email,
+                    tier: account.tier || "free",
+                    schemaVersion: account.schemaVersion || 2,
+                    vaultVersion: account.vaultVersion || 1,
+                    keys: keys
+                };
+
+                if (account.vault) {
+                    try {
+                        const decrypted = await RebalanceCrypto.decryptPortfolio(account.vault, keys.encryptionKey);
+                        loadPortfolioFromState(decrypted);
+                    } catch (decErr) {
+                        console.error("Failed to decrypt stored vault on session restore:", decErr);
+                    }
+                }
+
+                updateAccountUI();
+                return currentAccount;
+            } catch (err) {
+                console.error("Failed to restore session:", err);
+                clearSession();
+                updateAccountUI();
+                return null;
+            }
         }
 
         // --- Emergency Recovery Key Handlers ---
@@ -3506,6 +3637,8 @@ INSTRUCTIONS:
                     vaultVersion: account.vaultVersion,
                     keys: newKeys
                 };
+
+                saveSession(email, newKeys.rawKeyHex, newKeys.authHash);
 
                 loadPortfolioFromState(restoredPortfolio);
                 updateAccountUI();
@@ -5311,6 +5444,10 @@ INSTRUCTIONS:
             window.handleSignInSubmit = handleSignInSubmit;
             window.handleSignUpSubmit = handleSignUpSubmit;
             window.handleSignOut = handleSignOut;
+            window.saveSession = saveSession;
+            window.clearSession = clearSession;
+            window.getSession = getSession;
+            window.restoreSession = restoreSession;
             window.updateAccountUI = updateAccountUI;
             window.exportEncryptedBackupData = exportEncryptedBackupData;
             window.importEncryptedBackupData = importEncryptedBackupData;
