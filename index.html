@@ -2166,7 +2166,7 @@
             <div class="info-modal-body">
                 <!-- Status / Guest Pane -->
                 <div class="tab-pane active" id="tab-pane-acc-status" role="tabpanel">
-                    <h3 id="accountModalTitle">Account &amp; Vault Security</h3>
+                    <h3 id="accountModalTitle">Account &amp; Security</h3>
                     
                     <div class="account-status-card">
                         <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -2179,7 +2179,7 @@
                         </div>
                         <div id="accUserDisplay" style="font-size: 15px; font-weight: 600; color: var(--text-primary);">Guest Mode (Browser Storage)</div>
                         <p id="accStatusDesc" style="margin: 0; font-size: 13px; color: var(--text-secondary); line-height: 1.45;">
-                            Your portfolio data is stored locally in unencrypted browser storage. Create an account or sign in to encrypt your vault end-to-end with PBKDF2 + AES-GCM (256-bit).
+                            Your portfolio data is stored locally in your browser. Create an account or sign in to save and sync your portfolio across all your devices securely.
                         </p>
 
                         <!-- Emergency Recovery Key Card -->
@@ -2218,14 +2218,14 @@
                         </div>
                         <button type="button" class="btn-account-danger" id="btnSignOut" style="display: none; width: 100%;" onclick="handleSignOut()">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
-                            Sign Out of Vault
+                            Sign Out
                         </button>
                     </div>
                 </div>
 
                 <!-- Sign In Pane -->
                 <div class="tab-pane" id="tab-pane-acc-signin" role="tabpanel">
-                    <h3>Unlock Encrypted Vault</h3>
+                    <h3>Sign In to Your Account</h3>
                     <div class="account-notice">
                         Zero-Knowledge Security: Decryption keys are derived in browser memory. Your master password is never sent anywhere in plaintext.
                     </div>
@@ -2235,35 +2235,35 @@
                             <input type="email" class="account-input" id="signInEmail" placeholder="you@example.com" autocomplete="username" required>
                         </div>
                         <div class="account-field-group">
-                            <label class="account-label" for="signInPassword">Master Password</label>
+                            <label class="account-label" for="signInPassword">Password</label>
                             <input type="password" class="account-input" id="signInPassword" placeholder="••••••••••••" autocomplete="current-password" required>
                         </div>
                         <div style="display: flex; justify-content: flex-end; margin-top: -6px; margin-bottom: 12px;">
                             <button type="button" onclick="toggleRecoverySection()" id="btnForgotPass" style="background: none; border: none; padding: 0; color: var(--accent); font-size: 11.5px; cursor: pointer; text-decoration: underline;">
-                                Forgot Master Password?
+                                Forgot Password?
                             </button>
                         </div>
                         <div id="signInFeedback" style="display: none; padding: 8px 12px; border-radius: var(--radius-sm); font-size: 12px; margin-bottom: 12px;"></div>
                         <button type="submit" class="btn-account-primary" id="btnSignInSubmit">
-                            Unlock &amp; Sign In
+                            Sign In
                         </button>
 
                         <!-- Collapsible Emergency Recovery Section -->
                         <div id="recoverySection" style="display: none; margin-top: 14px; padding-top: 14px; border-top: 1px dashed var(--border-subtle);">
-                            <div style="font-size: 12px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px;">Recover with Emergency Key</div>
+                            <div style="font-size: 12px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px;">Recover Account with Emergency Key</div>
                             <p style="font-size: 11.5px; color: var(--text-secondary); margin: 0 0 10px 0; line-height: 1.4;">
-                                Enter your 24-character Emergency Recovery Key to reset your master password and unlock your portfolio:
+                                Enter your 24-character Emergency Recovery Key to reset your password and restore account access:
                             </p>
                             <div class="account-field-group">
                                 <label class="account-label" for="recoveryKeyInput">Emergency Recovery Key</label>
                                 <input type="text" class="account-input" id="recoveryKeyInput" placeholder="XXXX-XXXX-XXXX-XXXX-XXXX-XXXX" style="font-family: var(--font-mono); letter-spacing: 0.04em;">
                             </div>
                             <div class="account-field-group">
-                                <label class="account-label" for="recoveryNewPassword">New Master Password (min. 8 characters)</label>
+                                <label class="account-label" for="recoveryNewPassword">New Password (min. 8 characters)</label>
                                 <input type="password" class="account-input" id="recoveryNewPassword" placeholder="••••••••••••" minlength="8">
                             </div>
                             <button type="button" class="btn-account-secondary" onclick="handleRecoverAccount()" style="width: 100%;">
-                                Restore Vault with Recovery Key
+                                Reset Password with Key
                             </button>
                         </div>
                     </form>
@@ -2271,9 +2271,9 @@
 
                 <!-- Create Account Pane -->
                 <div class="tab-pane" id="tab-pane-acc-signup" role="tabpanel">
-                    <h3>Create End-to-End Encrypted Account</h3>
+                    <h3>Create an Account</h3>
                     <div class="account-notice">
-                        PBKDF2 SHA-256 (100,000 iterations) + AES-GCM 256-bit encryption protects your holdings. Because encryption is zero-knowledge, lost passwords cannot be reset.
+                        Client-side encrypted: your portfolio is protected with PBKDF2 + AES-256. Lost passwords cannot be reset without an Emergency Recovery Key.
                     </div>
                     <form id="signUpForm" onsubmit="handleSignUpSubmit(event)">
                         <div class="account-field-group">
@@ -2281,16 +2281,16 @@
                             <input type="email" class="account-input" id="signUpEmail" placeholder="you@example.com" autocomplete="username" required>
                         </div>
                         <div class="account-field-group">
-                            <label class="account-label" for="signUpPassword">Master Password (min. 8 characters)</label>
+                            <label class="account-label" for="signUpPassword">Password (min. 8 characters)</label>
                             <input type="password" class="account-input" id="signUpPassword" placeholder="••••••••••••" autocomplete="new-password" minlength="8" required>
                         </div>
                         <div class="account-field-group">
-                            <label class="account-label" for="signUpConfirmPassword">Confirm Master Password</label>
+                            <label class="account-label" for="signUpConfirmPassword">Confirm Password</label>
                             <input type="password" class="account-input" id="signUpConfirmPassword" placeholder="••••••••••••" autocomplete="new-password" minlength="8" required>
                         </div>
                         <div id="signUpFeedback" style="display: none; padding: 8px 12px; border-radius: var(--radius-sm); font-size: 12px; margin-bottom: 12px;"></div>
                         <button type="submit" class="btn-account-primary" id="btnSignUpSubmit">
-                            Create Vault &amp; Sign In
+                            Create Account
                         </button>
                     </form>
                 </div>
@@ -2419,7 +2419,7 @@
                     <div class="setting-row">
                         <div class="setting-info">
                             <span class="setting-title">Auto-Sync to Cloud</span>
-                            <span class="setting-sub">Automatically encrypt and synchronize vault on every portfolio change</span>
+                            <span class="setting-sub">Automatically synchronize portfolio across devices on every change</span>
                         </div>
                         <label class="toggle-switch" for="settingAutoSyncToggle" title="Toggle Cloud Auto-Sync">
                             <input type="checkbox" id="settingAutoSyncToggle" onchange="onSettingAutoSyncToggle(this.checked)">
@@ -2926,7 +2926,7 @@
                     userDisplay.innerText = currentAccount.email;
                 }
                 if (desc) {
-                    desc.innerText = "Your portfolio is protected with zero-knowledge PBKDF2 + AES-GCM (256-bit). Local edits will automatically sync to your encrypted vault.";
+                    desc.innerText = "Your account is active and protected with client-side encryption. Edits will automatically sync across your devices.";
                 }
                 if (btnSignOut) {
                     btnSignOut.style.display = "flex";
@@ -2955,7 +2955,7 @@
                     userDisplay.innerText = "Guest Mode (Browser Storage)";
                 }
                 if (desc) {
-                    desc.innerText = "Your portfolio data is stored locally in unencrypted browser storage. Create an account or sign in to encrypt your vault end-to-end with PBKDF2 + AES-GCM (256-bit).";
+                    desc.innerText = "Your portfolio data is stored locally in your browser. Create an account or sign in to save and sync your portfolio across all your devices securely.";
                 }
                 if (btnSignOut) {
                     btnSignOut.style.display = "none";
@@ -3248,7 +3248,7 @@
                 updateAccountUI();
                 const signUpForm = document.getElementById("signUpForm");
                 if (signUpForm && typeof signUpForm.reset === 'function') signUpForm.reset();
-                showFeedback("signUpFeedback", "Account created successfully! Vault unlocked.", false);
+                showFeedback("signUpFeedback", "Account created successfully! Signed in.", false);
 
                 setTimeout(() => {
                     switchAccountTab('status');
@@ -3327,7 +3327,7 @@
                 updateAccountUI();
                 const signInForm = document.getElementById("signInForm");
                 if (signInForm && typeof signInForm.reset === 'function') signInForm.reset();
-                showFeedback("signInFeedback", "Vault unlocked successfully!", false);
+                showFeedback("signInFeedback", "Signed in successfully!", false);
 
                 setTimeout(() => {
                     switchAccountTab('status');
@@ -3998,7 +3998,7 @@ INSTRUCTIONS:
                 const lastSyncEl = document.getElementById("settingLastSyncLabel");
                 if (lastSyncEl) lastSyncEl.innerText = `Last Synced: Today at ${timeStr}`;
 
-                showFeedback("settingSyncFeedback", "Cloud vault successfully synchronized to Cloudflare D1!", false);
+                showFeedback("settingSyncFeedback", "Portfolio successfully synchronized across devices!", false);
             } catch (err) {
                 console.error("Manual sync failed:", err);
                 showFeedback("settingSyncFeedback", "Sync failed: " + err.message, true);
