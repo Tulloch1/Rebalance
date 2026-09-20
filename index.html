@@ -2394,24 +2394,14 @@
                 <div class="tab-pane" id="tab-pane-set-sync" role="tabpanel">
                     <div class="modal-pane-header">
                         <h3>Cloud Synchronization</h3>
-                        <p class="modal-pane-desc">Configure your serverless edge API endpoint for multi-device encrypted backup.</p>
-                    </div>
-
-                    <!-- API Endpoint Setting -->
-                    <div class="setting-box">
-                        <label class="setting-label" for="settingSyncUrl">Cloudflare Worker API Endpoint</label>
-                        <div class="sync-input-row">
-                            <input type="url" class="clean-input" id="settingSyncUrl" placeholder="https://rebalance-api.portfolio-calculator.workers.dev" oninput="onSyncUrlInput()">
-                            <button type="button" class="btn-setting-action" id="btnSaveSyncUrl" onclick="saveSyncEndpoint()">Save</button>
-                        </div>
-                        <span class="setting-hint">Direct link to your deployed Cloudflare Worker edge backend. Leave blank to use local storage only.</span>
+                        <p class="modal-pane-desc">End-to-end encrypted synchronization across all your authorized devices.</p>
                     </div>
 
                     <!-- Connection Status & Ping -->
                     <div class="setting-row">
                         <div class="setting-info">
-                            <span class="setting-title">Server Connection Status</span>
-                            <span class="setting-sub" id="settingSyncStatusSub">Local storage only (Edge sync is optional)</span>
+                            <span class="setting-title">Cloud Connection Status</span>
+                            <span class="setting-sub" id="settingSyncStatusSub">Checking connection...</span>
                         </div>
                         <div style="display: flex; align-items: center; gap: 8px;">
                             <span id="settingSyncBadge" class="sync-status-badge offline">Offline</span>
@@ -4080,7 +4070,7 @@ INSTRUCTIONS:
                     badge.innerText = "Connected";
                 }
                 if (sub) {
-                    sub.innerHTML = `Connected to edge (${latency}ms) &bull; D1: <strong style="color: var(--accent);">${health.d1 || 'active'}</strong>`;
+                    sub.innerHTML = `Connected to cloud edge (${latency}ms) &bull; Database: <strong style="color: var(--accent);">Active</strong>`;
                 }
             } else {
                 if (badge) {
@@ -4089,8 +4079,8 @@ INSTRUCTIONS:
                 }
                 if (sub) {
                     sub.innerText = health.reason === "offline_mode"
-                        ? "Local browser storage only (No API endpoint configured)"
-                        : `Unreachable (${health.reason === 'network_unreachable' ? 'Backend worker not deployed' : health.reason || 'Check URL'})`;
+                        ? "Local browser storage only (Offline mode)"
+                        : "Cloud edge unreachable (Using local storage)";
                 }
             }
         }
