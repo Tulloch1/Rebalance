@@ -1427,13 +1427,86 @@
 
         /* Unified Modal Sidebar Layout System */
         #infoModalOverlay .info-modal-card,
-        #accountModalOverlay .info-modal-card,
         #settingsModalOverlay .info-modal-card {
             max-width: 780px;
             width: 95%;
             min-height: 480px;
             max-height: 85vh;
             flex-direction: row;
+        }
+
+        /* Streamlined Account Modal Card */
+        #accountModalOverlay .info-modal-card {
+            max-width: 480px;
+            width: 95%;
+            min-height: auto;
+            max-height: 88vh;
+            flex-direction: column;
+        }
+
+        .account-modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 22px 0 22px;
+        }
+
+        .account-modal-title-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .account-modal-title-group h3 {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .account-tab-bar {
+            display: flex;
+            gap: 6px;
+            padding: 14px 22px 10px 22px;
+            border-bottom: 1px solid var(--border-subtle);
+            user-select: none;
+        }
+
+        .account-tab {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 8px 10px;
+            font-family: var(--font-sans);
+            font-size: 12.5px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            background: transparent;
+            border: 1px solid transparent;
+            border-radius: 9px;
+            cursor: pointer;
+            transition: all 0.16s ease;
+            white-space: nowrap;
+            outline: none;
+        }
+
+        .account-tab:hover:not(.active) {
+            background: var(--track-bg);
+            color: var(--text-primary);
+        }
+
+        .account-tab.active {
+            background: var(--bg-base);
+            color: var(--accent);
+            border-color: var(--accent);
+            font-weight: 700;
+            box-shadow: 0 0 0 2px var(--accent-glow);
+        }
+
+        #accountModalOverlay .info-modal-body {
+            padding: 20px 24px 24px 24px;
         }
 
         .modal-sidebar,
@@ -1531,7 +1604,6 @@
         }
 
         #infoModalOverlay .info-modal-body,
-        #accountModalOverlay .info-modal-body,
         #settingsModalOverlay .info-modal-body {
             flex: 1;
             padding: 8px 28px 28px 28px;
@@ -1541,7 +1613,6 @@
         /* Responsive Collapse for Mobile Screens */
         @media (max-width: 640px) {
             #infoModalOverlay .info-modal-card,
-            #accountModalOverlay .info-modal-card,
             #settingsModalOverlay .info-modal-card {
                 flex-direction: column;
                 min-height: auto;
@@ -1595,9 +1666,17 @@
             }
 
             #infoModalOverlay .info-modal-body,
-            #accountModalOverlay .info-modal-body,
             #settingsModalOverlay .info-modal-body {
                 padding: 18px 20px 20px 20px;
+            }
+
+            #accountModalOverlay .info-modal-body {
+                padding: 16px 18px 20px 18px;
+            }
+
+            .account-tab {
+                font-size: 11.5px;
+                padding: 7px 6px;
             }
         }
 
@@ -2330,40 +2409,36 @@
     <!-- Account & Security Modal Overlay -->
     <div class="modal-overlay" id="accountModalOverlay" onclick="handleAccountBackdropClick(event)">
         <div class="info-modal-card card" role="dialog" aria-modal="true" aria-labelledby="accountModalTitle">
-            <!-- Left Sidebar with Vertical Tabs -->
-            <div class="modal-sidebar">
-                <div class="modal-sidebar-header">
-                    <span class="modal-sidebar-title">Account</span>
+            <!-- Account Modal Header -->
+            <div class="account-modal-header">
+                <div class="account-modal-title-group">
+                    <h3 id="accountModalTitle">Account &amp; Security</h3>
                 </div>
-                <div class="modal-sidebar-tabs" role="tablist">
-                    <button class="modal-sidebar-tab active" id="tab-btn-acc-status" role="tab" aria-selected="true" onclick="switchAccountTab('status')">
-                        <span class="tab-title">Status / Guest</span>
-                    </button>
-                    <button class="modal-sidebar-tab" id="tab-btn-acc-signin" role="tab" aria-selected="false" onclick="switchAccountTab('signin')">
-                        <span class="tab-title">Sign In</span>
-                    </button>
-                    <button class="modal-sidebar-tab" id="tab-btn-acc-signup" role="tab" aria-selected="false" onclick="switchAccountTab('signup')">
-                        <span class="tab-title">Create Account</span>
-                    </button>
-                </div>
+                <button class="modal-close-btn" id="accountModalCloseBtn" title="Close (Esc)" onclick="closeAccountModal()" aria-label="Close account modal">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
             </div>
 
-            <!-- Right Content Container -->
-            <div class="modal-content-container">
-                <div class="modal-content-header">
-                    <button class="modal-close-btn" id="accountModalCloseBtn" title="Close (Esc)" onclick="closeAccountModal()" aria-label="Close account modal">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-                            <line x1="18" y1="6" x2="6" y2="18"></line>
-                            <line x1="6" y1="6" x2="18" y2="18"></line>
-                        </svg>
-                    </button>
-                </div>
+            <!-- Segmented Tab Bar (When Logged Out) -->
+            <div class="account-tab-bar" id="accountTabBar" role="tablist">
+                <button class="account-tab active" id="tab-btn-acc-status" role="tab" aria-selected="true" onclick="switchAccountTab('status')">
+                    <span class="tab-title">Status / Guest</span>
+                </button>
+                <button class="account-tab" id="tab-btn-acc-signin" role="tab" aria-selected="false" onclick="switchAccountTab('signin')">
+                    <span class="tab-title">Sign In</span>
+                </button>
+                <button class="account-tab" id="tab-btn-acc-signup" role="tab" aria-selected="false" onclick="switchAccountTab('signup')">
+                    <span class="tab-title">Create Account</span>
+                </button>
+            </div>
 
-                <!-- Tab Panels Body -->
-                <div class="info-modal-body">
+            <!-- Tab Panels Body -->
+            <div class="info-modal-body">
                 <!-- Status / Guest Pane -->
                 <div class="tab-pane active" id="tab-pane-acc-status" role="tabpanel">
-                    <h3 id="accountModalTitle">Account &amp; Security</h3>
                     
                     <div class="account-status-card">
                         <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -2494,7 +2569,6 @@
             </div>
         </div>
     </div>
-</div>
 
     <!-- Settings & Preferences Modal Overlay -->
     <div class="modal-overlay" id="settingsModalOverlay" onclick="handleSettingsBackdropClick(event)">
@@ -3130,6 +3204,7 @@
             const btnSignOut = document.getElementById("btnSignOut");
             const btnGenRecovery = document.getElementById("btnGenRecoveryKey");
             const recBox = document.getElementById("recoveryKeyDisplayBox");
+            const tabBar = document.getElementById("accountTabBar");
 
             if (syncBadge) {
                 if (RebalanceSync && RebalanceSync.apiBaseUrl) {
@@ -3145,6 +3220,8 @@
 
             if (currentAccount && currentAccount.email) {
                 if (accountBtn) accountBtn.classList.add("logged-in");
+                if (tabBar) tabBar.style.display = "none";
+                switchAccountTab('status');
                 if (badge) {
                     badge.innerText = "Encrypted Vault";
                     badge.style.color = "var(--accent)";
@@ -3176,6 +3253,7 @@
                 }
             } else {
                 if (accountBtn) accountBtn.classList.remove("logged-in");
+                if (tabBar) tabBar.style.display = "flex";
                 if (badge) {
                     badge.innerText = "Guest (Local)";
                     badge.style.color = "";
