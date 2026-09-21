@@ -638,6 +638,15 @@ console.log("\n--- PART 4: Information Guide Modal & Chrome Tab Navigation ---")
         assert.strictEqual(paneComplete.classList.contains("active"), true);
         assert.strictEqual(btnDynamic.classList.contains("active"), false);
         assert.strictEqual(paneDynamic.classList.contains("active"), false);
+
+        // Switch to disclaimer
+        const btnDisclaimer = env.getEl("tab-btn-disclaimer");
+        const paneDisclaimer = env.getEl("tab-pane-disclaimer");
+        env.switchInfoTab("disclaimer");
+        assert.strictEqual(btnDisclaimer.classList.contains("active"), true);
+        assert.strictEqual(paneDisclaimer.classList.contains("active"), true);
+        assert.strictEqual(btnComplete.classList.contains("active"), false);
+        assert.strictEqual(paneComplete.classList.contains("active"), false);
     });
 }
 

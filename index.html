@@ -1279,6 +1279,44 @@
             transform: translateX(-50%) translateY(0);
         }
 
+        .footer-disclaimer-note {
+            margin-top: 8px;
+            font-size: 11.5px;
+            color: var(--text-muted);
+            line-height: 1.5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .footer-disclaimer-separator {
+            color: var(--text-muted);
+            opacity: 0.6;
+        }
+
+        .footer-disclaimer-link {
+            background: none;
+            border: none;
+            padding: 0;
+            margin: 0;
+            color: var(--accent);
+            font-family: inherit;
+            font-size: inherit;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: underline;
+            text-underline-offset: 2px;
+            text-decoration-color: rgba(36, 219, 161, 0.4);
+            transition: all 0.18s ease;
+        }
+
+        .footer-disclaimer-link:hover {
+            color: var(--accent-hover);
+            text-decoration-color: var(--accent);
+        }
+
         /* Information Modal & Backdrop */
         .modal-overlay {
             position: fixed;
@@ -2330,17 +2368,24 @@
 
         <!-- Feedback Footer -->
         <footer class="feedback-footer">
-            <span>Have feedback? Please send any thoughts or bugs you find to </span>
-            <span class="email-copy-btn" onclick="copyFeedbackEmail(event)" title="Click to copy email">
-                <span id="feedbackEmail">williambatulloch@gmail.com</span>
-                <span class="email-copy-icon">
-                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                    </svg>
+            <div>
+                <span>Have feedback? Please send any thoughts or bugs you find to </span>
+                <span class="email-copy-btn" onclick="copyFeedbackEmail(event)" title="Click to copy email">
+                    <span id="feedbackEmail">williambatulloch@gmail.com</span>
+                    <span class="email-copy-icon">
+                        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                    </span>
+                    <span class="email-toast" id="emailToast">Copied!</span>
                 </span>
-                <span class="email-toast" id="emailToast">Copied!</span>
-            </span>
+            </div>
+            <div class="footer-disclaimer-note">
+                <span>Rebalance is a portfolio calculation tool for informational purposes only and does not provide financial advice.</span>
+                <span class="footer-disclaimer-separator">&bull;</span>
+                <button type="button" class="footer-disclaimer-link" onclick="openInfoModal('disclaimer')">Disclaimer</button>
+            </div>
         </footer>
 
     </div>
@@ -2365,6 +2410,9 @@
                     </button>
                     <button class="info-sidebar-tab" id="tab-btn-thresholds" role="tab" aria-selected="false" onclick="switchInfoTab('thresholds')">
                         <span class="tab-title">Minimum Transactions</span>
+                    </button>
+                    <button class="info-sidebar-tab" id="tab-btn-disclaimer" role="tab" aria-selected="false" onclick="switchInfoTab('disclaimer')">
+                        <span class="tab-title">Disclaimer</span>
                     </button>
                 </div>
             </div>
@@ -2400,6 +2448,25 @@
                     <div class="tab-pane" id="tab-pane-thresholds" role="tabpanel">
                         <h3>Hello World!</h3>
                         <p>Minimum Transaction thresholds prevent tiny, fee-inefficient orders by consolidating sub-threshold amounts into the most underweight eligible asset.</p>
+                    </div>
+
+                    <div class="tab-pane" id="tab-pane-disclaimer" role="tabpanel">
+                        <h3>Financial &amp; Investment Disclaimer</h3>
+                        
+                        <p><strong>For Informational and Educational Purposes Only</strong><br>
+                        Rebalance is an independent mathematical calculation tool designed to assist self-directed investors in modeling portfolio asset allocations. <strong>Rebalance does not provide financial, investment, legal, tax, or accounting advice.</strong> Nothing contained on this site, generated by this calculator, or output in receipts constitutes an offer, solicitation, or recommendation to buy, sell, or hold any security, financial product, or instrument.</p>
+
+                        <p><strong>No Fiduciary or Advisory Relationship</strong><br>
+                        Using this software does not establish an advisory, fiduciary, or broker-dealer relationship between you and the operators of Rebalance. The calculations produced do not take into account your personal financial objectives, investment horizon, tax situation, or individual risk tolerance.</p>
+
+                        <p><strong>Accuracy and Verification</strong><br>
+                        All calculations, rebalancing models, whole-dollar roundings, and trade allocations are provided on an "as is" and "as available" basis without warranty of any kind, express or implied. While Rebalance strives for mathematical rigor, algorithms and manual data entry may produce errors, rounding differences, or unintended order sizes. <strong>You must independently verify all calculations, cash flows, and trade quantities with your registered brokerage prior to executing any transactions.</strong></p>
+
+                        <p><strong>Assumption of Risk</strong><br>
+                        All investments carry risk, including the potential loss of principal. Past performance of any asset or allocation strategy is no guarantee of future returns. You assume sole responsibility for all investment choices, asset selections, and trades executed.</p>
+
+                        <p><strong>Consult a Licensed Professional</strong><br>
+                        If you require financial advice, please consult a certified financial planner (CFP), registered investment advisor (RIA), or qualified tax professional licensed in your jurisdiction.</p>
                     </div>
                 </div>
             </div>
@@ -3076,11 +3143,14 @@
         });
 
         // --- Information Guide Modal ---
-        function openInfoModal() {
+        function openInfoModal(tabId) {
             const overlay = document.getElementById("infoModalOverlay");
             if (overlay) {
                 overlay.classList.add("active");
                 document.body.style.overflow = "hidden";
+                if (tabId) {
+                    switchInfoTab(tabId);
+                }
             }
         }
 
@@ -3099,7 +3169,7 @@
         }
 
         function switchInfoTab(tabId) {
-            const tabs = ['overview', 'dynamic', 'complete', 'thresholds'];
+            const tabs = ['overview', 'dynamic', 'complete', 'thresholds', 'disclaimer'];
             tabs.forEach(t => {
                 const btn = document.getElementById(`tab-btn-${t}`);
                 const pane = document.getElementById(`tab-pane-${t}`);
