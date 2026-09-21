@@ -1437,7 +1437,7 @@
 
         /* Streamlined Account Modal Card */
         #accountModalOverlay .info-modal-card {
-            max-width: 480px;
+            max-width: 620px;
             width: 95%;
             min-height: auto;
             max-height: 88vh;
@@ -2443,10 +2443,10 @@
                     <div class="account-status-card">
                         <div style="display: flex; justify-content: space-between; align-items: center;">
                             <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted);">Current Mode</span>
-                            <div style="display: flex; gap: 6px; align-items: center;">
+                            <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap; justify-content: flex-end;">
                                 <span class="brand-tag" id="accTierBadge" style="display: none; margin: 0; background: var(--accent-badge-bg); border-color: var(--accent-badge-border); color: var(--accent);">Free Plan</span>
-                                <span class="brand-tag" id="accSyncBadge" style="margin: 0; font-size: 11px;">Offline First</span>
-                                <span class="brand-tag" id="accStatusBadge" style="margin: 0;">Guest (Local)</span>
+                                <span class="brand-tag" id="accSyncBadge" style="margin: 0; font-size: 11px;">Not Synced</span>
+                                <span class="brand-tag" id="accStatusBadge" style="margin: 0;">Stored Locally</span>
                             </div>
                         </div>
                         <div id="accUserDisplay" style="font-size: 15px; font-weight: 600; color: var(--text-primary);">Guest Mode (Browser Storage)</div>
@@ -3208,11 +3208,11 @@
 
             if (syncBadge) {
                 if (RebalanceSync && RebalanceSync.apiBaseUrl) {
-                    syncBadge.innerText = "Cloud Edge";
+                    syncBadge.innerText = "Synced";
                     syncBadge.style.color = "var(--accent)";
                     syncBadge.style.borderColor = "var(--accent-badge-border)";
                 } else {
-                    syncBadge.innerText = "Offline First";
+                    syncBadge.innerText = "Not Synced";
                     syncBadge.style.color = "";
                     syncBadge.style.borderColor = "";
                 }
@@ -3223,7 +3223,7 @@
                 if (tabBar) tabBar.style.display = "none";
                 switchAccountTab('status');
                 if (badge) {
-                    badge.innerText = "Encrypted Vault";
+                    badge.innerText = "Encrypted";
                     badge.style.color = "var(--accent)";
                     badge.style.borderColor = "var(--accent-badge-border)";
                 }
@@ -3255,7 +3255,7 @@
                 if (accountBtn) accountBtn.classList.remove("logged-in");
                 if (tabBar) tabBar.style.display = "flex";
                 if (badge) {
-                    badge.innerText = "Guest (Local)";
+                    badge.innerText = "Stored Locally";
                     badge.style.color = "";
                     badge.style.borderColor = "";
                 }

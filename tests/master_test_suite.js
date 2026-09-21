@@ -876,7 +876,7 @@ console.log("\n--- PART 4: Information Guide Modal & Chrome Tab Navigation ---")
             assert.ok(cur !== null);
             assert.strictEqual(cur.email, "investor@example.com");
             assert.strictEqual(accountBtn.classList.contains("logged-in"), true);
-            assert.strictEqual(badge.innerText, "Encrypted Vault");
+            assert.strictEqual(badge.innerText, "Encrypted");
             assert.strictEqual(btnSignOut.style.display, "flex");
 
             // Verify account stored in localStorage
@@ -895,7 +895,7 @@ console.log("\n--- PART 4: Information Guide Modal & Chrome Tab Navigation ---")
             env.handleSignOut();
             assert.strictEqual(env.getCurrentAccount(), null);
             assert.strictEqual(env.getEl("accountBtn").classList.contains("logged-in"), false);
-            assert.strictEqual(env.getEl("accStatusBadge").innerText, "Guest (Local)");
+            assert.strictEqual(env.getEl("accStatusBadge").innerText, "Stored Locally");
             assert.strictEqual(env.getEl("btnSignOut").style.display, "none");
         });
 
@@ -1192,7 +1192,7 @@ console.log("\n--- PART 4: Information Guide Modal & Chrome Tab Navigation ---")
             assert.strictEqual(env.getCurrentAccount(), null);
             assert.strictEqual(env.getSession(), null, "rebalance_session should be removed");
             assert.strictEqual(env.getEl("accountBtn").classList.contains("logged-in"), false);
-            assert.strictEqual(env.getEl("accStatusBadge").innerText, "Guest (Local)");
+            assert.strictEqual(env.getEl("accStatusBadge").innerText, "Stored Locally");
         });
 
         // 12. restoreSession() rejects invalid or tampered session
