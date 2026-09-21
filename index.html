@@ -1425,8 +1425,10 @@
             line-height: 1.6;
         }
 
-        /* Vertical Sidebar Guide Modal Layout */
-        #infoModalOverlay .info-modal-card {
+        /* Unified Modal Sidebar Layout System */
+        #infoModalOverlay .info-modal-card,
+        #accountModalOverlay .info-modal-card,
+        #settingsModalOverlay .info-modal-card {
             max-width: 780px;
             width: 95%;
             min-height: 480px;
@@ -1434,6 +1436,7 @@
             flex-direction: row;
         }
 
+        .modal-sidebar,
         .info-sidebar {
             width: 220px;
             flex-shrink: 0;
@@ -1445,6 +1448,7 @@
             user-select: none;
         }
 
+        .modal-sidebar-header,
         .info-sidebar-header {
             display: flex;
             align-items: center;
@@ -1454,6 +1458,7 @@
             border-bottom: 1px solid var(--border-subtle);
         }
 
+        .modal-sidebar-title,
         .info-sidebar-title {
             font-family: var(--font-sans);
             font-size: 11.5px;
@@ -1463,6 +1468,7 @@
             color: var(--text-muted);
         }
 
+        .modal-sidebar-tabs,
         .info-sidebar-tabs {
             display: flex;
             flex-direction: column;
@@ -1470,6 +1476,7 @@
             margin-top: 8px;
         }
 
+        .modal-sidebar-tab,
         .info-sidebar-tab {
             background: transparent;
             border: 1px solid transparent;
@@ -1490,11 +1497,13 @@
             outline: none;
         }
 
+        .modal-sidebar-tab:hover:not(.active),
         .info-sidebar-tab:hover:not(.active) {
             background: var(--track-bg);
             color: var(--text-primary);
         }
 
+        .modal-sidebar-tab.active,
         .info-sidebar-tab.active {
             background: var(--bg-base);
             color: var(--accent);
@@ -1503,6 +1512,7 @@
             box-shadow: 0 0 0 2px var(--accent-glow);
         }
 
+        .modal-content-container,
         .info-content-container {
             flex: 1;
             display: flex;
@@ -1512,6 +1522,7 @@
             background: var(--surface-card);
         }
 
+        .modal-content-header,
         .info-content-header {
             display: flex;
             justify-content: flex-end;
@@ -1519,7 +1530,9 @@
             padding: 12px 14px 0 14px;
         }
 
-        #infoModalOverlay .info-modal-body {
+        #infoModalOverlay .info-modal-body,
+        #accountModalOverlay .info-modal-body,
+        #settingsModalOverlay .info-modal-body {
             flex: 1;
             padding: 8px 28px 28px 28px;
             overflow-y: auto;
@@ -1527,12 +1540,15 @@
 
         /* Responsive Collapse for Mobile Screens */
         @media (max-width: 640px) {
-            #infoModalOverlay .info-modal-card {
+            #infoModalOverlay .info-modal-card,
+            #accountModalOverlay .info-modal-card,
+            #settingsModalOverlay .info-modal-card {
                 flex-direction: column;
                 min-height: auto;
                 max-height: 88vh;
             }
 
+            .modal-sidebar,
             .info-sidebar {
                 width: 100%;
                 border-right: none;
@@ -1540,10 +1556,12 @@
                 padding: 10px 10px 6px 10px;
             }
 
+            .modal-sidebar-header,
             .info-sidebar-header {
                 display: none;
             }
 
+            .modal-sidebar-tabs,
             .info-sidebar-tabs {
                 flex-direction: row;
                 overflow-x: auto;
@@ -1554,10 +1572,12 @@
                 padding-bottom: 4px;
             }
 
+            .modal-sidebar-tabs::-webkit-scrollbar,
             .info-sidebar-tabs::-webkit-scrollbar {
                 display: none;
             }
 
+            .modal-sidebar-tab,
             .info-sidebar-tab {
                 width: auto;
                 padding: 7px 12px;
@@ -1565,6 +1585,7 @@
                 border-radius: 8px;
             }
 
+            .modal-content-header,
             .info-content-header {
                 position: absolute;
                 top: 8px;
@@ -1573,7 +1594,9 @@
                 padding: 0;
             }
 
-            #infoModalOverlay .info-modal-body {
+            #infoModalOverlay .info-modal-body,
+            #accountModalOverlay .info-modal-body,
+            #settingsModalOverlay .info-modal-body {
                 padding: 18px 20px 20px 20px;
             }
         }
@@ -2307,29 +2330,37 @@
     <!-- Account & Security Modal Overlay -->
     <div class="modal-overlay" id="accountModalOverlay" onclick="handleAccountBackdropClick(event)">
         <div class="info-modal-card card" role="dialog" aria-modal="true" aria-labelledby="accountModalTitle">
-            <!-- Chrome Tab Bar -->
-            <div class="chrome-tab-bar">
-                <div class="chrome-tabs-list" role="tablist">
-                    <button class="chrome-tab active" id="tab-btn-acc-status" role="tab" aria-selected="true" onclick="switchAccountTab('status')">
+            <!-- Left Sidebar with Vertical Tabs -->
+            <div class="modal-sidebar">
+                <div class="modal-sidebar-header">
+                    <span class="modal-sidebar-title">Account</span>
+                </div>
+                <div class="modal-sidebar-tabs" role="tablist">
+                    <button class="modal-sidebar-tab active" id="tab-btn-acc-status" role="tab" aria-selected="true" onclick="switchAccountTab('status')">
                         <span class="tab-title">Status / Guest</span>
                     </button>
-                    <button class="chrome-tab" id="tab-btn-acc-signin" role="tab" aria-selected="false" onclick="switchAccountTab('signin')">
+                    <button class="modal-sidebar-tab" id="tab-btn-acc-signin" role="tab" aria-selected="false" onclick="switchAccountTab('signin')">
                         <span class="tab-title">Sign In</span>
                     </button>
-                    <button class="chrome-tab" id="tab-btn-acc-signup" role="tab" aria-selected="false" onclick="switchAccountTab('signup')">
+                    <button class="modal-sidebar-tab" id="tab-btn-acc-signup" role="tab" aria-selected="false" onclick="switchAccountTab('signup')">
                         <span class="tab-title">Create Account</span>
                     </button>
                 </div>
-                <button class="modal-close-btn" id="accountModalCloseBtn" title="Close (Esc)" onclick="closeAccountModal()" aria-label="Close account modal">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                    </svg>
-                </button>
             </div>
 
-            <!-- Tab Panels Body -->
-            <div class="info-modal-body">
+            <!-- Right Content Container -->
+            <div class="modal-content-container">
+                <div class="modal-content-header">
+                    <button class="modal-close-btn" id="accountModalCloseBtn" title="Close (Esc)" onclick="closeAccountModal()" aria-label="Close account modal">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Tab Panels Body -->
+                <div class="info-modal-body">
                 <!-- Status / Guest Pane -->
                 <div class="tab-pane active" id="tab-pane-acc-status" role="tabpanel">
                     <h3 id="accountModalTitle">Account &amp; Security</h3>
@@ -2463,30 +2494,39 @@
             </div>
         </div>
     </div>
+</div>
 
     <!-- Settings & Preferences Modal Overlay -->
     <div class="modal-overlay" id="settingsModalOverlay" onclick="handleSettingsBackdropClick(event)">
         <div class="info-modal-card card" role="dialog" aria-modal="true" aria-labelledby="settingsModalTitle">
-            <!-- Chrome Tab Bar -->
-            <div class="chrome-tab-bar">
-                <div class="chrome-tabs-list" role="tablist">
-                    <button class="chrome-tab active" id="tab-btn-set-pref" role="tab" aria-selected="true" onclick="switchSettingsTab('pref')">
+            <!-- Left Sidebar with Vertical Tabs -->
+            <div class="modal-sidebar">
+                <div class="modal-sidebar-header">
+                    <span class="modal-sidebar-title">Settings</span>
+                </div>
+                <div class="modal-sidebar-tabs" role="tablist">
+                    <button class="modal-sidebar-tab active" id="tab-btn-set-pref" role="tab" aria-selected="true" onclick="switchSettingsTab('pref')">
                         <span class="tab-title">Preferences</span>
                     </button>
-                    <button class="chrome-tab" id="tab-btn-set-sync" role="tab" aria-selected="false" onclick="switchSettingsTab('sync')">
+                    <button class="modal-sidebar-tab" id="tab-btn-set-sync" role="tab" aria-selected="false" onclick="switchSettingsTab('sync')">
                         <span class="tab-title">Cloud Sync</span>
                     </button>
                 </div>
-                <button class="modal-close-btn" id="settingsModalCloseBtn" title="Close (Esc)" onclick="closeSettingsModal()" aria-label="Close settings modal">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                    </svg>
-                </button>
             </div>
 
-            <!-- Tab Panels Body -->
-            <div class="info-modal-body">
+            <!-- Right Content Container -->
+            <div class="modal-content-container">
+                <div class="modal-content-header">
+                    <button class="modal-close-btn" id="settingsModalCloseBtn" title="Close (Esc)" onclick="closeSettingsModal()" aria-label="Close settings modal">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Tab Panels Body -->
+                <div class="info-modal-body">
                 <!-- Preferences Pane -->
                 <div class="tab-pane active" id="tab-pane-set-pref" role="tabpanel">
                     <div class="modal-pane-header">
@@ -2602,6 +2642,7 @@
             </div>
         </div>
     </div>
+</div>
 
     <script>
         let holdingsData = [];
