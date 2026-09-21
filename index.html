@@ -1425,6 +1425,158 @@
             line-height: 1.6;
         }
 
+        /* Vertical Sidebar Guide Modal Layout */
+        #infoModalOverlay .info-modal-card {
+            max-width: 780px;
+            width: 95%;
+            min-height: 480px;
+            max-height: 85vh;
+            flex-direction: row;
+        }
+
+        .info-sidebar {
+            width: 220px;
+            flex-shrink: 0;
+            background: var(--surface-input);
+            border-right: 1px solid var(--border-subtle);
+            display: flex;
+            flex-direction: column;
+            padding: 18px 14px;
+            user-select: none;
+        }
+
+        .info-sidebar-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 2px 8px 12px 8px;
+            margin-bottom: 4px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .info-sidebar-title {
+            font-family: var(--font-sans);
+            font-size: 11.5px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        .info-sidebar-tabs {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .info-sidebar-tab {
+            background: transparent;
+            border: 1px solid transparent;
+            border-radius: 9px;
+            padding: 10px 14px;
+            font-family: var(--font-sans);
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.16s ease;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            text-align: left;
+            width: 100%;
+        }
+
+        .info-sidebar-tab:hover:not(.active) {
+            background: var(--track-bg);
+            color: var(--text-primary);
+        }
+
+        .info-sidebar-tab.active {
+            background: var(--accent);
+            color: var(--accent-on-text);
+            border-color: var(--accent);
+            font-weight: 700;
+            box-shadow: 0 2px 10px var(--accent-glow);
+        }
+
+        .info-content-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            position: relative;
+            background: var(--surface-card);
+        }
+
+        .info-content-header {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            padding: 12px 14px 0 14px;
+        }
+
+        #infoModalOverlay .info-modal-body {
+            flex: 1;
+            padding: 8px 28px 28px 28px;
+            overflow-y: auto;
+        }
+
+        /* Responsive Collapse for Mobile Screens */
+        @media (max-width: 640px) {
+            #infoModalOverlay .info-modal-card {
+                flex-direction: column;
+                min-height: auto;
+                max-height: 88vh;
+            }
+
+            .info-sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid var(--border-subtle);
+                padding: 10px 10px 6px 10px;
+            }
+
+            .info-sidebar-header {
+                display: none;
+            }
+
+            .info-sidebar-tabs {
+                flex-direction: row;
+                overflow-x: auto;
+                gap: 6px;
+                scrollbar-width: none;
+                -ms-overflow-style: none;
+                margin-top: 0;
+                padding-bottom: 4px;
+            }
+
+            .info-sidebar-tabs::-webkit-scrollbar {
+                display: none;
+            }
+
+            .info-sidebar-tab {
+                width: auto;
+                padding: 7px 12px;
+                font-size: 12px;
+                border-radius: 8px;
+            }
+
+            .info-content-header {
+                position: absolute;
+                top: 8px;
+                right: 8px;
+                z-index: 3;
+                padding: 0;
+            }
+
+            #infoModalOverlay .info-modal-body {
+                padding: 18px 20px 20px 20px;
+            }
+        }
+
         .tab-pane {
             display: none;
         }
@@ -2093,50 +2245,59 @@
     <!-- Information Guide Modal -->
     <div class="modal-overlay" id="infoModalOverlay" onclick="handleModalBackdropClick(event)">
         <div class="info-modal-card card" role="dialog" aria-modal="true" aria-labelledby="modalTabTitle">
-            <!-- Chrome Tab Bar -->
-            <div class="chrome-tab-bar">
-                <div class="chrome-tabs-list" role="tablist">
-                    <button class="chrome-tab active" id="tab-btn-overview" role="tab" aria-selected="true" onclick="switchInfoTab('overview')">
+            <!-- Left Sidebar with Vertical Tabs -->
+            <div class="info-sidebar">
+                <div class="info-sidebar-header">
+                    <span class="info-sidebar-title">Guide</span>
+                </div>
+                <div class="info-sidebar-tabs" role="tablist">
+                    <button class="info-sidebar-tab active" id="tab-btn-overview" role="tab" aria-selected="true" onclick="switchInfoTab('overview')">
                         <span class="tab-title">Overview</span>
                     </button>
-                    <button class="chrome-tab" id="tab-btn-dynamic" role="tab" aria-selected="false" onclick="switchInfoTab('dynamic')">
+                    <button class="info-sidebar-tab" id="tab-btn-dynamic" role="tab" aria-selected="false" onclick="switchInfoTab('dynamic')">
                         <span class="tab-title">DCA Rebalance</span>
                     </button>
-                    <button class="chrome-tab" id="tab-btn-complete" role="tab" aria-selected="false" onclick="switchInfoTab('complete')">
+                    <button class="info-sidebar-tab" id="tab-btn-complete" role="tab" aria-selected="false" onclick="switchInfoTab('complete')">
                         <span class="tab-title">Complete Rebalance</span>
                     </button>
-                    <button class="chrome-tab" id="tab-btn-thresholds" role="tab" aria-selected="false" onclick="switchInfoTab('thresholds')">
+                    <button class="info-sidebar-tab" id="tab-btn-thresholds" role="tab" aria-selected="false" onclick="switchInfoTab('thresholds')">
                         <span class="tab-title">Minimum Transactions</span>
                     </button>
                 </div>
-                <button class="modal-close-btn" id="modalCloseBtn" title="Close (Esc)" onclick="closeInfoModal()" aria-label="Close information modal">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                    </svg>
-                </button>
             </div>
 
-            <!-- Tab Panels Body -->
-            <div class="info-modal-body">
-                <div class="tab-pane active" id="tab-pane-overview" role="tabpanel">
-                    <h3 id="modalTabTitle">Hello World!</h3>
-                    <p>Welcome to the Portfolio Rebalancer. This section provides an overview of how the tool calculates asset weights, optimizes deposit allocations, and minimizes taxable events.</p>
+            <!-- Right Content Container -->
+            <div class="info-content-container">
+                <div class="info-content-header">
+                    <button class="modal-close-btn" id="modalCloseBtn" title="Close (Esc)" onclick="closeInfoModal()" aria-label="Close information modal">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
                 </div>
 
-                <div class="tab-pane" id="tab-pane-dynamic" role="tabpanel">
-                    <h3>Hello World!</h3>
-                    <p>Dynamic Rebalance uses incoming deposits to proportionally top up underweight holdings, or directs withdrawals from overweight positions, without forcing unnecessary asset sales.</p>
-                </div>
+                <!-- Tab Panels Body -->
+                <div class="info-modal-body">
+                    <div class="tab-pane active" id="tab-pane-overview" role="tabpanel">
+                        <h3 id="modalTabTitle">Hello World!</h3>
+                        <p>Welcome to the Portfolio Rebalancer. This section provides an overview of how the tool calculates asset weights, optimizes deposit allocations, and minimizes taxable events.</p>
+                    </div>
 
-                <div class="tab-pane" id="tab-pane-complete" role="tabpanel">
-                    <h3>Hello World!</h3>
-                    <p>Complete Rebalance performs simultaneous buys and sells across your holdings to bring each position to its exact target weighting in a single session.</p>
-                </div>
+                    <div class="tab-pane" id="tab-pane-dynamic" role="tabpanel">
+                        <h3>Hello World!</h3>
+                        <p>Dynamic Rebalance uses incoming deposits to proportionally top up underweight holdings, or directs withdrawals from overweight positions, without forcing unnecessary asset sales.</p>
+                    </div>
 
-                <div class="tab-pane" id="tab-pane-thresholds" role="tabpanel">
-                    <h3>Hello World!</h3>
-                    <p>Minimum Transaction thresholds prevent tiny, fee-inefficient orders by consolidating sub-threshold amounts into the most underweight eligible asset.</p>
+                    <div class="tab-pane" id="tab-pane-complete" role="tabpanel">
+                        <h3>Hello World!</h3>
+                        <p>Complete Rebalance performs simultaneous buys and sells across your holdings to bring each position to its exact target weighting in a single session.</p>
+                    </div>
+
+                    <div class="tab-pane" id="tab-pane-thresholds" role="tabpanel">
+                        <h3>Hello World!</h3>
+                        <p>Minimum Transaction thresholds prevent tiny, fee-inefficient orders by consolidating sub-threshold amounts into the most underweight eligible asset.</p>
+                    </div>
                 </div>
             </div>
         </div>
