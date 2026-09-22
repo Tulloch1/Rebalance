@@ -2633,6 +2633,10 @@
 
                                 <!-- Step 1: Request Code -->
                                 <div id="cleanSlateStep1">
+                                    <div class="account-field-group" style="margin-bottom: 10px;">
+                                        <label class="account-label" for="cleanSlateEmail">Account Email Address</label>
+                                        <input type="email" class="account-input" id="cleanSlateEmail" placeholder="you@example.com" autocomplete="email">
+                                    </div>
                                     <button type="button" class="btn-account-secondary" id="btnSendResetCode" onclick="handleRequestResetCode(false)" style="width: 100%; font-size: 12px;">
                                         Send 6-Digit Reset Code to Email
                                     </button>
@@ -2640,6 +2644,7 @@
 
                                 <!-- Step 2: Enter Code, Billing Challenge (if Pro), and New Password -->
                                 <div id="cleanSlateStep2" style="display: none;">
+                                    <div id="cleanSlateEmailNotice" style="font-size: 11px; color: var(--text-muted); margin-bottom: 10px; text-align: center; display: none;"></div>
                                     <div class="account-field-group">
                                         <label class="account-label" for="cleanSlateCode">6-Digit Verification Code</label>
                                         <input type="text" class="account-input" id="cleanSlateCode" placeholder="123456" maxlength="6" style="font-family: var(--font-mono); letter-spacing: 0.15em; font-size: 14px; text-align: center;">
@@ -2670,11 +2675,11 @@
                                         Wipe Vault &amp; Reset Password
                                     </button>
 
-                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
-                                        <button type="button" id="btnResendResetCode" onclick="handleRequestResetCode(true)" style="background: none; border: none; padding: 0; color: var(--accent); font-size: 11px; cursor: pointer; text-decoration: underline;">
+                                    <div style="display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 10px; text-align: center;">
+                                        <button type="button" id="btnResendResetCode" onclick="handleRequestResetCode(true)" style="background: none; border: none; padding: 0; color: var(--accent); font-size: 11.5px; cursor: pointer; text-decoration: underline;">
                                             Resend Code
                                         </button>
-                                        <span id="cleanSlateCooldown" style="font-size: 10.5px; color: var(--text-muted); display: none;"></span>
+                                        <span id="cleanSlateCooldown" style="font-size: 11px; color: var(--text-muted); display: none;"></span>
                                     </div>
                                 </div>
                             </div>
@@ -4157,6 +4162,13 @@ INSTRUCTIONS:
             if (s2) s2.style.display = "none";
             const bc = document.getElementById("cleanSlateBillingChallenge");
             if (bc) bc.style.display = "none";
+            const emailIn = document.getElementById("cleanSlateEmail");
+            if (emailIn) emailIn.value = "";
+            const emailNotice = document.getElementById("cleanSlateEmailNotice");
+            if (emailNotice) {
+                emailNotice.innerText = "";
+                emailNotice.style.display = "none";
+            }
             const codeIn = document.getElementById("cleanSlateCode");
             if (codeIn) codeIn.value = "";
             const cardIn = document.getElementById("cleanSlateCardLast4");
@@ -4192,16 +4204,30 @@ INSTRUCTIONS:
                 if (s1) s1.style.display = "block";
                 const s2 = document.getElementById("cleanSlateStep2");
                 if (s2) s2.style.display = "none";
+                const csEmail = document.getElementById("cleanSlateEmail");
+                const topEmail = document.getElementById("signInEmail");
+                if (csEmail) {
+                    if (!csEmail.value && topEmail && topEmail.value) {
+                        csEmail.value = topEmail.value.trim();
+                    }
+                    if (typeof csEmail.focus === 'function') csEmail.focus();
+                }
             }
         }
 
         async function handleRequestResetCode(isResend = false) {
-            const emailInput = document.getElementById("signInEmail");
+            const csEmailInput = document.getElementById("cleanSlateEmail");
+            const topEmailInput = document.getElementById("signInEmail");
+            const emailInput = (csEmailInput && csEmailInput.value.trim()) ? csEmailInput : (topEmailInput && topEmailInput.value.trim() ? topEmailInput : csEmailInput || topEmailInput);
             const email = emailInput ? emailInput.value.trim().toLowerCase() : "";
             if (!email || !email.includes("@")) {
-                showFeedback("signInFeedback", "Please enter your account email in the Email Address field above.", true);
-                if (emailInput && typeof emailInput.focus === 'function') emailInput.focus();
+                showFeedback("signInFeedback", "Please enter your account email in the Email Address field.", true);
+                if (csEmailInput && typeof csEmailInput.focus === 'function') csEmailInput.focus();
+                else if (emailInput && typeof emailInput.focus === 'function') emailInput.focus();
                 return;
+            }
+            if (csEmailInput && !csEmailInput.value) {
+                csEmailInput.value = email;
             }
 
             const resendBtn = document.getElementById("btnResendResetCode");
@@ -4220,6 +4246,12 @@ INSTRUCTIONS:
                 if (s1) s1.style.display = "none";
                 const s2 = document.getElementById("cleanSlateStep2");
                 if (s2) s2.style.display = "block";
+
+                const emailNotice = document.getElementById("cleanSlateEmailNotice");
+                if (emailNotice) {
+                    emailNotice.innerText = `Resetting account: ${email}`;
+                    emailNotice.style.display = "block";
+                }
 
                 const billEl = document.getElementById("cleanSlateBillingChallenge");
                 if (billEl) {
@@ -4244,7 +4276,7 @@ INSTRUCTIONS:
                 }
                 if (cdEl) {
                     cdEl.style.display = "inline";
-                    cdEl.innerText = `Resend in ${remainingSeconds}s`;
+                    cdEl.innerText = `(${remainingSeconds}s)`;
                 }
 
                 if (cleanSlateCooldownTimer && typeof clearInterval === 'function') clearInterval(cleanSlateCooldownTimer);
@@ -4264,7 +4296,7 @@ INSTRUCTIONS:
                                 cdEl.innerText = "";
                             }
                         } else if (cdEl) {
-                            cdEl.innerText = `Resend in ${remainingSeconds}s`;
+                            cdEl.innerText = `(${remainingSeconds}s)`;
                         }
                     }, 1000);
                 }
@@ -4275,7 +4307,9 @@ INSTRUCTIONS:
         }
 
         async function handleExecuteCleanSlate() {
-            const emailInput = document.getElementById("signInEmail");
+            const csEmailInput = document.getElementById("cleanSlateEmail");
+            const topEmailInput = document.getElementById("signInEmail");
+            const emailInput = (csEmailInput && csEmailInput.value.trim()) ? csEmailInput : (topEmailInput && topEmailInput.value.trim() ? topEmailInput : csEmailInput || topEmailInput);
             const codeInput = document.getElementById("cleanSlateCode");
             const cardInput = document.getElementById("cleanSlateCardLast4");
             const passInput = document.getElementById("cleanSlateNewPassword");
@@ -4289,7 +4323,8 @@ INSTRUCTIONS:
             const confirmPass = confirmInput ? confirmInput.value : "";
 
             if (!email || !email.includes("@")) {
-                showFeedback("signInFeedback", "Please enter your account email in the Email Address field above.", true);
+                showFeedback("signInFeedback", "Please enter your account email in the Email Address field.", true);
+                if (csEmailInput && typeof csEmailInput.focus === 'function') csEmailInput.focus();
                 return;
             }
             if (!code || !/^\d{6}$/.test(code)) {

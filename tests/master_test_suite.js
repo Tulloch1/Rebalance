@@ -1363,6 +1363,7 @@ console.log("\n--- PART 4: Information Guide Modal & Chrome Tab Navigation ---")
             env.getEl("cleanSlateStep1").style.display = "none";
             env.getEl("cleanSlateStep2").style.display = "block";
             env.getEl("cleanSlateBillingChallenge").style.display = "block";
+            env.getEl("cleanSlateEmail").value = "test@example.com";
             env.getEl("cleanSlateCode").value = "123456";
             env.getEl("cleanSlateCardLast4").value = "4242";
             env.getEl("cleanSlateNewPassword").value = "NewSecret123!";
@@ -1374,6 +1375,7 @@ console.log("\n--- PART 4: Information Guide Modal & Chrome Tab Navigation ---")
             assert.strictEqual(env.getEl("cleanSlateStep1").style.display, "block");
             assert.strictEqual(env.getEl("cleanSlateStep2").style.display, "none");
             assert.strictEqual(env.getEl("cleanSlateBillingChallenge").style.display, "none");
+            assert.strictEqual(env.getEl("cleanSlateEmail").value, "");
             assert.strictEqual(env.getEl("cleanSlateCode").value, "");
             assert.strictEqual(env.getEl("cleanSlateCardLast4").value, "");
             assert.strictEqual(env.getEl("cleanSlateNewPassword").value, "");
@@ -1382,12 +1384,13 @@ console.log("\n--- PART 4: Information Guide Modal & Chrome Tab Navigation ---")
 
         await runTest("handleRequestResetCode() requires valid email and reveals Step 2", async () => {
             env.toggleCleanSlateSection();
+            env.getEl("cleanSlateEmail").value = "";
             env.getEl("signInEmail").value = "";
             await env.handleRequestResetCode();
             assert.ok(env.getEl("signInFeedback").innerText.includes("Please enter your account email"));
 
-            // With valid email
-            env.getEl("signInEmail").value = "clean_test@example.com";
+            // With valid email in cleanSlateEmail
+            env.getEl("cleanSlateEmail").value = "clean_test@example.com";
             await env.handleRequestResetCode();
             assert.strictEqual(env.getEl("cleanSlateStep1").style.display, "none");
             assert.strictEqual(env.getEl("cleanSlateStep2").style.display, "block");
@@ -1406,13 +1409,13 @@ console.log("\n--- PART 4: Information Guide Modal & Chrome Tab Navigation ---")
             };
             env.setStoredAccounts(stored);
 
-            env.getEl("signInEmail").value = "pro_reset@example.com";
+            env.getEl("cleanSlateEmail").value = "pro_reset@example.com";
             await env.handleRequestResetCode();
             assert.strictEqual(env.getEl("cleanSlateBillingChallenge").style.display, "block");
         });
 
         await runTest("handleExecuteCleanSlate() validates code, billing card, and password requirements", async () => {
-            env.getEl("signInEmail").value = "pro_reset@example.com";
+            env.getEl("cleanSlateEmail").value = "pro_reset@example.com";
             env.getEl("cleanSlateBillingChallenge").style.display = "block";
 
             // Missing/short code
@@ -1440,7 +1443,7 @@ console.log("\n--- PART 4: Information Guide Modal & Chrome Tab Navigation ---")
         });
 
         await runTest("handleExecuteCleanSlate() wipes vault, updates credentials, and establishes session", async () => {
-            env.getEl("signInEmail").value = "pro_reset@example.com";
+            env.getEl("cleanSlateEmail").value = "pro_reset@example.com";
             env.getEl("cleanSlateBillingChallenge").style.display = "none";
             env.getEl("cleanSlateCode").value = "123456";
             env.getEl("cleanSlateNewPassword").value = "FreshPassword123!";
