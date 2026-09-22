@@ -5665,8 +5665,8 @@ INSTRUCTIONS:
                 } else if (newPct < initialPct) {
                     const startW = Math.min(initialPct, 100);
                     const newW = Math.min(newPct, 100);
-                    barStartStyle = `left: 0; width: ${startW}%; border-radius: var(--radius-pill); background: ${isSell ? 'rgba(255, 92, 92, 0.35)' : 'var(--accent)'};`;
-                    barNewStyle = `left: 0; width: ${newW}%; border-radius: var(--radius-pill); background: rgba(36, 219, 161, 0.4);${newW <= 0.01 ? ' display: none;' : ''}`;
+                    barStartStyle = `left: 0; width: ${startW}%; border-radius: var(--radius-pill); z-index: 1; background: ${isSell ? 'rgba(255, 92, 92, 0.35)' : 'var(--accent)'};`;
+                    barNewStyle = `left: 0; width: ${newW}%; border-radius: var(--radius-pill); z-index: 2; background: color-mix(in srgb, var(--accent) 40%, var(--surface-card) 60%);${newW <= 0.01 ? ' display: none;' : ''}`;
                 } else {
                     const w = Math.min(newPct, 100);
                     barStartStyle = `display: none;`;
