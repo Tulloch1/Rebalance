@@ -2614,6 +2614,71 @@
                                 Reset Password with Key
                             </button>
                         </div>
+
+                        <!-- Lost Recovery Key? Clean Slate Link -->
+                        <div style="text-align: center; margin-top: 12px;">
+                            <button type="button" id="btnToggleCleanSlate" onclick="toggleCleanSlateSection()" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 11px; cursor: pointer; text-decoration: underline;">
+                                Lost Recovery Key? Reset via Email &amp; Billing (Clean Slate)
+                            </button>
+                        </div>
+
+                        <!-- Clean Slate Account Reset Section (Option B) -->
+                        <div id="cleanSlateSection" style="display: none; margin-top: 14px; padding: 12px; background: var(--surface-card); border: 1px solid var(--danger-border); border-radius: var(--radius-card);">
+                            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 6px;">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                                <span style="font-size: 12px; font-weight: 700; color: var(--danger); text-transform: uppercase; letter-spacing: 0.04em;">Clean Slate Reset</span>
+                            </div>
+                            <p style="font-size: 11px; color: var(--text-secondary); margin: 0 0 10px 0; line-height: 1.4;">
+                                Due to zero-knowledge encryption, your portfolio cannot be decrypted without your password or recovery key. A <strong>Clean Slate Reset</strong> wipes unreadable vault data while preserving your account and active Pro subscription.
+                            </p>
+
+                            <!-- Step 1: Request Code -->
+                            <div id="cleanSlateStep1">
+                                <button type="button" class="btn-account-secondary" id="btnSendResetCode" onclick="handleRequestResetCode(false)" style="width: 100%; font-size: 12px;">
+                                    Send 6-Digit Reset Code to Email
+                                </button>
+                            </div>
+
+                            <!-- Step 2: Enter Code, Billing Challenge (if Pro), and New Password -->
+                            <div id="cleanSlateStep2" style="display: none;">
+                                <div class="account-field-group">
+                                    <label class="account-label" for="cleanSlateCode">6-Digit Verification Code</label>
+                                    <input type="text" class="account-input" id="cleanSlateCode" placeholder="123456" maxlength="6" style="font-family: var(--font-mono); letter-spacing: 0.15em; font-size: 14px; text-align: center;">
+                                </div>
+
+                                <!-- Pro Tier Billing Challenge (Option B) -->
+                                <div id="cleanSlateBillingChallenge" style="display: none; background: var(--surface-input); border: 1px solid var(--accent-badge-border); border-radius: var(--radius-sm); padding: 8px 10px; margin-bottom: 12px;">
+                                    <label class="account-label" for="cleanSlateCardLast4" style="color: var(--accent); font-weight: 600;">
+                                        💳 Security Check: Last 4 Digits of Card on File
+                                    </label>
+                                    <input type="text" class="account-input" id="cleanSlateCardLast4" placeholder="••••" maxlength="4" style="font-family: var(--font-mono); letter-spacing: 0.15em; text-align: center; margin-top: 4px;">
+                                    <span style="font-size: 10.5px; color: var(--text-muted); display: block; margin-top: 4px;">
+                                        Required to verify account ownership and protect your Pro subscription. Max 3 attempts.
+                                    </span>
+                                </div>
+
+                                <div class="account-field-group">
+                                    <label class="account-label" for="cleanSlateNewPassword">New Password (min. 8 chars)</label>
+                                    <input type="password" class="account-input" id="cleanSlateNewPassword" placeholder="••••••••••••" minlength="8">
+                                </div>
+
+                                <div class="account-field-group">
+                                    <label class="account-label" for="cleanSlateConfirmPassword">Confirm New Password</label>
+                                    <input type="password" class="account-input" id="cleanSlateConfirmPassword" placeholder="••••••••••••" minlength="8">
+                                </div>
+
+                                <button type="button" class="btn-account-danger" id="btnExecuteCleanSlate" onclick="handleExecuteCleanSlate()" style="width: 100%; margin-top: 4px;">
+                                    Wipe Vault &amp; Reset Password
+                                </button>
+
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
+                                    <button type="button" id="btnResendResetCode" onclick="handleRequestResetCode(true)" style="background: none; border: none; padding: 0; color: var(--accent); font-size: 11px; cursor: pointer; text-decoration: underline;">
+                                        Resend Code
+                                    </button>
+                                    <span id="cleanSlateCooldown" style="font-size: 10.5px; color: var(--text-muted); display: none;"></span>
+                                </div>
+                            </div>
+                        </div>
                     </form>
                 </div>
 
@@ -3221,6 +3286,7 @@
             if (recKeyInput) recKeyInput.value = "";
             const recNewPass = document.getElementById("recoveryNewPassword");
             if (recNewPass) recNewPass.value = "";
+            resetCleanSlateForm();
             hideFeedback("signInFeedback");
             hideFeedback("signUpFeedback");
         }
@@ -3535,6 +3601,73 @@
                     }
                 }
                 return null;
+            },
+
+            async requestReset(email) {
+                if (!email) return { success: false, error: "Email is required." };
+                const normalizedEmail = email.trim().toLowerCase();
+                if (this.apiBaseUrl) {
+                    try {
+                        const res = await fetch(`${this.apiBaseUrl}/api/account/request-reset`, {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ email: normalizedEmail })
+                        });
+                        const data = await res.json();
+                        if (!res.ok) {
+                            return { success: false, error: data.error || "Failed to request reset code." };
+                        }
+                        return data;
+                    } catch (netErr) {
+                        console.warn("Cloud backend unreachable for reset request:", netErr);
+                    }
+                }
+                // Local / offline simulation mode
+                const accounts = getStoredAccounts();
+                const acc = accounts[normalizedEmail];
+                return {
+                    success: true,
+                    requiresBillingChallenge: Boolean(acc && acc.tier === 'pro' && acc.stripeCustomerId),
+                    isOffline: true
+                };
+            },
+
+            async cleanSlateReset(email, code, newAuthHash, cardLast4 = "") {
+                if (!email) return { success: false, error: "Email is required." };
+                const normalizedEmail = email.trim().toLowerCase();
+                if (this.apiBaseUrl) {
+                    try {
+                        const res = await fetch(`${this.apiBaseUrl}/api/account/clean-slate-reset`, {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ email: normalizedEmail, code, newAuthHash, cardLast4 })
+                        });
+                        const data = await res.json();
+                        if (!res.ok) {
+                            return {
+                                success: false,
+                                error: data.error || "Reset failed.",
+                                attemptsRemaining: data.attemptsRemaining,
+                                revoked: data.revoked
+                            };
+                        }
+                        return { success: true, account: data };
+                    } catch (netErr) {
+                        console.warn("Cloud backend unreachable during clean slate reset:", netErr);
+                    }
+                }
+                // Local fallback
+                const accounts = getStoredAccounts();
+                if (accounts[normalizedEmail]) {
+                    accounts[normalizedEmail].authHash = newAuthHash;
+                    accounts[normalizedEmail].vault = null;
+                    accounts[normalizedEmail].recoveryEnvelope = null;
+                    accounts[normalizedEmail].vaultVersion = 1;
+                    accounts[normalizedEmail].updatedAt = new Date().toISOString();
+                    setStoredAccounts(accounts);
+                    return { success: true, account: accounts[normalizedEmail] };
+                }
+                return { success: false, error: "Account not found." };
             }
         };
 
@@ -4008,6 +4141,233 @@ INSTRUCTIONS:
                 }, 600);
             } catch (err) {
                 showFeedback("signInFeedback", "Recovery failed: invalid key or corrupted recovery data.", true);
+            }
+        }
+
+        let cleanSlateCooldownTimer = null;
+
+        function resetCleanSlateForm() {
+            const csSec = document.getElementById("cleanSlateSection");
+            if (csSec) csSec.style.display = "none";
+            const s1 = document.getElementById("cleanSlateStep1");
+            if (s1) s1.style.display = "block";
+            const s2 = document.getElementById("cleanSlateStep2");
+            if (s2) s2.style.display = "none";
+            const bc = document.getElementById("cleanSlateBillingChallenge");
+            if (bc) bc.style.display = "none";
+            const codeIn = document.getElementById("cleanSlateCode");
+            if (codeIn) codeIn.value = "";
+            const cardIn = document.getElementById("cleanSlateCardLast4");
+            if (cardIn) cardIn.value = "";
+            const p1 = document.getElementById("cleanSlateNewPassword");
+            if (p1) p1.value = "";
+            const p2 = document.getElementById("cleanSlateConfirmPassword");
+            if (p2) p2.value = "";
+            if (cleanSlateCooldownTimer) {
+                if (typeof clearInterval === 'function') clearInterval(cleanSlateCooldownTimer);
+                cleanSlateCooldownTimer = null;
+            }
+            const cdEl = document.getElementById("cleanSlateCooldown");
+            if (cdEl) {
+                cdEl.innerText = "";
+                cdEl.style.display = "none";
+            }
+            const resendBtn = document.getElementById("btnResendResetCode");
+            if (resendBtn) {
+                resendBtn.disabled = false;
+                resendBtn.style.opacity = "1";
+                resendBtn.style.cursor = "pointer";
+            }
+        }
+
+        function toggleCleanSlateSection() {
+            const sec = document.getElementById("cleanSlateSection");
+            if (!sec) return;
+            const isHidden = sec.style.display === "none" || !sec.style.display;
+            sec.style.display = isHidden ? "block" : "none";
+            if (isHidden) {
+                const s1 = document.getElementById("cleanSlateStep1");
+                if (s1) s1.style.display = "block";
+                const s2 = document.getElementById("cleanSlateStep2");
+                if (s2) s2.style.display = "none";
+            }
+        }
+
+        async function handleRequestResetCode(isResend = false) {
+            const emailInput = document.getElementById("signInEmail");
+            const email = emailInput ? emailInput.value.trim().toLowerCase() : "";
+            if (!email || !email.includes("@")) {
+                showFeedback("signInFeedback", "Please enter your account email in the Email Address field above.", true);
+                if (emailInput && typeof emailInput.focus === 'function') emailInput.focus();
+                return;
+            }
+
+            const resendBtn = document.getElementById("btnResendResetCode");
+            if (isResend && resendBtn && resendBtn.disabled) return;
+
+            showFeedback("signInFeedback", "Sending verification code...", false);
+
+            try {
+                const res = await RebalanceSync.requestReset(email);
+                if (!res.success) {
+                    showFeedback("signInFeedback", res.error || "Failed to request reset code.", true);
+                    return;
+                }
+
+                const s1 = document.getElementById("cleanSlateStep1");
+                if (s1) s1.style.display = "none";
+                const s2 = document.getElementById("cleanSlateStep2");
+                if (s2) s2.style.display = "block";
+
+                const billEl = document.getElementById("cleanSlateBillingChallenge");
+                if (billEl) {
+                    billEl.style.display = res.requiresBillingChallenge ? "block" : "none";
+                }
+
+                const codeInput = document.getElementById("cleanSlateCode");
+                if (codeInput) {
+                    codeInput.value = "";
+                    if (typeof codeInput.focus === 'function') codeInput.focus();
+                }
+
+                showFeedback("signInFeedback", "6-digit verification code sent! Check your inbox (expires in 15 mins).", false);
+
+                // Start 60-second cooldown on Resend button
+                let remainingSeconds = 60;
+                const cdEl = document.getElementById("cleanSlateCooldown");
+                if (resendBtn) {
+                    resendBtn.disabled = true;
+                    resendBtn.style.opacity = "0.5";
+                    resendBtn.style.cursor = "not-allowed";
+                }
+                if (cdEl) {
+                    cdEl.style.display = "inline";
+                    cdEl.innerText = `Resend in ${remainingSeconds}s`;
+                }
+
+                if (cleanSlateCooldownTimer && typeof clearInterval === 'function') clearInterval(cleanSlateCooldownTimer);
+                if (typeof setInterval === 'function') {
+                    cleanSlateCooldownTimer = setInterval(() => {
+                        remainingSeconds--;
+                        if (remainingSeconds <= 0) {
+                            if (typeof clearInterval === 'function') clearInterval(cleanSlateCooldownTimer);
+                            cleanSlateCooldownTimer = null;
+                            if (resendBtn) {
+                                resendBtn.disabled = false;
+                                resendBtn.style.opacity = "1";
+                                resendBtn.style.cursor = "pointer";
+                            }
+                            if (cdEl) {
+                                cdEl.style.display = "none";
+                                cdEl.innerText = "";
+                            }
+                        } else if (cdEl) {
+                            cdEl.innerText = `Resend in ${remainingSeconds}s`;
+                        }
+                    }, 1000);
+                }
+
+            } catch (err) {
+                showFeedback("signInFeedback", "Error requesting reset code: " + err.message, true);
+            }
+        }
+
+        async function handleExecuteCleanSlate() {
+            const emailInput = document.getElementById("signInEmail");
+            const codeInput = document.getElementById("cleanSlateCode");
+            const cardInput = document.getElementById("cleanSlateCardLast4");
+            const passInput = document.getElementById("cleanSlateNewPassword");
+            const confirmInput = document.getElementById("cleanSlateConfirmPassword");
+            const billBox = document.getElementById("cleanSlateBillingChallenge");
+
+            const email = emailInput ? emailInput.value.trim().toLowerCase() : "";
+            const code = codeInput ? codeInput.value.trim() : "";
+            const cardLast4 = cardInput ? cardInput.value.trim() : "";
+            const newPass = passInput ? passInput.value : "";
+            const confirmPass = confirmInput ? confirmInput.value : "";
+
+            if (!email || !email.includes("@")) {
+                showFeedback("signInFeedback", "Please enter your account email in the Email Address field above.", true);
+                return;
+            }
+            if (!code || !/^\d{6}$/.test(code)) {
+                showFeedback("signInFeedback", "Please enter the 6-digit verification code sent to your email.", true);
+                if (codeInput && typeof codeInput.focus === 'function') codeInput.focus();
+                return;
+            }
+            const isBillingRequired = billBox && billBox.style.display !== "none";
+            if (isBillingRequired) {
+                if (!cardLast4 || !/^\d{4}$/.test(cardLast4)) {
+                    showFeedback("signInFeedback", "Please enter the last 4 digits of the payment card on file.", true);
+                    if (cardInput && typeof cardInput.focus === 'function') cardInput.focus();
+                    return;
+                }
+            }
+            if (!newPass || newPass.length < 8) {
+                showFeedback("signInFeedback", "New Master Password must be at least 8 characters long.", true);
+                if (passInput && typeof passInput.focus === 'function') passInput.focus();
+                return;
+            }
+            if (newPass !== confirmPass) {
+                showFeedback("signInFeedback", "New passwords do not match. Please verify and try again.", true);
+                if (confirmInput && typeof confirmInput.focus === 'function') confirmInput.focus();
+                return;
+            }
+
+            showFeedback("signInFeedback", "Verifying credentials & executing clean slate reset...", false);
+
+            try {
+                const newKeys = await RebalanceCrypto.deriveKeys(email, newPass);
+                const res = await RebalanceSync.cleanSlateReset(email, code, newKeys.authHash, cardLast4);
+
+                if (!res.success) {
+                    showFeedback("signInFeedback", res.error || "Reset failed. Please try again.", true);
+                    if (res.revoked) {
+                        resetCleanSlateForm();
+                    }
+                    return;
+                }
+
+                const account = res.account;
+
+                // Reset current portfolio to default empty/clean slate
+                initDefaultHoldings();
+                const depositEl = document.getElementById("deposit");
+                if (depositEl) depositEl.value = "";
+                const minBuyEl = document.getElementById("minBuy");
+                if (minBuyEl) minBuyEl.value = "0";
+                const completeEl = document.getElementById("completeRebalance");
+                if (completeEl) completeEl.checked = false;
+                renderRows();
+                saveFormData();
+
+                // Sign in user with new master key
+                currentAccount = {
+                    email: email,
+                    tier: account.tier || "free",
+                    schemaVersion: account.schemaVersion || 2,
+                    vaultVersion: 1,
+                    keys: newKeys
+                };
+
+                saveSession(email, newKeys.rawKeyHex, newKeys.authHash);
+
+                // Hide recovery box
+                const recBox = document.getElementById("recoveryKeyDisplayBox");
+                if (recBox) recBox.style.display = "none";
+
+                resetCleanSlateForm();
+                updateAccountUI();
+
+                showFeedback("signInFeedback", "Clean slate reset successful! Account credentials updated & Pro subscription preserved.", false);
+
+                setTimeout(() => {
+                    switchAccountTab('status');
+                }, 600);
+
+            } catch (err) {
+                console.error("Clean slate reset error:", err);
+                showFeedback("signInFeedback", "Failed to reset account: " + err.message, true);
             }
         }
 
@@ -5814,6 +6174,10 @@ INSTRUCTIONS:
             window.downloadRecoveryKit = downloadRecoveryKit;
             window.toggleRecoverySection = toggleRecoverySection;
             window.handleRecoverAccount = handleRecoverAccount;
+            window.toggleCleanSlateSection = toggleCleanSlateSection;
+            window.resetCleanSlateForm = resetCleanSlateForm;
+            window.handleRequestResetCode = handleRequestResetCode;
+            window.handleExecuteCleanSlate = handleExecuteCleanSlate;
             window.getStoredAccounts = getStoredAccounts;
             window.setStoredAccounts = setStoredAccounts;
             window.openSettingsModal = openSettingsModal;

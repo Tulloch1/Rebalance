@@ -1326,6 +1326,129 @@ console.log("\n--- PART 4: Information Guide Modal & Chrome Tab Navigation ---")
         });
     }
 
+    // =========================================================================
+    // PART 9: CLEAN SLATE ACCOUNT RESET & BILLING CHALLENGE (OPTION B)
+    // =========================================================================
+    console.log("\n--- PART 9: Clean Slate Account Reset & Billing Challenge (Option B) ---");
+    {
+        const env = createTestEnv();
+
+        runTest("toggleCleanSlateSection() reveals and hides cleanSlateSection", () => {
+            const sec = env.getEl("cleanSlateSection");
+            assert.ok(sec.style.display === "none" || !sec.style.display);
+            env.toggleCleanSlateSection();
+            assert.strictEqual(sec.style.display, "block");
+            env.toggleCleanSlateSection();
+            assert.strictEqual(sec.style.display, "none");
+        });
+
+        runTest("resetCleanSlateForm() resets all fields, hides billing challenge, and restores step 1", () => {
+            env.toggleCleanSlateSection();
+            env.getEl("cleanSlateStep1").style.display = "none";
+            env.getEl("cleanSlateStep2").style.display = "block";
+            env.getEl("cleanSlateBillingChallenge").style.display = "block";
+            env.getEl("cleanSlateCode").value = "123456";
+            env.getEl("cleanSlateCardLast4").value = "4242";
+            env.getEl("cleanSlateNewPassword").value = "NewSecret123!";
+            env.getEl("cleanSlateConfirmPassword").value = "NewSecret123!";
+
+            env.resetCleanSlateForm();
+
+            assert.strictEqual(env.getEl("cleanSlateSection").style.display, "none");
+            assert.strictEqual(env.getEl("cleanSlateStep1").style.display, "block");
+            assert.strictEqual(env.getEl("cleanSlateStep2").style.display, "none");
+            assert.strictEqual(env.getEl("cleanSlateBillingChallenge").style.display, "none");
+            assert.strictEqual(env.getEl("cleanSlateCode").value, "");
+            assert.strictEqual(env.getEl("cleanSlateCardLast4").value, "");
+            assert.strictEqual(env.getEl("cleanSlateNewPassword").value, "");
+            assert.strictEqual(env.getEl("cleanSlateConfirmPassword").value, "");
+        });
+
+        await runTest("handleRequestResetCode() requires valid email and reveals Step 2", async () => {
+            env.toggleCleanSlateSection();
+            env.getEl("signInEmail").value = "";
+            await env.handleRequestResetCode();
+            assert.ok(env.getEl("signInFeedback").innerText.includes("Please enter your account email"));
+
+            // With valid email
+            env.getEl("signInEmail").value = "clean_test@example.com";
+            await env.handleRequestResetCode();
+            assert.strictEqual(env.getEl("cleanSlateStep1").style.display, "none");
+            assert.strictEqual(env.getEl("cleanSlateStep2").style.display, "block");
+            assert.ok(env.getEl("signInFeedback").innerText.includes("verification code sent"));
+        });
+
+        await runTest("handleRequestResetCode() conditionally reveals Billing Challenge for Pro accounts", async () => {
+            // Create stored account with pro tier and stripeCustomerId
+            const stored = env.getStoredAccounts();
+            stored["pro_reset@example.com"] = {
+                email: "pro_reset@example.com",
+                authHash: "x".repeat(32),
+                tier: "pro",
+                stripeCustomerId: "cus_mock_999",
+                vault: { ciphertext: "abc" }
+            };
+            env.setStoredAccounts(stored);
+
+            env.getEl("signInEmail").value = "pro_reset@example.com";
+            await env.handleRequestResetCode();
+            assert.strictEqual(env.getEl("cleanSlateBillingChallenge").style.display, "block");
+        });
+
+        await runTest("handleExecuteCleanSlate() validates code, billing card, and password requirements", async () => {
+            env.getEl("signInEmail").value = "pro_reset@example.com";
+            env.getEl("cleanSlateBillingChallenge").style.display = "block";
+
+            // Missing/short code
+            env.getEl("cleanSlateCode").value = "12";
+            await env.handleExecuteCleanSlate();
+            assert.ok(env.getEl("signInFeedback").innerText.includes("6-digit verification code"));
+
+            // Valid code, missing card last 4
+            env.getEl("cleanSlateCode").value = "123456";
+            env.getEl("cleanSlateCardLast4").value = "12";
+            await env.handleExecuteCleanSlate();
+            assert.ok(env.getEl("signInFeedback").innerText.includes("last 4 digits"));
+
+            // Valid card last 4, short password
+            env.getEl("cleanSlateCardLast4").value = "4242";
+            env.getEl("cleanSlateNewPassword").value = "short";
+            await env.handleExecuteCleanSlate();
+            assert.ok(env.getEl("signInFeedback").innerText.includes("at least 8 characters"));
+
+            // Password mismatch
+            env.getEl("cleanSlateNewPassword").value = "StrongPass123!";
+            env.getEl("cleanSlateConfirmPassword").value = "DifferentPass!";
+            await env.handleExecuteCleanSlate();
+            assert.ok(env.getEl("signInFeedback").innerText.includes("do not match"));
+        });
+
+        await runTest("handleExecuteCleanSlate() wipes vault, updates credentials, and establishes session", async () => {
+            env.getEl("signInEmail").value = "pro_reset@example.com";
+            env.getEl("cleanSlateBillingChallenge").style.display = "none";
+            env.getEl("cleanSlateCode").value = "123456";
+            env.getEl("cleanSlateNewPassword").value = "FreshPassword123!";
+            env.getEl("cleanSlateConfirmPassword").value = "FreshPassword123!";
+
+            await env.handleExecuteCleanSlate();
+
+            // Verify tab switched to status
+            assert.strictEqual(env.getEl("tab-pane-acc-status").classList.contains("active"), true);
+
+            // Check account state
+            const current = env.getCurrentAccount();
+            assert.ok(current);
+            assert.strictEqual(current.email, "pro_reset@example.com");
+            assert.strictEqual(current.tier, "pro");
+
+            // Check vault wiped in storage
+            const accounts = env.getStoredAccounts();
+            assert.strictEqual(accounts["pro_reset@example.com"].vault, null);
+            assert.strictEqual(accounts["pro_reset@example.com"].recoveryEnvelope, null);
+            assert.strictEqual(accounts["pro_reset@example.com"].vaultVersion, 1);
+        });
+    }
+
     console.log(`\n=================================================`);
     console.log(` MASTER TEST SUITE COMPLETE: ${passedTests}/${totalTests} TESTS PASSED`);
     console.log(`=================================================\n`);

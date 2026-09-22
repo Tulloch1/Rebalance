@@ -20,3 +20,19 @@ CREATE TABLE IF NOT EXISTS accounts (
 
 CREATE INDEX IF NOT EXISTS idx_accounts_auth ON accounts(auth_hash);
 CREATE INDEX IF NOT EXISTS idx_accounts_tier ON accounts(tier);
+
+-- Password Reset & Clean Slate Verification Tokens
+CREATE TABLE IF NOT EXISTS password_reset_tokens (
+    id TEXT PRIMARY KEY,
+    email TEXT NOT NULL,
+    token_hash TEXT NOT NULL,
+    code TEXT NOT NULL,
+    failed_attempts INTEGER NOT NULL DEFAULT 0,
+    status TEXT NOT NULL DEFAULT 'active',
+    expires_at TEXT NOT NULL,
+    created_at TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_reset_email_status ON password_reset_tokens(email, status);
+CREATE INDEX IF NOT EXISTS idx_reset_email_created ON password_reset_tokens(email, created_at);
+

@@ -47,7 +47,9 @@ function createTestEnv() {
                     if (child.innerHTML) this.innerHTML += child.innerHTML;
                 },
                 scrollIntoView() {},
-                reset() {}
+                reset() {},
+                focus() {},
+                blur() {}
             };
         }
         return elements[id];
@@ -71,6 +73,10 @@ function createTestEnv() {
         atob,
         TextEncoder,
         TextDecoder,
+        setTimeout,
+        clearTimeout,
+        setInterval,
+        clearInterval,
         crypto: globalThis.crypto,
         document: {
             body: { style: {} },
@@ -152,6 +158,10 @@ function createTestEnv() {
         downloadRecoveryKit: sandbox.downloadRecoveryKit,
         toggleRecoverySection: sandbox.toggleRecoverySection,
         handleRecoverAccount: sandbox.handleRecoverAccount,
+        toggleCleanSlateSection: sandbox.toggleCleanSlateSection,
+        resetCleanSlateForm: sandbox.resetCleanSlateForm,
+        handleRequestResetCode: sandbox.handleRequestResetCode,
+        handleExecuteCleanSlate: sandbox.handleExecuteCleanSlate,
         getStoredAccounts: sandbox.getStoredAccounts,
         setStoredAccounts: sandbox.setStoredAccounts,
         openSettingsModal: sandbox.openSettingsModal,

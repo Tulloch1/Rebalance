@@ -269,6 +269,296 @@ async function runAllBackendTests() {
         assert.strictEqual(res.status, 400); // Invalid email format rejects safely
     });
 
+    // --- 8. Clean Slate Account Reset & Billing Challenge (Option B) ---
+    env.STRIPE_MOCK_CARDS = { "cus_pro_test_123": "4242" };
+
+    await runTest("POST /api/account/request-reset returns success for nonexistent account (anti-enumeration)", async () => {
+        const res = await request("/api/account/request-reset", {
+            method: "POST",
+            body: { email: "ghost@example.com" }
+        });
+        assert.strictEqual(res.status, 200);
+        const data = await res.json();
+        assert.strictEqual(data.success, true);
+        assert.strictEqual(data.requiresBillingChallenge, false);
+    });
+
+    await runTest("POST /api/account/request-reset generates OTP and sets requiresBillingChallenge: false for Free account", async () => {
+        const res = await request("/api/account/request-reset", {
+            method: "POST",
+            body: { email: "investor@example.com" }
+        });
+        assert.strictEqual(res.status, 200);
+        const data = await res.json();
+        assert.strictEqual(data.success, true);
+        assert.strictEqual(data.requiresBillingChallenge, false);
+        assert.ok(env._sentEmails && env._sentEmails.length > 0);
+        const lastSent = env._sentEmails[env._sentEmails.length - 1];
+        assert.strictEqual(lastSent.email, "investor@example.com");
+        assert.match(lastSent.code, /^\d{6}$/);
+    });
+
+    await runTest("POST /api/account/request-reset sets requiresBillingChallenge: true for Pro account", async () => {
+        // Register and set pro account
+        await request("/api/account", {
+            method: "POST",
+            body: {
+                email: "pro_user@example.com",
+                authHash: "p".repeat(32)
+            }
+        });
+        await d1._rawDb.prepare(`
+            UPDATE accounts 
+            SET tier = 'pro', 
+                stripe_customer_id = 'cus_pro_test_123',
+                vault_ciphertext = '{"holdings":["VTI"]}',
+                recovery_envelope = '{"ciphertext":"enc_recovery"}'
+            WHERE email = 'pro_user@example.com'
+        `).run();
+
+        const res = await request("/api/account/request-reset", {
+            method: "POST",
+            body: { email: "pro_user@example.com" }
+        });
+        assert.strictEqual(res.status, 200);
+        const data = await res.json();
+        assert.strictEqual(data.success, true);
+        assert.strictEqual(data.requiresBillingChallenge, true);
+    });
+
+    await runTest("POST /api/account/request-reset enforces rate limiting (max 3 requests per hour)", async () => {
+        // pro_user has made 1 request so far. Make 2nd and 3rd requests.
+        const res2 = await request("/api/account/request-reset", {
+            method: "POST",
+            body: { email: "pro_user@example.com" }
+        });
+        assert.strictEqual(res2.status, 200);
+
+        const res3 = await request("/api/account/request-reset", {
+            method: "POST",
+            body: { email: "pro_user@example.com" }
+        });
+        assert.strictEqual(res3.status, 200);
+
+        // 4th request within 1 hour must be rejected with 429
+        const res4 = await request("/api/account/request-reset", {
+            method: "POST",
+            body: { email: "pro_user@example.com" }
+        });
+        assert.strictEqual(res4.status, 429);
+        const data4 = await res4.json();
+        assert.strictEqual(data4.success, false);
+        assert.ok(data4.error.includes("3 reset codes per hour"));
+    });
+
+    await runTest("POST /api/account/clean-slate-reset resets free account without billing challenge and wipes vault", async () => {
+        // Put some vault and recovery envelope on investor@example.com
+        await d1._rawDb.prepare(`
+            UPDATE accounts 
+            SET vault_ciphertext = '{"holdings":["BND"]}',
+                recovery_envelope = '{"ciphertext":"env123"}'
+            WHERE email = 'investor@example.com'
+        `).run();
+
+        // Get latest OTP from sent emails
+        const sent = env._sentEmails.filter(e => e.email === "investor@example.com");
+        const activeOtp = sent[sent.length - 1].code;
+
+        const newHash = "new_auth_hash_free_account_123456789";
+        const res = await request("/api/account/clean-slate-reset", {
+            method: "POST",
+            body: {
+                email: "investor@example.com",
+                code: activeOtp,
+                newAuthHash: newHash
+            }
+        });
+        assert.strictEqual(res.status, 200);
+        const acc = await res.json();
+        assert.strictEqual(acc.authHash, newHash);
+        assert.strictEqual(acc.vault, null);
+        assert.strictEqual(acc.recoveryEnvelope, null);
+        assert.strictEqual(acc.vaultVersion, 1);
+        assert.strictEqual(acc.tier, "free");
+    });
+
+    await runTest("POST /api/account/clean-slate-reset rejects invalid card last-4 for Pro account and tracks attempts", async () => {
+        // Create fresh reset token for a new pro user to avoid rate limit
+        await request("/api/account", {
+            method: "POST",
+            body: {
+                email: "pro_challenge@example.com",
+                authHash: "c".repeat(32)
+            }
+        });
+        await d1._rawDb.prepare(`
+            UPDATE accounts 
+            SET tier = 'pro', 
+                stripe_customer_id = 'cus_pro_test_123',
+                vault_ciphertext = '{"holdings":["SPY"]}',
+                recovery_envelope = '{"ciphertext":"rec456"}'
+            WHERE email = 'pro_challenge@example.com'
+        `).run();
+
+        await request("/api/account/request-reset", {
+            method: "POST",
+            body: { email: "pro_challenge@example.com" }
+        });
+        const sent = env._sentEmails.filter(e => e.email === "pro_challenge@example.com");
+        const activeOtp = sent[sent.length - 1].code;
+
+        // Attempt 1 with wrong card last-4 "9999" (expect 2 attempts remaining)
+        const res1 = await request("/api/account/clean-slate-reset", {
+            method: "POST",
+            body: {
+                email: "pro_challenge@example.com",
+                code: activeOtp,
+                newAuthHash: "n".repeat(32),
+                cardLast4: "9999"
+            }
+        });
+        assert.strictEqual(res1.status, 401);
+        const data1 = await res1.json();
+        assert.strictEqual(data1.attemptsRemaining, 2);
+
+        // Attempt 2 with wrong card last-4 "8888" (expect 1 attempt remaining)
+        const res2 = await request("/api/account/clean-slate-reset", {
+            method: "POST",
+            body: {
+                email: "pro_challenge@example.com",
+                code: activeOtp,
+                newAuthHash: "n".repeat(32),
+                cardLast4: "8888"
+            }
+        });
+        assert.strictEqual(res2.status, 401);
+        const data2 = await res2.json();
+        assert.strictEqual(data2.attemptsRemaining, 1);
+
+        // Attempt 3 with wrong card last-4 "7777" (expect 403 Forbidden & token revocation)
+        const res3 = await request("/api/account/clean-slate-reset", {
+            method: "POST",
+            body: {
+                email: "pro_challenge@example.com",
+                code: activeOtp,
+                newAuthHash: "n".repeat(32),
+                cardLast4: "7777"
+            }
+        });
+        assert.strictEqual(res3.status, 403);
+        const data3 = await res3.json();
+        assert.strictEqual(data3.revoked, true);
+        assert.ok(data3.error.includes("code has been revoked"));
+
+        // Attempt 4 even with correct card last-4 "4242" must fail because token is revoked
+        const res4 = await request("/api/account/clean-slate-reset", {
+            method: "POST",
+            body: {
+                email: "pro_challenge@example.com",
+                code: activeOtp,
+                newAuthHash: "n".repeat(32),
+                cardLast4: "4242"
+            }
+        });
+        assert.strictEqual(res4.status, 400); // No active reset request found
+    });
+
+    await runTest("POST /api/account/clean-slate-reset succeeds with matching card digits on Pro account", async () => {
+        // Register fresh pro account
+        await request("/api/account", {
+            method: "POST",
+            body: {
+                email: "pro_winner@example.com",
+                authHash: "w".repeat(32)
+            }
+        });
+        await d1._rawDb.prepare(`
+            UPDATE accounts 
+            SET tier = 'pro', 
+                stripe_customer_id = 'cus_pro_test_123',
+                subscription_status = 'active',
+                vault_ciphertext = '{"holdings":["AAPL","MSFT"]}',
+                recovery_envelope = '{"ciphertext":"winner_envelope"}'
+            WHERE email = 'pro_winner@example.com'
+        `).run();
+
+        await request("/api/account/request-reset", {
+            method: "POST",
+            body: { email: "pro_winner@example.com" }
+        });
+        const sent = env._sentEmails.filter(e => e.email === "pro_winner@example.com");
+        const activeOtp = sent[sent.length - 1].code;
+
+        const newHash = "winner_new_auth_hash_32_bytes_long";
+        const res = await request("/api/account/clean-slate-reset", {
+            method: "POST",
+            body: {
+                email: "pro_winner@example.com",
+                code: activeOtp,
+                newAuthHash: newHash,
+                cardLast4: "4242"
+            }
+        });
+        assert.strictEqual(res.status, 200);
+        const acc = await res.json();
+        assert.strictEqual(acc.email, "pro_winner@example.com");
+        assert.strictEqual(acc.authHash, newHash);
+        assert.strictEqual(acc.tier, "pro");
+        assert.strictEqual(acc.stripeCustomerId, "cus_pro_test_123");
+        assert.strictEqual(acc.subscriptionStatus, "active");
+        assert.strictEqual(acc.vault, null);
+        assert.strictEqual(acc.recoveryEnvelope, null);
+        assert.strictEqual(acc.vaultVersion, 1);
+
+        // Confirm confirmation email was dispatched
+        assert.ok(env._sentConfirmations && env._sentConfirmations.length > 0);
+        assert.strictEqual(env._sentConfirmations[env._sentConfirmations.length - 1].email, "pro_winner@example.com");
+
+        // Replay attempt with same code must fail because token was marked 'used'
+        const replayRes = await request("/api/account/clean-slate-reset", {
+            method: "POST",
+            body: {
+                email: "pro_winner@example.com",
+                code: activeOtp,
+                newAuthHash: "another_hash_32_characters_long",
+                cardLast4: "4242"
+            }
+        });
+        assert.strictEqual(replayRes.status, 400);
+    });
+
+    await runTest("POST /api/account/clean-slate-reset rejects expired OTP tokens", async () => {
+        await request("/api/account", {
+            method: "POST",
+            body: {
+                email: "expired_test@example.com",
+                authHash: "e".repeat(32)
+            }
+        });
+        await request("/api/account/request-reset", {
+            method: "POST",
+            body: { email: "expired_test@example.com" }
+        });
+        const sent = env._sentEmails.filter(e => e.email === "expired_test@example.com");
+        const activeOtp = sent[sent.length - 1].code;
+
+        // Manually backdate the token expiration in D1
+        const pastDate = new Date(Date.now() - 60 * 1000).toISOString();
+        await d1._rawDb.prepare("UPDATE password_reset_tokens SET expires_at = ? WHERE email = 'expired_test@example.com'").run(pastDate);
+
+        const res = await request("/api/account/clean-slate-reset", {
+            method: "POST",
+            body: {
+                email: "expired_test@example.com",
+                code: activeOtp,
+                newAuthHash: "expired_new_auth_hash_32_characters"
+            }
+        });
+        assert.strictEqual(res.status, 400);
+        const data = await res.json();
+        assert.ok(data.error.includes("expired"));
+    });
+
     console.log(`\n=================================================`);
     console.log(` BACKEND TEST SUITE COMPLETE: ${passedTests}/${totalTests} TESTS PASSED`);
     console.log(`=================================================\n`);
