@@ -1347,15 +1347,15 @@ console.log("\n--- PART 4: Information Guide Modal & Chrome Tab Navigation ---")
             );
 
             // For decreasing weight holding (VAS: 80% -> 50%):
-            // alloc-bar-start (dark green underneath) extends to initialPct (80%) with rounded pill radius
+            // alloc-bar-start (bright green underneath) extends to initialPct (80%) with rounded pill radius
             assert.ok(
-                allocList.innerHTML.includes('class="alloc-bar-start" style="left: 0; width: 80%; border-radius: var(--radius-pill);"'),
-                "Decreasing asset start bar (dark green underneath) must extend to 80% with pill radius"
+                allocList.innerHTML.includes('class="alloc-bar-start" style="left: 0; width: 80%; border-radius: var(--radius-pill); background: var(--accent);"'),
+                "Decreasing asset start bar (bright green underneath) must extend to 80% with pill radius"
             );
-            // alloc-bar-new (bright green on top) extends to newPct (50%) with rounded pill radius
+            // alloc-bar-new (dark green on top) extends to newPct (50%) with rounded pill radius
             assert.ok(
-                allocList.innerHTML.includes('class="alloc-bar-new" style="left: 0; width: 50%; border-radius: var(--radius-pill);"'),
-                "Decreasing asset new bar (bright green on top) must extend to 50% with pill radius"
+                allocList.innerHTML.includes('class="alloc-bar-new" style="left: 0; width: 50%; border-radius: var(--radius-pill); background: rgba(36, 219, 161, 0.4);"'),
+                "Decreasing asset new bar (dark green on top) must extend to 50% with pill radius"
             );
         });
 
@@ -1373,10 +1373,10 @@ console.log("\n--- PART 4: Information Guide Modal & Chrome Tab Navigation ---")
                 allocList.innerHTML.includes('width: 70%; border-radius: var(--radius-pill); background: rgba(255, 92, 92, 0.35);'),
                 "Sell asset start bar must extend to 70% with soft red background and pill radius"
             );
-            // AAPL new bar extends to 50% with pill radius
+            // AAPL new bar extends to 50% with pill radius and dark green kept portion
             assert.ok(
-                allocList.innerHTML.includes('class="alloc-bar-new" style="left: 0; width: 50%; border-radius: var(--radius-pill);"'),
-                "Sell asset new bar must extend to 50% with pill radius"
+                allocList.innerHTML.includes('class="alloc-bar-new" style="left: 0; width: 50%; border-radius: var(--radius-pill); background: rgba(36, 219, 161, 0.4);"'),
+                "Sell asset new bar must extend to 50% with pill radius and dark green"
             );
         });
     }
