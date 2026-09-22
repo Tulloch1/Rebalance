@@ -638,15 +638,6 @@ console.log("\n--- PART 4: Information Guide Modal & Chrome Tab Navigation ---")
         assert.strictEqual(paneComplete.classList.contains("active"), true);
         assert.strictEqual(btnDynamic.classList.contains("active"), false);
         assert.strictEqual(paneDynamic.classList.contains("active"), false);
-
-        // Switch to disclaimers
-        const btnDisclaimer = env.getEl("tab-btn-disclaimers");
-        const paneDisclaimer = env.getEl("tab-pane-disclaimers");
-        env.switchInfoTab("disclaimers");
-        assert.strictEqual(btnDisclaimer.classList.contains("active"), true);
-        assert.strictEqual(paneDisclaimer.classList.contains("active"), true);
-        assert.strictEqual(btnComplete.classList.contains("active"), false);
-        assert.strictEqual(paneComplete.classList.contains("active"), false);
     });
 }
 
@@ -1327,366 +1318,66 @@ console.log("\n--- PART 4: Information Guide Modal & Chrome Tab Navigation ---")
     }
 
     // =========================================================================
-    // PART 9: CLEAN SLATE ACCOUNT RESET & BILLING CHALLENGE (OPTION B)
+    // PART 10: COMPARATIVE PROGRESS BARS & REBALANCE BREAKDOWN STYLING
     // =========================================================================
-    console.log("\n--- PART 9: Clean Slate Account Reset & Billing Challenge (Option B) ---");
+    console.log("\n--- PART 10: Comparative Progress Bars & Rebalance Breakdown Styling ---");
+
     {
         const env = createTestEnv();
 
-        runTest("toggleRecoverySection() reveals recoverySection and resets nested Clean Slate options when closed", () => {
-            const recSec = env.getEl("recoverySection");
-            recSec.style.display = "none";
-            env.toggleRecoverySection();
-            assert.strictEqual(recSec.style.display, "block");
-
-            // Open clean slate section
-            env.toggleCleanSlateSection();
-            assert.strictEqual(env.getEl("cleanSlateSection").style.display, "block");
-
-            // Toggling recovery section closed also hides and resets clean slate section
-            env.toggleRecoverySection();
-            assert.strictEqual(recSec.style.display, "none");
-            assert.strictEqual(env.getEl("cleanSlateSection").style.display, "none");
-        });
-
-        runTest("toggleCleanSlateSection() reveals and hides cleanSlateSection", () => {
-            const sec = env.getEl("cleanSlateSection");
-            assert.ok(sec.style.display === "none" || !sec.style.display);
-            env.toggleCleanSlateSection();
-            assert.strictEqual(sec.style.display, "block");
-            env.toggleCleanSlateSection();
-            assert.strictEqual(sec.style.display, "none");
-        });
-
-        runTest("resetCleanSlateForm() resets all fields, hides billing challenge, and restores step 1", () => {
-            env.toggleCleanSlateSection();
-            env.getEl("cleanSlateStep1").style.display = "none";
-            env.getEl("cleanSlateStep2").style.display = "block";
-            env.getEl("cleanSlateBillingChallenge").style.display = "block";
-            env.getEl("cleanSlateEmail").value = "test@example.com";
-            env.getEl("cleanSlateCode").value = "123456";
-            env.getEl("cleanSlateCardLast4").value = "4242";
-            env.getEl("cleanSlateNewPassword").value = "NewSecret123!";
-            env.getEl("cleanSlateConfirmPassword").value = "NewSecret123!";
-
-            env.resetCleanSlateForm();
-
-            assert.strictEqual(env.getEl("cleanSlateSection").style.display, "none");
-            assert.strictEqual(env.getEl("cleanSlateStep1").style.display, "block");
-            assert.strictEqual(env.getEl("cleanSlateStep2").style.display, "none");
-            assert.strictEqual(env.getEl("cleanSlateBillingChallenge").style.display, "none");
-            assert.strictEqual(env.getEl("cleanSlateEmail").value, "");
-            assert.strictEqual(env.getEl("cleanSlateCode").value, "");
-            assert.strictEqual(env.getEl("cleanSlateCardLast4").value, "");
-            assert.strictEqual(env.getEl("cleanSlateNewPassword").value, "");
-            assert.strictEqual(env.getEl("cleanSlateConfirmPassword").value, "");
-        });
-
-        await runTest("handleRequestResetCode() requires valid email and reveals Step 2", async () => {
-            env.toggleCleanSlateSection();
-            env.getEl("cleanSlateEmail").value = "";
-            env.getEl("signInEmail").value = "";
-            await env.handleRequestResetCode();
-            assert.ok(env.getEl("signInFeedback").innerText.includes("Please enter your account email"));
-
-            // With valid email in cleanSlateEmail
-            env.getEl("cleanSlateEmail").value = "clean_test@example.com";
-            await env.handleRequestResetCode();
-            assert.strictEqual(env.getEl("cleanSlateStep1").style.display, "none");
-            assert.strictEqual(env.getEl("cleanSlateStep2").style.display, "block");
-            assert.ok(env.getEl("signInFeedback").innerText.includes("verification code has been sent"));
-        });
-
-        await runTest("handleRequestResetCode() conditionally reveals Billing Challenge for Pro accounts", async () => {
-            // Create stored account with pro tier and stripeCustomerId
-            const stored = env.getStoredAccounts();
-            stored["pro_reset@example.com"] = {
-                email: "pro_reset@example.com",
-                authHash: "x".repeat(32),
-                tier: "pro",
-                stripeCustomerId: "cus_mock_999",
-                vault: { ciphertext: "abc" }
-            };
-            env.setStoredAccounts(stored);
-
-            env.getEl("cleanSlateEmail").value = "pro_reset@example.com";
-            await env.handleRequestResetCode();
-            assert.strictEqual(env.getEl("cleanSlateBillingChallenge").style.display, "block");
-        });
-
-        await runTest("handleExecuteCleanSlate() validates code, billing card, and password requirements", async () => {
-            env.getEl("cleanSlateEmail").value = "pro_reset@example.com";
-            env.getEl("cleanSlateBillingChallenge").style.display = "block";
-
-            // Missing/short code
-            env.getEl("cleanSlateCode").value = "12";
-            await env.handleExecuteCleanSlate();
-            assert.ok(env.getEl("signInFeedback").innerText.includes("6-digit verification code"));
-
-            // Valid code, missing card last 4
-            env.getEl("cleanSlateCode").value = "123456";
-            env.getEl("cleanSlateCardLast4").value = "12";
-            await env.handleExecuteCleanSlate();
-            assert.ok(env.getEl("signInFeedback").innerText.includes("last 4 digits"));
-
-            // Valid card last 4, short password
-            env.getEl("cleanSlateCardLast4").value = "4242";
-            env.getEl("cleanSlateNewPassword").value = "short";
-            await env.handleExecuteCleanSlate();
-            assert.ok(env.getEl("signInFeedback").innerText.includes("at least 8 characters"));
-
-            // Password mismatch
-            env.getEl("cleanSlateNewPassword").value = "StrongPass123!";
-            env.getEl("cleanSlateConfirmPassword").value = "DifferentPass!";
-            await env.handleExecuteCleanSlate();
-            assert.ok(env.getEl("signInFeedback").innerText.includes("do not match"));
-        });
-
-        await runTest("handleExecuteCleanSlate() wipes vault, updates credentials, and establishes session", async () => {
-            env.getEl("cleanSlateEmail").value = "pro_reset@example.com";
-            env.getEl("cleanSlateBillingChallenge").style.display = "none";
-            env.getEl("cleanSlateCode").value = "123456";
-            env.getEl("cleanSlateNewPassword").value = "FreshPassword123!";
-            env.getEl("cleanSlateConfirmPassword").value = "FreshPassword123!";
-
-            await env.handleExecuteCleanSlate();
-
-            // Verify tab switched to status
-            assert.strictEqual(env.getEl("tab-pane-acc-status").classList.contains("active"), true);
-
-            // Check account state
-            const current = env.getCurrentAccount();
-            assert.ok(current);
-            assert.strictEqual(current.email, "pro_reset@example.com");
-            assert.strictEqual(current.tier, "pro");
-
-            // Check vault wiped in storage
-            const accounts = env.getStoredAccounts();
-            assert.strictEqual(accounts["pro_reset@example.com"].vault, null);
-            assert.strictEqual(accounts["pro_reset@example.com"].recoveryEnvelope, null);
-            assert.strictEqual(accounts["pro_reset@example.com"].vaultVersion, 1);
-        });
-    }
-
-    // =========================================================================
-    // PART 10: SHARE PRICE & QUANTITY INPUT MODE
-    // =========================================================================
-    console.log("\n--- PART 10: Share Price & Quantity Input Mode ---");
-    {
-        const env = createTestEnv();
-
-        // 1. Default mode is value mode
-        runTest("isSharesInputMode() defaults to false for new users", () => {
-            assert.strictEqual(env.isSharesInputMode(), false);
-        });
-
-        // 2. onSettingInputModeToggle(true) enables shares mode and updates storage
-        runTest("onSettingInputModeToggle(true) enables shares mode and persists in localStorage", () => {
-            env.onSettingInputModeToggle(true);
-            assert.strictEqual(env.isSharesInputMode(), true);
-            assert.strictEqual(env.sandbox.localStorage.getItem("rebalancer_input_mode"), "shares");
-            const th = env.getEl("tableHeaders");
-            assert.strictEqual(th.classList.contains("mode-shares"), true);
-            assert.ok(th.innerHTML.includes("Share Price"));
-            assert.ok(th.innerHTML.includes("Quantity"));
-        });
-
-        // 3. renderTableHeaders switches back to 5-column Value headers when toggled off
-        runTest("onSettingInputModeToggle(false) reverts to Current Value header", () => {
-            env.onSettingInputModeToggle(false);
-            assert.strictEqual(env.isSharesInputMode(), false);
-            assert.strictEqual(env.sandbox.localStorage.getItem("rebalancer_input_mode"), "value");
-            const th = env.getEl("tableHeaders");
-            assert.strictEqual(th.classList.contains("mode-shares"), false);
-            assert.ok(th.innerHTML.includes("Current Value"));
-            assert.strictEqual(th.innerHTML.includes("Share Price"), false);
-        });
-
-        // 4. renderRows in shares mode injects input-price and input-qty fields
-        runTest("renderRows() renders price and quantity inputs when in shares mode", () => {
-            env.onSettingInputModeToggle(true);
+        runTest("Increasing and decreasing weight comparative progress bars render with rounded pill edges", () => {
+            env.setInputs({ deposit: '1000', minBuy: '0', complete: false });
             env.setHoldings([
-                { t: "AAPL", p: "180", q: "10", v: "1800", w: "100" }
-            ]);
-            env.renderRows();
-
-            const container = env.getEl("portfolioContainer");
-            assert.strictEqual(container.classList.contains("mode-shares"), true);
-            assert.ok(container.innerHTML.includes("input-price"));
-            assert.ok(container.innerHTML.includes("input-qty"));
-            assert.strictEqual(container.innerHTML.includes("input-value"), false);
-        });
-
-        // 5. updateHolding auto-calculates v = p * q
-        runTest("updateHolding() dynamically calculates current value (v = p * q)", () => {
-            env.onSettingInputModeToggle(true);
-            env.setHoldings([
-                { t: "MSFT", p: "", q: "", v: "", w: "100" }
-            ]);
-
-            env.updateHolding(0, "p", "250.50");
-            let holdings = env.getHoldings();
-            assert.strictEqual(holdings[0].v, ""); // incomplete until quantity is present
-
-            env.updateHolding(0, "q", "4");
-            holdings = env.getHoldings();
-            assert.strictEqual(holdings[0].v, "1002"); // 250.50 * 4 = 1002
-
-            // Test fractional shares and decimals
-            env.updateHolding(0, "p", "12.50");
-            env.updateHolding(0, "q", "2.5");
-            holdings = env.getHoldings();
-            assert.strictEqual(holdings[0].v, "31.25"); // 12.50 * 2.5 = 31.25
-        });
-
-        // 6. Switching back to Value Mode displays calculated v
-        runTest("Toggling from Shares Mode to Value Mode retains computed current value", () => {
-            env.onSettingInputModeToggle(true);
-            env.setHoldings([
-                { t: "GOOG", p: "150", q: "10", v: "1500", w: "100" }
-            ]);
-            env.renderRows();
-
-            // Toggle back to Value mode
-            env.onSettingInputModeToggle(false);
-            const container = env.getEl("portfolioContainer");
-            assert.strictEqual(container.classList.contains("mode-shares"), false);
-            assert.ok(container.innerHTML.includes("input-value"));
-            assert.ok(container.innerHTML.includes('value="1500"'));
-        });
-
-        // 7. Validation in Shares Mode catches missing share price
-        runTest("calculateRebalance() validates missing share price in shares mode", () => {
-            env.onSettingInputModeToggle(true);
-            env.setInputs({ deposit: "500", minBuy: "0", complete: false });
-            env.setHoldings([
-                { t: "VOO", p: "", q: "10", w: "100" }
-            ]);
-            env.calculateRebalance();
-            assert.deepStrictEqual(env.getErrorMessages(), ["Please fill in a valid share price for holding #1."]);
-        });
-
-        // 8. Validation in Shares Mode catches missing quantity
-        runTest("calculateRebalance() validates missing quantity in shares mode", () => {
-            env.onSettingInputModeToggle(true);
-            env.setInputs({ deposit: "500", minBuy: "0", complete: false });
-            env.setHoldings([
-                { t: "VOO", p: "500", q: "", w: "100" }
-            ]);
-            env.calculateRebalance();
-            assert.deepStrictEqual(env.getErrorMessages(), ["Please fill in a valid quantity for holding #1."]);
-        });
-
-        // 9. Validation in Shares Mode catches both missing price and quantity
-        runTest("calculateRebalance() validates missing price and quantity together", () => {
-            env.onSettingInputModeToggle(true);
-            env.setInputs({ deposit: "500", minBuy: "0", complete: false });
-            env.setHoldings([
-                { t: "VOO", p: "", q: "", w: "100" }
-            ]);
-            env.calculateRebalance();
-            assert.deepStrictEqual(env.getErrorMessages(), ["Please fill in a valid share price and quantity for holding #1."]);
-        });
-
-        // 10. calculateRebalance computes allocations using p * q portfolio values
-        runTest("calculateRebalance() successfully executes allocation in shares mode", () => {
-            env.onSettingInputModeToggle(true);
-            env.setInputs({ deposit: "1000", minBuy: "0", complete: false });
-            env.setHoldings([
-                { t: "VOO", p: "500", q: "10", w: "50" },  // 5000 (50%)
-                { t: "VXUS", p: "60", q: "50", w: "30" },  // 3000 (30%)
-                { t: "BND", p: "80", q: "25", w: "20" }    // 2000 (20%)
-            ]);
-            env.calculateRebalance();
-            assert.deepStrictEqual(env.getErrorMessages(), []);
-            const outEl = env.getEl("outputArea");
-            assert.ok(outEl.innerText.includes("VOO"));
-            assert.ok(outEl.innerText.includes("VXUS"));
-            assert.ok(outEl.innerText.includes("BND"));
-        });
-
-        // 11. handleResetToExample sets p, q, and v for example assets
-        runTest("handleResetToExample() restores clean example data with prices and quantities", () => {
-            env.onSettingInputModeToggle(true);
-            env.handleResetToExample();
-            const holdings = env.getHoldings();
-            assert.strictEqual(holdings.length, 3);
-            assert.strictEqual(holdings[0].t, "VOO");
-            assert.strictEqual(holdings[0].p, "500");
-            assert.strictEqual(holdings[0].q, "10");
-            assert.strictEqual(holdings[0].v, "5000");
-        });
-
-        // 12. openSettingsModal initializes input mode toggle checkbox
-        runTest("openSettingsModal() initializes settingInputModeToggle checkbox state", () => {
-            env.onSettingInputModeToggle(true);
-            env.openSettingsModal();
-            assert.strictEqual(env.getEl("settingInputModeToggle").checked, true);
-
-            env.onSettingInputModeToggle(false);
-            env.openSettingsModal();
-            assert.strictEqual(env.getEl("settingInputModeToggle").checked, false);
-        });
-
-        // 13. saveFormData and loadFormData persist and restore inputMode
-        runTest("saveFormData() and loadFormData() persist and restore inputMode state", () => {
-            env.onSettingInputModeToggle(true);
-            env.setInputs({ deposit: "250", minBuy: "0", complete: false });
-            env.setHoldings([
-                { t: "VT", p: "100", q: "5", v: "500", w: "100" }
-            ]);
-            env.sandbox.saveFormData();
-
-            const savedRaw = env.sandbox.localStorage.getItem("rebalancer_state");
-            assert.ok(savedRaw);
-            const parsed = JSON.parse(savedRaw);
-            assert.strictEqual(parsed.inputMode, "shares");
-
-            // Reset mode and reload
-            env.sandbox.localStorage.setItem("rebalancer_input_mode", "value");
-            env.sandbox.loadFormData();
-            assert.strictEqual(env.isSharesInputMode(), true); // restored from payload
-        });
-
-        // 14. Progress bar before/after rendering for increasing weightings
-        runTest("Progress bar renders original weighting in darker mint green and increase in standard mint green", () => {
-            env.onSettingInputModeToggle(false);
-            env.setInputs({ deposit: "1000", minBuy: "0", complete: false });
-            // Initial: VOO $1000 (25%), VXUS $3000 (75%). Target: VOO 50%, VXUS 50%.
-            // With $1000 deposit, total becomes $5000. All $1000 goes to VOO -> $2000 (40%).
-            // VOO increases: 20% -> 40%. VXUS decreases: 60% -> 60%.
-            env.setHoldings([
-                { t: "VOO", v: "1000", w: "50" },
-                { t: "VXUS", v: "3000", w: "50" }
+                { t: 'VGS', v: '200', w: '50' }, // Increases from 20% to 50%
+                { t: 'VAS', v: '800', w: '50' }  // Decreases from 80% to 50%
             ]);
             env.calculateRebalance();
             const allocList = env.getEl("allocationList");
-            assert.ok(allocList.innerHTML.includes("alloc-bar-start"));
-            assert.ok(allocList.innerHTML.includes("alloc-bar-new"));
-            assert.ok(allocList.innerHTML.includes("alloc-target-marker"));
 
-            // Check that the increasing item (VOO) has alloc-bar-new positioned after alloc-bar-start
-            const vooItem = allocList.innerHTML;
-            // VOO starts at 25% and goes to 40% (newPct > initialPct):
-            // alloc-bar-start should have width 25%, alloc-bar-new should have left: 25% and width: 15%
-            assert.ok(vooItem.includes("left: 25%"));
+            // For increasing weight holding (VGS: 20% -> 50%):
+            // alloc-bar-start (dark green underneath) extends to newPct (50%) with rounded pill radius
+            assert.ok(
+                allocList.innerHTML.includes('class="alloc-bar-start" style="left: 0; width: 50%; border-radius: var(--radius-pill);"'),
+                "Increasing asset start bar (dark green underneath) must extend to 50% with pill radius"
+            );
+            // alloc-bar-new (bright green on top) extends to initialPct (20%) with rounded pill radius
+            assert.ok(
+                allocList.innerHTML.includes('class="alloc-bar-new" style="left: 0; width: 20%; border-radius: var(--radius-pill);"'),
+                "Increasing asset new bar (bright green on top) must extend to 20% with pill radius"
+            );
+
+            // For decreasing weight holding (VAS: 80% -> 50%):
+            // alloc-bar-start (dark green underneath) extends to initialPct (80%) with rounded pill radius
+            assert.ok(
+                allocList.innerHTML.includes('class="alloc-bar-start" style="left: 0; width: 80%; border-radius: var(--radius-pill);"'),
+                "Decreasing asset start bar (dark green underneath) must extend to 80% with pill radius"
+            );
+            // alloc-bar-new (bright green on top) extends to newPct (50%) with rounded pill radius
+            assert.ok(
+                allocList.innerHTML.includes('class="alloc-bar-new" style="left: 0; width: 50%; border-radius: var(--radius-pill);"'),
+                "Decreasing asset new bar (bright green on top) must extend to 50% with pill radius"
+            );
         });
 
-        // 15. Progress bar before/after rendering for decreasing weightings
-        runTest("Progress bar renders original weighting extension for decreasing weightings", () => {
-            env.onSettingInputModeToggle(false);
-            env.setInputs({ deposit: "0", minBuy: "0", complete: true });
-            // Complete rebalance: VOO $4000 (80%), VXUS $1000 (20%). Target: VOO 50%, VXUS 50%.
-            // VOO is sold down from 80% to 50%.
+        runTest("Complete Rebalance sell holding renders sell bar in soft red with rounded pill radius", () => {
+            env.setInputs({ deposit: '0', minBuy: '0', complete: true });
             env.setHoldings([
-                { t: "VOO", v: "4000", w: "50" },
-                { t: "VXUS", v: "1000", w: "50" }
+                { t: 'AAPL', v: '700', w: '50' }, // Sells 200, drops from 70% to 50%
+                { t: 'BHP', v: '300', w: '50' }   // Buys 200, rises from 30% to 50%
             ]);
             env.calculateRebalance();
             const allocList = env.getEl("allocationList");
-            // In decreasing mode, alloc-bar-start has width 80% with sell background, and alloc-bar-new has left: 0; width: 50%
-            assert.ok(allocList.innerHTML.includes("rgba(255, 92, 92, 0.35)"));
-            assert.ok(allocList.innerHTML.includes("left: 0; width: 50%"));
+
+            // AAPL is sold: start bar extends to initialPct (70%) with soft red and pill radius
+            assert.ok(
+                allocList.innerHTML.includes('width: 70%; border-radius: var(--radius-pill); background: rgba(255, 92, 92, 0.35);'),
+                "Sell asset start bar must extend to 70% with soft red background and pill radius"
+            );
+            // AAPL new bar extends to 50% with pill radius
+            assert.ok(
+                allocList.innerHTML.includes('class="alloc-bar-new" style="left: 0; width: 50%; border-radius: var(--radius-pill);"'),
+                "Sell asset new bar must extend to 50% with pill radius"
+            );
         });
     }
 

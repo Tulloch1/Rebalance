@@ -1055,10 +1055,11 @@
         .alloc-bar-start {
             height: 100%;
             background: rgba(36, 219, 161, 0.4);
-            border-radius: var(--radius-pill) 0 0 var(--radius-pill);
+            border-radius: var(--radius-pill);
             position: absolute;
             left: 0;
             top: 0;
+            transition: width 0.4s ease;
         }
 
         .alloc-bar-new {
@@ -5658,14 +5659,14 @@ INSTRUCTIONS:
 
                 if (newPct > initialPct) {
                     const startW = Math.min(initialPct, 100);
-                    const incW = Math.max(0, Math.min(newPct, 100) - startW);
-                    barStartStyle = `left: 0; width: ${startW}%; border-radius: ${incW > 0 ? 'var(--radius-pill) 0 0 var(--radius-pill)' : 'var(--radius-pill)'};`;
-                    barNewStyle = `left: ${startW}%; width: ${incW}%; border-radius: ${startW > 0.05 ? '0 var(--radius-pill) var(--radius-pill) 0' : 'var(--radius-pill)'};`;
+                    const newW = Math.min(newPct, 100);
+                    barStartStyle = `left: 0; width: ${newW}%; border-radius: var(--radius-pill);`;
+                    barNewStyle = `left: 0; width: ${startW}%; border-radius: var(--radius-pill);${startW <= 0.01 ? ' display: none;' : ''}`;
                 } else if (newPct < initialPct) {
                     const startW = Math.min(initialPct, 100);
                     const newW = Math.min(newPct, 100);
-                    barStartStyle = `left: 0; width: ${startW}%; border-radius: var(--radius-pill); ${isSell ? 'background: rgba(255, 92, 92, 0.35);' : ''}`;
-                    barNewStyle = `left: 0; width: ${newW}%; border-radius: var(--radius-pill);`;
+                    barStartStyle = `left: 0; width: ${startW}%; border-radius: var(--radius-pill);${isSell ? ' background: rgba(255, 92, 92, 0.35);' : ''}`;
+                    barNewStyle = `left: 0; width: ${newW}%; border-radius: var(--radius-pill);${newW <= 0.01 ? ' display: none;' : ''}`;
                 } else {
                     const w = Math.min(newPct, 100);
                     barStartStyle = `display: none;`;
