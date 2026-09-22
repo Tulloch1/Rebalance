@@ -1375,7 +1375,7 @@ console.log("\n--- PART 4: Information Guide Modal & Chrome Tab Navigation ---")
             await env.handleRequestResetCode();
             assert.strictEqual(env.getEl("cleanSlateStep1").style.display, "none");
             assert.strictEqual(env.getEl("cleanSlateStep2").style.display, "block");
-            assert.ok(env.getEl("signInFeedback").innerText.includes("verification code sent"));
+            assert.ok(env.getEl("signInFeedback").innerText.includes("verification code has been sent"));
         });
 
         await runTest("handleRequestResetCode() conditionally reveals Billing Challenge for Pro accounts", async () => {
