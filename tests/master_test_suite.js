@@ -1468,6 +1468,187 @@ console.log("\n--- PART 4: Information Guide Modal & Chrome Tab Navigation ---")
         });
     }
 
+    // =========================================================================
+    // PART 10: SHARE PRICE & QUANTITY INPUT MODE
+    // =========================================================================
+    console.log("\n--- PART 10: Share Price & Quantity Input Mode ---");
+    {
+        const env = createTestEnv();
+
+        // 1. Default mode is value mode
+        runTest("isSharesInputMode() defaults to false for new users", () => {
+            assert.strictEqual(env.isSharesInputMode(), false);
+        });
+
+        // 2. onSettingInputModeToggle(true) enables shares mode and updates storage
+        runTest("onSettingInputModeToggle(true) enables shares mode and persists in localStorage", () => {
+            env.onSettingInputModeToggle(true);
+            assert.strictEqual(env.isSharesInputMode(), true);
+            assert.strictEqual(env.sandbox.localStorage.getItem("rebalancer_input_mode"), "shares");
+            const th = env.getEl("tableHeaders");
+            assert.strictEqual(th.classList.contains("mode-shares"), true);
+            assert.ok(th.innerHTML.includes("Share Price"));
+            assert.ok(th.innerHTML.includes("Quantity"));
+        });
+
+        // 3. renderTableHeaders switches back to 5-column Value headers when toggled off
+        runTest("onSettingInputModeToggle(false) reverts to Current Value header", () => {
+            env.onSettingInputModeToggle(false);
+            assert.strictEqual(env.isSharesInputMode(), false);
+            assert.strictEqual(env.sandbox.localStorage.getItem("rebalancer_input_mode"), "value");
+            const th = env.getEl("tableHeaders");
+            assert.strictEqual(th.classList.contains("mode-shares"), false);
+            assert.ok(th.innerHTML.includes("Current Value"));
+            assert.strictEqual(th.innerHTML.includes("Share Price"), false);
+        });
+
+        // 4. renderRows in shares mode injects input-price and input-qty fields
+        runTest("renderRows() renders price and quantity inputs when in shares mode", () => {
+            env.onSettingInputModeToggle(true);
+            env.setHoldings([
+                { t: "AAPL", p: "180", q: "10", v: "1800", w: "100" }
+            ]);
+            env.renderRows();
+
+            const container = env.getEl("portfolioContainer");
+            assert.strictEqual(container.classList.contains("mode-shares"), true);
+            assert.ok(container.innerHTML.includes("input-price"));
+            assert.ok(container.innerHTML.includes("input-qty"));
+            assert.strictEqual(container.innerHTML.includes("input-value"), false);
+        });
+
+        // 5. updateHolding auto-calculates v = p * q
+        runTest("updateHolding() dynamically calculates current value (v = p * q)", () => {
+            env.onSettingInputModeToggle(true);
+            env.setHoldings([
+                { t: "MSFT", p: "", q: "", v: "", w: "100" }
+            ]);
+
+            env.updateHolding(0, "p", "250.50");
+            let holdings = env.getHoldings();
+            assert.strictEqual(holdings[0].v, ""); // incomplete until quantity is present
+
+            env.updateHolding(0, "q", "4");
+            holdings = env.getHoldings();
+            assert.strictEqual(holdings[0].v, "1002"); // 250.50 * 4 = 1002
+
+            // Test fractional shares and decimals
+            env.updateHolding(0, "p", "12.50");
+            env.updateHolding(0, "q", "2.5");
+            holdings = env.getHoldings();
+            assert.strictEqual(holdings[0].v, "31.25"); // 12.50 * 2.5 = 31.25
+        });
+
+        // 6. Switching back to Value Mode displays calculated v
+        runTest("Toggling from Shares Mode to Value Mode retains computed current value", () => {
+            env.onSettingInputModeToggle(true);
+            env.setHoldings([
+                { t: "GOOG", p: "150", q: "10", v: "1500", w: "100" }
+            ]);
+            env.renderRows();
+
+            // Toggle back to Value mode
+            env.onSettingInputModeToggle(false);
+            const container = env.getEl("portfolioContainer");
+            assert.strictEqual(container.classList.contains("mode-shares"), false);
+            assert.ok(container.innerHTML.includes("input-value"));
+            assert.ok(container.innerHTML.includes('value="1500"'));
+        });
+
+        // 7. Validation in Shares Mode catches missing share price
+        runTest("calculateRebalance() validates missing share price in shares mode", () => {
+            env.onSettingInputModeToggle(true);
+            env.setInputs({ deposit: "500", minBuy: "0", complete: false });
+            env.setHoldings([
+                { t: "VOO", p: "", q: "10", w: "100" }
+            ]);
+            env.calculateRebalance();
+            assert.deepStrictEqual(env.getErrorMessages(), ["Please fill in a valid share price for holding #1."]);
+        });
+
+        // 8. Validation in Shares Mode catches missing quantity
+        runTest("calculateRebalance() validates missing quantity in shares mode", () => {
+            env.onSettingInputModeToggle(true);
+            env.setInputs({ deposit: "500", minBuy: "0", complete: false });
+            env.setHoldings([
+                { t: "VOO", p: "500", q: "", w: "100" }
+            ]);
+            env.calculateRebalance();
+            assert.deepStrictEqual(env.getErrorMessages(), ["Please fill in a valid quantity for holding #1."]);
+        });
+
+        // 9. Validation in Shares Mode catches both missing price and quantity
+        runTest("calculateRebalance() validates missing price and quantity together", () => {
+            env.onSettingInputModeToggle(true);
+            env.setInputs({ deposit: "500", minBuy: "0", complete: false });
+            env.setHoldings([
+                { t: "VOO", p: "", q: "", w: "100" }
+            ]);
+            env.calculateRebalance();
+            assert.deepStrictEqual(env.getErrorMessages(), ["Please fill in a valid share price and quantity for holding #1."]);
+        });
+
+        // 10. calculateRebalance computes allocations using p * q portfolio values
+        runTest("calculateRebalance() successfully executes allocation in shares mode", () => {
+            env.onSettingInputModeToggle(true);
+            env.setInputs({ deposit: "1000", minBuy: "0", complete: false });
+            env.setHoldings([
+                { t: "VOO", p: "500", q: "10", w: "50" },  // 5000 (50%)
+                { t: "VXUS", p: "60", q: "50", w: "30" },  // 3000 (30%)
+                { t: "BND", p: "80", q: "25", w: "20" }    // 2000 (20%)
+            ]);
+            env.calculateRebalance();
+            assert.deepStrictEqual(env.getErrorMessages(), []);
+            const outEl = env.getEl("outputArea");
+            assert.ok(outEl.innerText.includes("VOO"));
+            assert.ok(outEl.innerText.includes("VXUS"));
+            assert.ok(outEl.innerText.includes("BND"));
+        });
+
+        // 11. handleResetToExample sets p, q, and v for example assets
+        runTest("handleResetToExample() restores clean example data with prices and quantities", () => {
+            env.onSettingInputModeToggle(true);
+            env.handleResetToExample();
+            const holdings = env.getHoldings();
+            assert.strictEqual(holdings.length, 3);
+            assert.strictEqual(holdings[0].t, "VOO");
+            assert.strictEqual(holdings[0].p, "500");
+            assert.strictEqual(holdings[0].q, "10");
+            assert.strictEqual(holdings[0].v, "5000");
+        });
+
+        // 12. openSettingsModal initializes input mode toggle checkbox
+        runTest("openSettingsModal() initializes settingInputModeToggle checkbox state", () => {
+            env.onSettingInputModeToggle(true);
+            env.openSettingsModal();
+            assert.strictEqual(env.getEl("settingInputModeToggle").checked, true);
+
+            env.onSettingInputModeToggle(false);
+            env.openSettingsModal();
+            assert.strictEqual(env.getEl("settingInputModeToggle").checked, false);
+        });
+
+        // 13. saveFormData and loadFormData persist and restore inputMode
+        runTest("saveFormData() and loadFormData() persist and restore inputMode state", () => {
+            env.onSettingInputModeToggle(true);
+            env.setInputs({ deposit: "250", minBuy: "0", complete: false });
+            env.setHoldings([
+                { t: "VT", p: "100", q: "5", v: "500", w: "100" }
+            ]);
+            env.sandbox.saveFormData();
+
+            const savedRaw = env.sandbox.localStorage.getItem("rebalancer_state");
+            assert.ok(savedRaw);
+            const parsed = JSON.parse(savedRaw);
+            assert.strictEqual(parsed.inputMode, "shares");
+
+            // Reset mode and reload
+            env.sandbox.localStorage.setItem("rebalancer_input_mode", "value");
+            env.sandbox.loadFormData();
+            assert.strictEqual(env.isSharesInputMode(), true); // restored from payload
+        });
+    }
+
     console.log(`\n=================================================`);
     console.log(` MASTER TEST SUITE COMPLETE: ${passedTests}/${totalTests} TESTS PASSED`);
     console.log(`=================================================\n`);

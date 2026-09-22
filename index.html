@@ -610,6 +610,13 @@
             transition: all 0.2s ease;
         }
 
+        /* 6-Column Share Price & Quantity Grid */
+        .table-headers.mode-shares,
+        .holding-row.mode-shares {
+            grid-template-columns: 32px 1.2fr 1.1fr 1fr 1fr 36px;
+            gap: 8px;
+        }
+
         .holding-row:hover {
             border-color: var(--border-hover);
             background: rgba(255, 255, 255, 0.015);
@@ -679,7 +686,8 @@
             font-weight: 600;
         }
 
-        .input-value {
+        .input-value,
+        .input-price {
             padding-left: 22px;
         }
 
@@ -1894,6 +1902,30 @@
                 gap: 6px;
                 padding: 6px 8px;
             }
+            .table-headers.mode-shares,
+            .holding-row.mode-shares {
+                grid-template-columns: 20px 1.1fr 1fr 0.9fr 0.9fr 28px;
+                gap: 4px;
+                padding: 6px 6px;
+            }
+            .mode-shares .clean-input {
+                padding: 6px 6px;
+                font-size: 11px;
+            }
+            .mode-shares .input-price {
+                padding-left: 16px;
+            }
+            .mode-shares .input-weight {
+                padding-right: 16px;
+            }
+            .mode-shares .input-prefix {
+                left: 6px;
+                font-size: 11px;
+            }
+            .mode-shares .input-suffix {
+                right: 6px;
+                font-size: 11px;
+            }
             .stat-grid {
                 grid-template-columns: 1fr;
             }
@@ -2251,7 +2283,7 @@
                 </div>
             </div>
 
-            <div class="table-headers">
+            <div class="table-headers" id="tableHeaders">
                 <div style="text-align: center;">#</div>
                 <div>Asset / Ticker</div>
                 <div>Current Value</div>
@@ -2790,6 +2822,18 @@
                         </div>
                         <label class="toggle-switch" for="settingRoundingToggle" title="Toggle Whole Dollar Rounding">
                             <input type="checkbox" id="settingRoundingToggle" onchange="onSettingRoundingToggle(this.checked)">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <!-- Share Price & Quantity Input Mode (Toggle Switch) -->
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <span class="setting-title">Share Price &amp; Quantity Input</span>
+                            <span class="setting-sub">Input holdings using share price and number of shares instead of a single total value</span>
+                        </div>
+                        <label class="toggle-switch" for="settingInputModeToggle" title="Toggle Share Price & Quantity Mode">
+                            <input type="checkbox" id="settingInputModeToggle" onchange="onSettingInputModeToggle(this.checked)">
                             <span class="toggle-slider"></span>
                         </label>
                     </div>
@@ -3684,12 +3728,18 @@
                 deposit: depositEl ? depositEl.value : "",
                 minBuy: (minBuyEl && minBuyEl.value !== undefined && minBuyEl.value !== "") ? minBuyEl.value : "0",
                 completeRebalance: completeEl ? completeEl.checked : false,
+                inputMode: isSharesInputMode() ? "shares" : "value",
                 holdings: Array.isArray(holdingsData) ? holdingsData : []
             };
         }
 
         function loadPortfolioFromState(data) {
             if (!data) return;
+            if (data.inputMode) {
+                try {
+                    localStorage.setItem("rebalancer_input_mode", data.inputMode === "shares" ? "shares" : "value");
+                } catch (e) {}
+            }
             const depositEl = document.getElementById("deposit");
             const minBuyEl = document.getElementById("minBuy");
             const completeEl = document.getElementById("completeRebalance");
@@ -4601,6 +4651,56 @@ INSTRUCTIONS:
             }
         }
 
+        function isSharesInputMode() {
+            try {
+                return typeof localStorage !== 'undefined' && localStorage.getItem("rebalancer_input_mode") === "shares";
+            } catch (e) {
+                return false;
+            }
+        }
+
+        function onSettingInputModeToggle(isShares) {
+            try {
+                localStorage.setItem("rebalancer_input_mode", isShares ? "shares" : "value");
+            } catch (e) {}
+
+            renderTableHeaders();
+            renderRows();
+
+            const resultsSection = document.getElementById("resultsSection");
+            if (resultsSection && resultsSection.style.display !== "none" && typeof calculateRebalance === 'function') {
+                calculateRebalance();
+            }
+
+            saveFormData();
+        }
+
+        function renderTableHeaders() {
+            const th = document.getElementById("tableHeaders");
+            if (!th) return;
+            const isShares = isSharesInputMode();
+            if (isShares) {
+                th.classList.add("mode-shares");
+                th.innerHTML = `
+                    <div style="text-align: center;">#</div>
+                    <div>Asset / Ticker</div>
+                    <div>Share Price</div>
+                    <div>Quantity</div>
+                    <div>Target</div>
+                    <div></div>
+                `;
+            } else {
+                th.classList.remove("mode-shares");
+                th.innerHTML = `
+                    <div style="text-align: center;">#</div>
+                    <div>Asset / Ticker</div>
+                    <div>Current Value</div>
+                    <div>Target</div>
+                    <div></div>
+                `;
+            }
+        }
+
         function applyWholeDollarRounding(assets, totalAdded, isComplete) {
             if (!assets || assets.length === 0) return;
 
@@ -4716,6 +4816,11 @@ INSTRUCTIONS:
                 const roundToggle = document.getElementById("settingRoundingToggle");
                 if (roundToggle) {
                     roundToggle.checked = isWholeRoundingEnabled();
+                }
+
+                const inputModeToggle = document.getElementById("settingInputModeToggle");
+                if (inputModeToggle) {
+                    inputModeToggle.checked = isSharesInputMode();
                 }
 
                 const syncInput = document.getElementById("settingSyncUrl");
@@ -4902,9 +5007,9 @@ INSTRUCTIONS:
                 return;
             }
             holdingsData = [
-                { t: "VOO", v: "5000", w: "50" },
-                { t: "VXUS", v: "3000", w: "30" },
-                { t: "BND", v: "2000", w: "20" }
+                { t: "VOO", p: "500", q: "10", v: "5000", w: "50" },
+                { t: "VXUS", p: "60", q: "50", v: "3000", w: "30" },
+                { t: "BND", p: "80", q: "25", v: "2000", w: "20" }
             ];
             if (document.getElementById("deposit")) {
                 document.getElementById("deposit").value = "1000";
@@ -4951,35 +5056,70 @@ INSTRUCTIONS:
         });
 
         function renderRows() {
+            renderTableHeaders();
             const container = document.getElementById("portfolioContainer");
+            if (!container) return;
             container.innerHTML = "";
+            const isShares = isSharesInputMode();
+
+            if (isShares) {
+                container.classList.add("mode-shares");
+            } else {
+                container.classList.remove("mode-shares");
+            }
 
             holdingsData.forEach((holding, index) => {
                 const rowNum = index + 1;
                 const row = document.createElement("div");
-                row.className = "holding-row";
+                row.className = isShares ? "holding-row mode-shares" : "holding-row";
                 row.id = `row_${rowNum}`;
 
-                row.innerHTML = `
-                    <div class="row-index">${rowNum}</div>
-                    <div class="input-group">
-                        <input type="text" class="clean-input input-ticker" id="ticker_${rowNum}" placeholder="e.g. AAPL" value="${holding.t || ''}" oninput="updateHolding(${index}, 't', this.value)">
-                    </div>
-                    <div class="input-group">
-                        <span class="input-prefix">${getCurrencySymbol()}</span>
-                        <input type="number" step="any" min="0" class="clean-input input-value" id="value_${rowNum}" placeholder="0.00" value="${holding.v || ''}" oninput="updateHolding(${index}, 'v', this.value)">
-                    </div>
-                    <div class="input-group">
-                        <input type="number" step="any" min="0" max="100" class="clean-input input-weight" id="weight_${rowNum}" placeholder="0" value="${holding.w || ''}" oninput="updateHolding(${index}, 'w', this.value)">
-                        <span class="input-suffix">%</span>
-                    </div>
-                    <button class="btn-remove" title="Remove row" onclick="removeHolding(${index})">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <line x1="18" y1="6" x2="6" y2="18"></line>
-                            <line x1="6" y1="6" x2="18" y2="18"></line>
-                        </svg>
-                    </button>
-                `;
+                if (isShares) {
+                    row.innerHTML = `
+                        <div class="row-index">${rowNum}</div>
+                        <div class="input-group">
+                            <input type="text" class="clean-input input-ticker" id="ticker_${rowNum}" placeholder="e.g. AAPL" value="${holding.t || ''}" oninput="updateHolding(${index}, 't', this.value)">
+                        </div>
+                        <div class="input-group">
+                            <span class="input-prefix">${getCurrencySymbol()}</span>
+                            <input type="number" step="any" min="0" class="clean-input input-price" id="price_${rowNum}" placeholder="0.00" value="${holding.p !== undefined && holding.p !== null ? holding.p : ''}" oninput="updateHolding(${index}, 'p', this.value)">
+                        </div>
+                        <div class="input-group">
+                            <input type="number" step="any" min="0" class="clean-input input-qty" id="qty_${rowNum}" placeholder="0" value="${holding.q !== undefined && holding.q !== null ? holding.q : ''}" oninput="updateHolding(${index}, 'q', this.value)">
+                        </div>
+                        <div class="input-group">
+                            <input type="number" step="any" min="0" max="100" class="clean-input input-weight" id="weight_${rowNum}" placeholder="0" value="${holding.w !== undefined && holding.w !== null ? holding.w : ''}" oninput="updateHolding(${index}, 'w', this.value)">
+                            <span class="input-suffix">%</span>
+                        </div>
+                        <button class="btn-remove" title="Remove row" onclick="removeHolding(${index})">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        </button>
+                    `;
+                } else {
+                    row.innerHTML = `
+                        <div class="row-index">${rowNum}</div>
+                        <div class="input-group">
+                            <input type="text" class="clean-input input-ticker" id="ticker_${rowNum}" placeholder="e.g. AAPL" value="${holding.t || ''}" oninput="updateHolding(${index}, 't', this.value)">
+                        </div>
+                        <div class="input-group">
+                            <span class="input-prefix">${getCurrencySymbol()}</span>
+                            <input type="number" step="any" min="0" class="clean-input input-value" id="value_${rowNum}" placeholder="0.00" value="${holding.v !== undefined && holding.v !== null ? holding.v : ''}" oninput="updateHolding(${index}, 'v', this.value)">
+                        </div>
+                        <div class="input-group">
+                            <input type="number" step="any" min="0" max="100" class="clean-input input-weight" id="weight_${rowNum}" placeholder="0" value="${holding.w !== undefined && holding.w !== null ? holding.w : ''}" oninput="updateHolding(${index}, 'w', this.value)">
+                            <span class="input-suffix">%</span>
+                        </div>
+                        <button class="btn-remove" title="Remove row" onclick="removeHolding(${index})">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        </button>
+                    `;
+                }
                 container.appendChild(row);
             });
 
@@ -4987,20 +5127,33 @@ INSTRUCTIONS:
         }
 
         function updateHolding(index, field, value) {
+            if (!holdingsData[index]) return;
             holdingsData[index][field] = value;
+            if (isSharesInputMode()) {
+                const rawP = (holdingsData[index].p !== undefined && holdingsData[index].p !== null) ? String(holdingsData[index].p).trim() : "";
+                const rawQ = (holdingsData[index].q !== undefined && holdingsData[index].q !== null) ? String(holdingsData[index].q).trim() : "";
+                const p = parseFloat(rawP);
+                const q = parseFloat(rawQ);
+                if (rawP !== "" && rawQ !== "" && !isNaN(p) && !isNaN(q)) {
+                    const calculatedVal = p * q;
+                    holdingsData[index].v = String(Math.round(calculatedVal * 10000) / 10000);
+                } else if (rawP === "" || rawQ === "") {
+                    holdingsData[index].v = "";
+                }
+            }
             saveFormData();
             updateWeightSummary();
         }
 
-        function addHolding(ticker = "", value = "", weight = "") {
-            holdingsData.push({ t: ticker, v: value, w: weight });
+        function addHolding(ticker = "", value = "", weight = "", price = "", quantity = "") {
+            holdingsData.push({ t: ticker, v: value, p: price, q: quantity, w: weight });
             renderRows();
             saveFormData();
         }
 
         function removeHolding(index) {
             if (holdingsData.length <= 1) {
-                holdingsData[0] = { t: "", v: "", w: "" };
+                holdingsData[0] = { t: "", v: "", p: "", q: "", w: "" };
             } else {
                 holdingsData.splice(index, 1);
             }
@@ -5114,6 +5267,7 @@ INSTRUCTIONS:
                 deposit: depositEl ? depositEl.value : "",
                 minBuy: (minBuyEl && minBuyEl.value !== undefined && minBuyEl.value !== "") ? minBuyEl.value : "0",
                 completeRebalance: completeEl ? completeEl.checked : false,
+                inputMode: isSharesInputMode() ? "shares" : "value",
                 holdings: holdingsData
             };
             localStorage.setItem("rebalancer_state", JSON.stringify(payload));
@@ -5136,6 +5290,11 @@ INSTRUCTIONS:
             if (saved) {
                 try {
                     const data = JSON.parse(saved);
+                    if (data.inputMode) {
+                        try {
+                            localStorage.setItem("rebalancer_input_mode", data.inputMode === "shares" ? "shares" : "value");
+                        } catch (e) {}
+                    }
                     if (document.getElementById("deposit")) {
                         document.getElementById("deposit").value = data.deposit || "";
                     }
@@ -5163,7 +5322,7 @@ INSTRUCTIONS:
 
         function initDefaultHoldings() {
             holdingsData = [
-                { t: "", v: "", w: "" }
+                { t: "", v: "", p: "", q: "", w: "" }
             ];
         }
 
@@ -5280,16 +5439,29 @@ INSTRUCTIONS:
             let validHoldings = [];
             let holdingErrors = [];
             let totalWeightInput = 0;
+            const isShares = isSharesInputMode();
+
             for (let i = 0; i < holdingsData.length; i++) {
                 const h = holdingsData[i];
                 const ticker = (h.t || "").trim();
                 const rawVal = (h.v !== undefined && h.v !== null) ? String(h.v).trim() : "";
                 const rawWeight = (h.w !== undefined && h.w !== null) ? String(h.w).trim() : "";
+                const rawPrice = (h.p !== undefined && h.p !== null) ? String(h.p).trim() : "";
+                const rawQty = (h.q !== undefined && h.q !== null) ? String(h.q).trim() : "";
+
                 const value = parseFloat(h.v);
                 const weight = parseFloat(h.w);
+                const price = parseFloat(h.p);
+                const qty = parseFloat(h.q);
 
-                if (ticker === "" && (rawVal === "" || isNaN(value)) && (rawWeight === "" || isNaN(weight))) {
-                    continue;
+                if (isShares) {
+                    if (ticker === "" && (rawPrice === "" || isNaN(price)) && (rawQty === "" || isNaN(qty)) && (rawWeight === "" || isNaN(weight))) {
+                        continue;
+                    }
+                } else {
+                    if (ticker === "" && (rawVal === "" || isNaN(value)) && (rawWeight === "" || isNaN(weight))) {
+                        continue;
+                    }
                 }
 
                 if (!isNaN(weight) && weight > 0) {
@@ -5300,9 +5472,20 @@ INSTRUCTIONS:
                 if (ticker === "") {
                     invalidFields.push("asset name");
                 }
-                if (rawVal === "" || isNaN(value) || value < 0) {
-                    invalidFields.push("value");
+
+                if (isShares) {
+                    if (rawPrice === "" || isNaN(price) || price < 0) {
+                        invalidFields.push("share price");
+                    }
+                    if (rawQty === "" || isNaN(qty) || qty < 0) {
+                        invalidFields.push("quantity");
+                    }
+                } else {
+                    if (rawVal === "" || isNaN(value) || value < 0) {
+                        invalidFields.push("value");
+                    }
                 }
+
                 if (rawWeight === "" || isNaN(weight) || weight < 0) {
                     invalidFields.push("weight");
                 }
@@ -5314,16 +5497,22 @@ INSTRUCTIONS:
                     } else if (invalidFields.length === 2) {
                         fieldMsg = `Please fill in a valid ${invalidFields[0]} and ${invalidFields[1]} for holding #${i + 1}.`;
                     } else {
-                        fieldMsg = `Please fill in valid asset name, value and weight values for holding #${i + 1}.`;
+                        const allButLast = invalidFields.slice(0, -1).join(", ");
+                        const last = invalidFields[invalidFields.length - 1];
+                        fieldMsg = `Please fill in valid ${allButLast} and ${last} values for holding #${i + 1}.`;
                     }
                     holdingErrors.push(fieldMsg);
                     continue;
                 }
 
+                const calculatedHoldingValue = isShares ? (price * qty) : value;
+
                 validHoldings.push({
                     name: ticker.toUpperCase(),
-                    value: value,
-                    targ_weight: weight / 100.0
+                    value: calculatedHoldingValue,
+                    targ_weight: weight / 100.0,
+                    sharePrice: isShares ? price : (parseFloat(h.p) || null),
+                    currentShares: isShares ? qty : (parseFloat(h.q) || null)
                 });
             }
 
@@ -5342,7 +5531,7 @@ INSTRUCTIONS:
             }
 
             if (validHoldings.length === 0) {
-                showError("Please add at least one holding with ticker, value, and target weight.");
+                showError(isShares ? "Please add at least one holding with ticker, share price, quantity, and target weight." : "Please add at least one holding with ticker, value, and target weight.");
                 return;
             }
 
@@ -6237,6 +6426,14 @@ INSTRUCTIONS:
             window.isWholeRoundingEnabled = isWholeRoundingEnabled;
             window.formatMoney = formatMoney;
             window.applyWholeDollarRounding = applyWholeDollarRounding;
+            window.isSharesInputMode = isSharesInputMode;
+            window.onSettingInputModeToggle = onSettingInputModeToggle;
+            window.renderTableHeaders = renderTableHeaders;
+            window.renderRows = renderRows;
+            window.updateHolding = updateHolding;
+            window.addHolding = addHolding;
+            window.removeHolding = removeHolding;
+            window.calculateRebalance = calculateRebalance;
         }
     </script>
 </body>

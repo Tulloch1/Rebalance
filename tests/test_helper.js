@@ -37,6 +37,11 @@ function createTestEnv() {
                     },
                     contains(c) { return this.classes.has(c); }
                 },
+                get className() { return Array.from(this.classList.classes).join(' '); },
+                set className(val) {
+                    this.classList.classes.clear();
+                    if (val) String(val).split(/\s+/).filter(Boolean).forEach(c => this.classList.classes.add(c));
+                },
                 disabled: false,
                 checked: false,
                 setAttribute(attr, val) { this[attr] = val; },
@@ -182,11 +187,20 @@ function createTestEnv() {
         isWholeRoundingEnabled: sandbox.isWholeRoundingEnabled,
         formatMoney: sandbox.formatMoney,
         applyWholeDollarRounding: sandbox.applyWholeDollarRounding,
+        isSharesInputMode: sandbox.isSharesInputMode,
+        onSettingInputModeToggle: sandbox.onSettingInputModeToggle,
+        renderTableHeaders: sandbox.renderTableHeaders,
+        renderRows: sandbox.renderRows,
+        updateHolding: sandbox.updateHolding,
+        addHolding: sandbox.addHolding,
+        removeHolding: sandbox.removeHolding,
         dispatchDocumentEvent: (event) => sandbox.document.dispatchEvent(event),
         setHoldings(holdings) {
             const formatted = holdings.map(h => ({
                 t: h.t !== undefined ? h.t : (h.name || ""),
                 v: h.v !== undefined ? h.v : (h.value !== undefined ? String(h.value) : ""),
+                p: h.p !== undefined ? h.p : (h.price !== undefined ? String(h.price) : ""),
+                q: h.q !== undefined ? h.q : (h.quantity !== undefined ? String(h.quantity) : (h.shares !== undefined ? String(h.shares) : "")),
                 w: h.w !== undefined ? h.w : (h.weight !== undefined ? String(h.weight) : (h.targ_weight !== undefined ? String(h.targ_weight * 100) : ""))
             }));
             vm.runInContext(`holdingsData = ${JSON.stringify(formatted)};`, sandbox);
