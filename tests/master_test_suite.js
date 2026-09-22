@@ -1647,6 +1647,47 @@ console.log("\n--- PART 4: Information Guide Modal & Chrome Tab Navigation ---")
             env.sandbox.loadFormData();
             assert.strictEqual(env.isSharesInputMode(), true); // restored from payload
         });
+
+        // 14. Progress bar before/after rendering for increasing weightings
+        runTest("Progress bar renders original weighting in darker mint green and increase in standard mint green", () => {
+            env.onSettingInputModeToggle(false);
+            env.setInputs({ deposit: "1000", minBuy: "0", complete: false });
+            // Initial: VOO $1000 (25%), VXUS $3000 (75%). Target: VOO 50%, VXUS 50%.
+            // With $1000 deposit, total becomes $5000. All $1000 goes to VOO -> $2000 (40%).
+            // VOO increases: 20% -> 40%. VXUS decreases: 60% -> 60%.
+            env.setHoldings([
+                { t: "VOO", v: "1000", w: "50" },
+                { t: "VXUS", v: "3000", w: "50" }
+            ]);
+            env.calculateRebalance();
+            const allocList = env.getEl("allocationList");
+            assert.ok(allocList.innerHTML.includes("alloc-bar-start"));
+            assert.ok(allocList.innerHTML.includes("alloc-bar-new"));
+            assert.ok(allocList.innerHTML.includes("alloc-target-marker"));
+
+            // Check that the increasing item (VOO) has alloc-bar-new positioned after alloc-bar-start
+            const vooItem = allocList.innerHTML;
+            // VOO starts at 25% and goes to 40% (newPct > initialPct):
+            // alloc-bar-start should have width 25%, alloc-bar-new should have left: 25% and width: 15%
+            assert.ok(vooItem.includes("left: 25%"));
+        });
+
+        // 15. Progress bar before/after rendering for decreasing weightings
+        runTest("Progress bar renders original weighting extension for decreasing weightings", () => {
+            env.onSettingInputModeToggle(false);
+            env.setInputs({ deposit: "0", minBuy: "0", complete: true });
+            // Complete rebalance: VOO $4000 (80%), VXUS $1000 (20%). Target: VOO 50%, VXUS 50%.
+            // VOO is sold down from 80% to 50%.
+            env.setHoldings([
+                { t: "VOO", v: "4000", w: "50" },
+                { t: "VXUS", v: "1000", w: "50" }
+            ]);
+            env.calculateRebalance();
+            const allocList = env.getEl("allocationList");
+            // In decreasing mode, alloc-bar-start has width 80% with sell background, and alloc-bar-new has left: 0; width: 50%
+            assert.ok(allocList.innerHTML.includes("rgba(255, 92, 92, 0.35)"));
+            assert.ok(allocList.innerHTML.includes("left: 0; width: 50%"));
+        });
     }
 
     console.log(`\n=================================================`);

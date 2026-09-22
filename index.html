@@ -2235,7 +2235,7 @@
                         <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
                     </svg>
                 </button>
-                <span class="brand-tag">v1.2.1</span>
+                <span class="brand-tag">v1.2.2</span>
             </div>
         </header>
 
@@ -5653,6 +5653,25 @@ INSTRUCTIONS:
 
                 const legendColor = isSell ? '#FF7B7B' : 'var(--accent)';
 
+                let barStartStyle = "";
+                let barNewStyle = "";
+
+                if (newPct > initialPct) {
+                    const startW = Math.min(initialPct, 100);
+                    const incW = Math.max(0, Math.min(newPct, 100) - startW);
+                    barStartStyle = `left: 0; width: ${startW}%; border-radius: ${incW > 0 ? 'var(--radius-pill) 0 0 var(--radius-pill)' : 'var(--radius-pill)'};`;
+                    barNewStyle = `left: ${startW}%; width: ${incW}%; border-radius: ${startW > 0.05 ? '0 var(--radius-pill) var(--radius-pill) 0' : 'var(--radius-pill)'};`;
+                } else if (newPct < initialPct) {
+                    const startW = Math.min(initialPct, 100);
+                    const newW = Math.min(newPct, 100);
+                    barStartStyle = `left: 0; width: ${startW}%; border-radius: var(--radius-pill); ${isSell ? 'background: rgba(255, 92, 92, 0.35);' : ''}`;
+                    barNewStyle = `left: 0; width: ${newW}%; border-radius: var(--radius-pill);`;
+                } else {
+                    const w = Math.min(newPct, 100);
+                    barStartStyle = `display: none;`;
+                    barNewStyle = `left: 0; width: ${w}%; border-radius: var(--radius-pill);`;
+                }
+
                 item.innerHTML = `
                     <div class="allocation-item-top">
                         <div class="asset-identity">
@@ -5669,8 +5688,8 @@ INSTRUCTIONS:
                     <!-- Comparative Progress Bar (Start % -> New % vs Target %) -->
                     <div class="allocation-progress-container">
                         <div class="allocation-progress-track">
-                            <div class="alloc-bar-start" style="width: ${Math.min(initialPct, 100)}%; ${isSell ? 'background: rgba(255, 92, 92, 0.35);' : ''}"></div>
-                            <div class="alloc-bar-new" style="width: ${Math.min(newPct, 100)}%;"></div>
+                            <div class="alloc-bar-start" style="${barStartStyle}"></div>
+                            <div class="alloc-bar-new" style="${barNewStyle}"></div>
                             <div class="alloc-target-marker" style="left: ${Math.min(targetPct, 100)}%;" title="Target: ${targetPct.toFixed(1)}%"></div>
                         </div>
                         <div class="allocation-progress-legend">
