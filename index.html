@@ -2613,69 +2613,69 @@
                             <button type="button" class="btn-account-secondary" onclick="handleRecoverAccount()" style="width: 100%;">
                                 Reset Password with Key
                             </button>
-                        </div>
 
-                        <!-- Lost Recovery Key? Clean Slate Link -->
-                        <div style="text-align: center; margin-top: 12px;">
-                            <button type="button" id="btnToggleCleanSlate" onclick="toggleCleanSlateSection()" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 11px; cursor: pointer; text-decoration: underline;">
-                                Lost Recovery Key? Reset via Email &amp; Billing (Clean Slate)
-                            </button>
-                        </div>
-
-                        <!-- Clean Slate Account Reset Section (Option B) -->
-                        <div id="cleanSlateSection" style="display: none; margin-top: 14px; padding: 12px; background: var(--surface-card); border: 1px solid var(--danger-border); border-radius: var(--radius-card);">
-                            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 6px;">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-                                <span style="font-size: 12px; font-weight: 700; color: var(--danger); text-transform: uppercase; letter-spacing: 0.04em;">Clean Slate Reset</span>
-                            </div>
-                            <p style="font-size: 11px; color: var(--text-secondary); margin: 0 0 10px 0; line-height: 1.4;">
-                                Due to zero-knowledge encryption, your portfolio cannot be decrypted without your password or recovery key. A <strong>Clean Slate Reset</strong> wipes unreadable vault data while preserving your account and active Pro subscription.
-                            </p>
-
-                            <!-- Step 1: Request Code -->
-                            <div id="cleanSlateStep1">
-                                <button type="button" class="btn-account-secondary" id="btnSendResetCode" onclick="handleRequestResetCode(false)" style="width: 100%; font-size: 12px;">
-                                    Send 6-Digit Reset Code to Email
+                            <!-- Lost Recovery Key? Clean Slate Link -->
+                            <div style="text-align: center; margin-top: 12px;">
+                                <button type="button" id="btnToggleCleanSlate" onclick="toggleCleanSlateSection()" style="background: none; border: none; padding: 0; color: var(--accent); font-size: 11.5px; cursor: pointer; text-decoration: underline;">
+                                    Lost Recovery Key? Reset via Email &amp; Billing (Clean Slate)
                                 </button>
                             </div>
 
-                            <!-- Step 2: Enter Code, Billing Challenge (if Pro), and New Password -->
-                            <div id="cleanSlateStep2" style="display: none;">
-                                <div class="account-field-group">
-                                    <label class="account-label" for="cleanSlateCode">6-Digit Verification Code</label>
-                                    <input type="text" class="account-input" id="cleanSlateCode" placeholder="123456" maxlength="6" style="font-family: var(--font-mono); letter-spacing: 0.15em; font-size: 14px; text-align: center;">
+                            <!-- Clean Slate Account Reset Section (Option B) -->
+                            <div id="cleanSlateSection" style="display: none; margin-top: 14px; padding: 12px; background: var(--surface-card); border: 1px solid var(--danger-border); border-radius: var(--radius-card);">
+                                <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 6px;">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                                    <span style="font-size: 12px; font-weight: 700; color: var(--danger); text-transform: uppercase; letter-spacing: 0.04em;">Clean Slate Reset</span>
                                 </div>
+                                <p style="font-size: 11px; color: var(--text-secondary); margin: 0 0 10px 0; line-height: 1.4;">
+                                    Due to zero-knowledge encryption, your portfolio cannot be decrypted without your password or recovery key. A <strong>Clean Slate Reset</strong> wipes unreadable vault data while preserving your account and active Pro subscription.
+                                </p>
 
-                                <!-- Pro Tier Billing Challenge (Option B) -->
-                                <div id="cleanSlateBillingChallenge" style="display: none; background: var(--surface-input); border: 1px solid var(--accent-badge-border); border-radius: var(--radius-sm); padding: 8px 10px; margin-bottom: 12px;">
-                                    <label class="account-label" for="cleanSlateCardLast4" style="color: var(--accent); font-weight: 600;">
-                                        💳 Security Check: Last 4 Digits of Card on File
-                                    </label>
-                                    <input type="text" class="account-input" id="cleanSlateCardLast4" placeholder="••••" maxlength="4" style="font-family: var(--font-mono); letter-spacing: 0.15em; text-align: center; margin-top: 4px;">
-                                    <span style="font-size: 10.5px; color: var(--text-muted); display: block; margin-top: 4px;">
-                                        Required to verify account ownership and protect your Pro subscription. Max 3 attempts.
-                                    </span>
-                                </div>
-
-                                <div class="account-field-group">
-                                    <label class="account-label" for="cleanSlateNewPassword">New Password (min. 8 chars)</label>
-                                    <input type="password" class="account-input" id="cleanSlateNewPassword" placeholder="••••••••••••" minlength="8">
-                                </div>
-
-                                <div class="account-field-group">
-                                    <label class="account-label" for="cleanSlateConfirmPassword">Confirm New Password</label>
-                                    <input type="password" class="account-input" id="cleanSlateConfirmPassword" placeholder="••••••••••••" minlength="8">
-                                </div>
-
-                                <button type="button" class="btn-account-danger" id="btnExecuteCleanSlate" onclick="handleExecuteCleanSlate()" style="width: 100%; margin-top: 4px;">
-                                    Wipe Vault &amp; Reset Password
-                                </button>
-
-                                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
-                                    <button type="button" id="btnResendResetCode" onclick="handleRequestResetCode(true)" style="background: none; border: none; padding: 0; color: var(--accent); font-size: 11px; cursor: pointer; text-decoration: underline;">
-                                        Resend Code
+                                <!-- Step 1: Request Code -->
+                                <div id="cleanSlateStep1">
+                                    <button type="button" class="btn-account-secondary" id="btnSendResetCode" onclick="handleRequestResetCode(false)" style="width: 100%; font-size: 12px;">
+                                        Send 6-Digit Reset Code to Email
                                     </button>
-                                    <span id="cleanSlateCooldown" style="font-size: 10.5px; color: var(--text-muted); display: none;"></span>
+                                </div>
+
+                                <!-- Step 2: Enter Code, Billing Challenge (if Pro), and New Password -->
+                                <div id="cleanSlateStep2" style="display: none;">
+                                    <div class="account-field-group">
+                                        <label class="account-label" for="cleanSlateCode">6-Digit Verification Code</label>
+                                        <input type="text" class="account-input" id="cleanSlateCode" placeholder="123456" maxlength="6" style="font-family: var(--font-mono); letter-spacing: 0.15em; font-size: 14px; text-align: center;">
+                                    </div>
+
+                                    <!-- Pro Tier Billing Challenge (Option B) -->
+                                    <div id="cleanSlateBillingChallenge" style="display: none; background: var(--surface-input); border: 1px solid var(--accent-badge-border); border-radius: var(--radius-sm); padding: 8px 10px; margin-bottom: 12px;">
+                                        <label class="account-label" for="cleanSlateCardLast4" style="color: var(--accent); font-weight: 600;">
+                                            💳 Security Check: Last 4 Digits of Card on File
+                                        </label>
+                                        <input type="text" class="account-input" id="cleanSlateCardLast4" placeholder="••••" maxlength="4" style="font-family: var(--font-mono); letter-spacing: 0.15em; text-align: center; margin-top: 4px;">
+                                        <span style="font-size: 10.5px; color: var(--text-muted); display: block; margin-top: 4px;">
+                                            Required to verify account ownership and protect your Pro subscription. Max 3 attempts.
+                                        </span>
+                                    </div>
+
+                                    <div class="account-field-group">
+                                        <label class="account-label" for="cleanSlateNewPassword">New Password (min. 8 chars)</label>
+                                        <input type="password" class="account-input" id="cleanSlateNewPassword" placeholder="••••••••••••" minlength="8">
+                                    </div>
+
+                                    <div class="account-field-group">
+                                        <label class="account-label" for="cleanSlateConfirmPassword">Confirm New Password</label>
+                                        <input type="password" class="account-input" id="cleanSlateConfirmPassword" placeholder="••••••••••••" minlength="8">
+                                    </div>
+
+                                    <button type="button" class="btn-account-danger" id="btnExecuteCleanSlate" onclick="handleExecuteCleanSlate()" style="width: 100%; margin-top: 4px;">
+                                        Wipe Vault &amp; Reset Password
+                                    </button>
+
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
+                                        <button type="button" id="btnResendResetCode" onclick="handleRequestResetCode(true)" style="background: none; border: none; padding: 0; color: var(--accent); font-size: 11px; cursor: pointer; text-decoration: underline;">
+                                            Resend Code
+                                        </button>
+                                        <span id="cleanSlateCooldown" style="font-size: 10.5px; color: var(--text-muted); display: none;"></span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -3972,6 +3972,8 @@
             if (isHidden) {
                 const recKeyInput = document.getElementById("recoveryKeyInput");
                 if (recKeyInput) recKeyInput.focus();
+            } else {
+                resetCleanSlateForm();
             }
         }
 
@@ -4352,9 +4354,11 @@ INSTRUCTIONS:
 
                 saveSession(email, newKeys.rawKeyHex, newKeys.authHash);
 
-                // Hide recovery box
+                // Hide recovery box & recovery section
                 const recBox = document.getElementById("recoveryKeyDisplayBox");
                 if (recBox) recBox.style.display = "none";
+                const recSec = document.getElementById("recoverySection");
+                if (recSec) recSec.style.display = "none";
 
                 resetCleanSlateForm();
                 updateAccountUI();

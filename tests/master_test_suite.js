@@ -1333,6 +1333,22 @@ console.log("\n--- PART 4: Information Guide Modal & Chrome Tab Navigation ---")
     {
         const env = createTestEnv();
 
+        runTest("toggleRecoverySection() reveals recoverySection and resets nested Clean Slate options when closed", () => {
+            const recSec = env.getEl("recoverySection");
+            recSec.style.display = "none";
+            env.toggleRecoverySection();
+            assert.strictEqual(recSec.style.display, "block");
+
+            // Open clean slate section
+            env.toggleCleanSlateSection();
+            assert.strictEqual(env.getEl("cleanSlateSection").style.display, "block");
+
+            // Toggling recovery section closed also hides and resets clean slate section
+            env.toggleRecoverySection();
+            assert.strictEqual(recSec.style.display, "none");
+            assert.strictEqual(env.getEl("cleanSlateSection").style.display, "none");
+        });
+
         runTest("toggleCleanSlateSection() reveals and hides cleanSlateSection", () => {
             const sec = env.getEl("cleanSlateSection");
             assert.ok(sec.style.display === "none" || !sec.style.display);
