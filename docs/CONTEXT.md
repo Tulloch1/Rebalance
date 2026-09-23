@@ -84,3 +84,4 @@
 2. **Preserve User Code:** Do not revert user edits, and strictly preserve version tags (currently **`v1.2.2`**).
 3. **Strict Parity:** Always mirror changes between `c:\Users\willi\Desktop\Rebalancing\index.html` and `c:\Users\willi\Desktop\Rebalancing\GitHub\Rebalance\index.html`.
 4. **All Tests Green:** Run `node tests/master_test_suite.js` (111 tests) and `node tests/backend_test_suite.js` (23 tests) before finishing any task. All 134 tests must pass.
+
