@@ -76,6 +76,9 @@ function createTestEnv() {
         Promise,
         Uint8Array,
         ArrayBuffer,
+        DataView,
+        DecompressionStream: typeof DecompressionStream !== 'undefined' ? DecompressionStream : undefined,
+        Buffer: typeof Buffer !== 'undefined' ? Buffer : undefined,
         btoa,
         atob,
         TextEncoder,
@@ -126,6 +129,17 @@ function createTestEnv() {
                 setTimeout(() => {
                     if (this.onload) {
                         this.onload({ target: { result: file && file.content !== undefined ? file.content : '' } });
+                    }
+                }, 0);
+            }
+            readAsArrayBuffer(file) {
+                setTimeout(() => {
+                    if (this.onload) {
+                        let res = file && file.content !== undefined ? file.content : new ArrayBuffer(0);
+                        if (typeof Buffer !== 'undefined' && Buffer.isBuffer(res)) {
+                            res = res.buffer.slice(res.byteOffset, res.byteOffset + res.byteLength);
+                        }
+                        this.onload({ target: { result: res } });
                     }
                 }, 0);
             }
@@ -265,6 +279,10 @@ function createTestEnv() {
         executeCsvImport: sandbox.executeCsvImport,
         parseCsvText: sandbox.parseCsvText,
         sanitizeCsvNumber: sandbox.sanitizeCsvNumber,
+        parseXlsxToCsv: sandbox.parseXlsxToCsv,
+        parseXlsxNative: sandbox.parseXlsxNative,
+        parseXlsToCsv: sandbox.parseXlsToCsv,
+        parseHtmlTableToCsv: sandbox.parseHtmlTableToCsv,
         BrokerRegistry: vm.runInContext('BrokerRegistry', sandbox),
         DeclarativeCsvAdapter: vm.runInContext('DeclarativeCsvAdapter', sandbox),
         getStagedCsvHoldings: () => vm.runInContext('stagedCsvHoldings', sandbox),

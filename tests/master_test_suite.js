@@ -1892,6 +1892,264 @@ console.log("\n--- PART 4: Information Guide Modal & Chrome Tab Navigation ---")
             assert.strictEqual(res.holdings[0].t, "VAS");
             assert.strictEqual(res.holdings[1].t, "VGS");
         });
+
+        // Helper to construct in-memory test XLSX zip archives
+        function createTestXlsx(files) {
+            const zlib = require('zlib');
+            const crcTable = new Uint32Array(256);
+            for (let i = 0; i < 256; i++) {
+                let c = i;
+                for (let k = 0; k < 8; k++) {
+                    c = ((c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1));
+                }
+                crcTable[i] = c;
+            }
+            function getCrc32(buf) {
+                let crc = 0 ^ (-1);
+                for (let i = 0; i < buf.length; i++) {
+                    crc = (crc >>> 8) ^ crcTable[(crc ^ buf[i]) & 0xFF];
+                }
+                return (crc ^ (-1)) >>> 0;
+            }
+
+            const localHeaders = [];
+            const cdHeaders = [];
+            let offset = 0;
+
+            for (const file of files) {
+                const nameBuf = Buffer.from(file.name, 'utf8');
+                const uncompressed = Buffer.isBuffer(file.content) ? file.content : Buffer.from(file.content, 'utf8');
+                const compressed = zlib.deflateRawSync(uncompressed);
+                const crc = getCrc32(uncompressed);
+
+                const lh = Buffer.alloc(30 + nameBuf.length);
+                lh.writeUInt32LE(0x04034b50, 0);
+                lh.writeUInt16LE(20, 4);
+                lh.writeUInt16LE(0, 6);
+                lh.writeUInt16LE(8, 8);
+                lh.writeUInt16LE(0, 10);
+                lh.writeUInt16LE(0, 12);
+                lh.writeUInt32LE(crc, 14);
+                lh.writeUInt32LE(compressed.length, 18);
+                lh.writeUInt32LE(uncompressed.length, 22);
+                lh.writeUInt16LE(nameBuf.length, 26);
+                lh.writeUInt16LE(0, 28);
+                nameBuf.copy(lh, 30);
+
+                localHeaders.push(lh);
+                localHeaders.push(compressed);
+
+                const cdh = Buffer.alloc(46 + nameBuf.length);
+                cdh.writeUInt32LE(0x02014b50, 0);
+                cdh.writeUInt16LE(20, 4);
+                cdh.writeUInt16LE(20, 6);
+                cdh.writeUInt16LE(0, 8);
+                cdh.writeUInt16LE(8, 10);
+                cdh.writeUInt16LE(0, 12);
+                cdh.writeUInt16LE(0, 14);
+                cdh.writeUInt32LE(crc, 16);
+                cdh.writeUInt32LE(compressed.length, 20);
+                cdh.writeUInt32LE(uncompressed.length, 24);
+                cdh.writeUInt16LE(nameBuf.length, 28);
+                cdh.writeUInt16LE(0, 30);
+                cdh.writeUInt16LE(0, 32);
+                cdh.writeUInt16LE(0, 34);
+                cdh.writeUInt16LE(0, 36);
+                cdh.writeUInt32LE(0, 38);
+                cdh.writeUInt32LE(offset, 42);
+                nameBuf.copy(cdh, 46);
+
+                cdHeaders.push(cdh);
+                offset += lh.length + compressed.length;
+            }
+
+            const cdOffset = offset;
+            const cdSize = cdHeaders.reduce((sum, h) => sum + h.length, 0);
+
+            const eocd = Buffer.alloc(22);
+            eocd.writeUInt32LE(0x06054b50, 0);
+            eocd.writeUInt16LE(0, 4);
+            eocd.writeUInt16LE(0, 6);
+            eocd.writeUInt16LE(files.length, 8);
+            eocd.writeUInt16LE(files.length, 10);
+            eocd.writeUInt32LE(cdSize, 12);
+            eocd.writeUInt32LE(cdOffset, 16);
+            eocd.writeUInt16LE(0, 20);
+
+            return Buffer.concat([...localHeaders, ...cdHeaders, eocd]);
+        }
+
+        // 20. parseXlsxToCsv parses standard OpenXML workbook with sharedStrings table
+        await runTest("parseXlsxToCsv() parses OpenXML workbook with sharedStrings table", async () => {
+            const xlsxBuf = createTestXlsx([
+                {
+                    name: 'xl/sharedStrings.xml',
+                    content: '<sst><si><t>Asset</t></si><si><t>Number of shares</t></si><si><t>Shareprice</t></si><si><t>Weighting</t></si><si><t>AAPL</t></si><si><t>MSFT</t></si></sst>'
+                },
+                {
+                    name: 'xl/worksheets/sheet1.xml',
+                    content: '<sheetData>' +
+                        '<row r="1"><c r="A1" t="s"><v>0</v></c><c r="B1" t="s"><v>1</v></c><c r="C1" t="s"><v>2</v></c><c r="D1" t="s"><v>3</v></c></row>' +
+                        '<row r="2"><c r="A2" t="s"><v>4</v></c><c r="B2"><v>25</v></c><c r="C2"><v>210.50</v></c><c r="D2"><v>60</v></c></row>' +
+                        '<row r="3"><c r="A3" t="s"><v>5</v></c><c r="B3"><v>15</v></c><c r="C3"><v>420.00</v></c><c r="D3"><v>40</v></c></row>' +
+                        '</sheetData>'
+                }
+            ]);
+            const ab = xlsxBuf.buffer.slice(xlsxBuf.byteOffset, xlsxBuf.byteOffset + xlsxBuf.byteLength);
+            const csv = await env.parseXlsxToCsv(ab);
+            assert.ok(csv.includes("Asset,Number of shares,Shareprice,Weighting"));
+            assert.ok(csv.includes("AAPL,25,210.50,60"));
+            assert.ok(csv.includes("MSFT,15,420.00,40"));
+        });
+
+        // 21. parseXlsxToCsv parses workbook with inline strings and rich text
+        await runTest("parseXlsxToCsv() parses workbook with inline strings and rich text", async () => {
+            const xlsxBuf = createTestXlsx([
+                {
+                    name: 'xl/sharedStrings.xml',
+                    content: '<sst><si><r><t>Global </t></r><r><t>Equities</t></r></si></sst>'
+                },
+                {
+                    name: 'xl/worksheets/sheet1.xml',
+                    content: '<sheetData>' +
+                        '<row r="1"><c r="A1" t="inlineStr"><is><t>Holding</t></is></c><c r="B1" t="inlineStr"><is><t>Value</t></is></c><c r="C1" t="inlineStr"><is><t>Weight</t></is></c></row>' +
+                        '<row r="2"><c r="A2" t="s"><v>0</v></c><c r="B2"><v>75000</v></c><c r="C2"><v>100</v></c></row>' +
+                        '</sheetData>'
+                }
+            ]);
+            const ab = xlsxBuf.buffer.slice(xlsxBuf.byteOffset, xlsxBuf.byteOffset + xlsxBuf.byteLength);
+            const csv = await env.parseXlsxToCsv(ab);
+            assert.ok(csv.includes("Holding,Value,Weight"));
+            assert.ok(csv.includes("Global Equities,75000,100"));
+        });
+
+        // 22. handleCsvFileSelect accepts and parses .xlsx file
+        await runTest("handleCsvFileSelect() accepts and parses an .xlsx file into staged holdings", async () => {
+            env.openCsvModal();
+            env.onCsvFormatChange("generic_shares");
+
+            const xlsxBuf = createTestXlsx([
+                {
+                    name: 'xl/sharedStrings.xml',
+                    content: '<sst><si><t>Holding</t></si><si><t>Quantity</t></si><si><t>Share Price</t></si><si><t>Weight</t></si><si><t>IVV</t></si><si><t>IOZ</t></si></sst>'
+                },
+                {
+                    name: 'xl/worksheets/sheet1.xml',
+                    content: '<sheetData>' +
+                        '<row r="1"><c r="A1" t="s"><v>0</v></c><c r="B1" t="s"><v>1</v></c><c r="C1" t="s"><v>2</v></c><c r="D1" t="s"><v>3</v></c></row>' +
+                        '<row r="2"><c r="A2" t="s"><v>4</v></c><c r="B2"><v>50</v></c><c r="C2"><v>550</v></c><c r="D2"><v>70</v></c></row>' +
+                        '<row r="3"><c r="A3" t="s"><v>5</v></c><c r="B3"><v>80</v></c><c r="C3"><v>32</v></c><c r="D3"><v>30</v></c></row>' +
+                        '</sheetData>'
+                }
+            ]);
+
+            const mockFile = {
+                name: "portfolio.xlsx",
+                size: xlsxBuf.length,
+                type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                content: xlsxBuf
+            };
+
+            await env.handleCsvFileSelect(mockFile);
+
+            assert.strictEqual(env.getEl("csvDropZone").classList.contains("has-file"), true);
+            assert.strictEqual(env.getEl("csvFileName").innerText, "portfolio.xlsx");
+            assert.ok(env.getEl("csvHoldingCountText").innerText.includes("2 holdings ready to import"));
+            assert.strictEqual(env.getEl("btnImportCsv").disabled, false);
+            assert.strictEqual(env.getStagedCsvHoldings().length, 2);
+        });
+
+        // 23. executeCsvImport applies staged .xlsx holdings and displays Excel success feedback
+        await runTest("executeCsvImport() applies .xlsx holdings and shows Excel import notice", () => {
+            env.executeCsvImport();
+            assert.strictEqual(env.getEl("csvModalOverlay").classList.contains("active"), false);
+            assert.strictEqual(env.isSharesInputMode(), true);
+
+            const holdings = env.getHoldings();
+            assert.strictEqual(holdings.length, 2);
+            assert.strictEqual(holdings[0].t, "IVV");
+            assert.strictEqual(holdings[0].q, "50");
+            assert.strictEqual(holdings[0].p, "550");
+            assert.strictEqual(holdings[0].w, "70");
+
+            const notice = env.getEl("calcNotice");
+            assert.ok(notice.innerText.includes("Successfully imported 2 holdings from Excel"));
+        });
+
+        // 24. handleCsvFileSelect accepts and parses an .xlsm (macro-enabled workbook) file
+        await runTest("handleCsvFileSelect() accepts and parses an .xlsm file into staged holdings", async () => {
+            env.openCsvModal();
+            env.onCsvFormatChange("generic_shares");
+
+            const xlsmBuf = createTestXlsx([
+                {
+                    name: 'xl/sharedStrings.xml',
+                    content: '<sst><si><t>Holding</t></si><si><t>Quantity</t></si><si><t>Share Price</t></si><si><t>Weight</t></si><si><t>NVDA</t></si></sst>'
+                },
+                {
+                    name: 'xl/worksheets/sheet1.xml',
+                    content: '<sheetData>' +
+                        '<row r="1"><c r="A1" t="s"><v>0</v></c><c r="B1" t="s"><v>1</v></c><c r="C1" t="s"><v>2</v></c><c r="D1" t="s"><v>3</v></c></row>' +
+                        '<row r="2"><c r="A2" t="s"><v>4</v></c><c r="B2"><v>100</v></c><c r="C2"><v>125</v></c><c r="D2"><v>100</v></c></row>' +
+                        '</sheetData>'
+                },
+                {
+                    name: 'xl/vbaProject.bin',
+                    content: Buffer.from([0x01, 0x02, 0x03])
+                }
+            ]);
+
+            const mockFile = {
+                name: "portfolio_macro.xlsm",
+                size: xlsmBuf.length,
+                type: "application/vnd.ms-excel.sheet.macroEnabled.12",
+                content: xlsmBuf
+            };
+
+            await env.handleCsvFileSelect(mockFile);
+
+            assert.strictEqual(env.getEl("csvDropZone").classList.contains("has-file"), true);
+            assert.strictEqual(env.getEl("csvFileName").innerText, "portfolio_macro.xlsm");
+            assert.ok(env.getEl("csvHoldingCountText").innerText.includes("1 holding ready to import"));
+            assert.strictEqual(env.getStagedCsvHoldings().length, 1);
+            assert.strictEqual(env.getStagedCsvHoldings()[0].t, "NVDA");
+
+            env.executeCsvImport();
+            const notice = env.getEl("calcNotice");
+            assert.ok(notice.innerText.includes("Successfully imported 1 holding from Excel"));
+        });
+
+        // 25. parseHtmlTableToCsv and handleCsvFileSelect support .xls files
+        await runTest("handleCsvFileSelect() accepts and parses an HTML-table .xls file into staged holdings", async () => {
+            env.openCsvModal();
+            env.onCsvFormatChange("generic_value");
+
+            const htmlXls = "<html><body><table>" +
+                "<tr><th>Asset</th><th>Value</th><th>Weighting</th></tr>" +
+                "<tr><td>BND</td><td>$25,000</td><td>50%</td></tr>" +
+                "<tr><td>VTI</td><td>$25,000</td><td>50%</td></tr>" +
+                "</table></body></html>";
+
+            const mockFile = {
+                name: "bank_export.xls",
+                size: htmlXls.length,
+                type: "application/vnd.ms-excel",
+                content: htmlXls
+            };
+
+            await env.handleCsvFileSelect(mockFile);
+
+            assert.strictEqual(env.getEl("csvDropZone").classList.contains("has-file"), true);
+            assert.strictEqual(env.getEl("csvFileName").innerText, "bank_export.xls");
+            assert.ok(env.getEl("csvHoldingCountText").innerText.includes("2 holdings ready to import"));
+            assert.strictEqual(env.getStagedCsvHoldings().length, 2);
+            assert.strictEqual(env.getStagedCsvHoldings()[0].t, "BND");
+            assert.strictEqual(env.getStagedCsvHoldings()[1].t, "VTI");
+
+            env.executeCsvImport();
+            const notice = env.getEl("calcNotice");
+            assert.ok(notice.innerText.includes("Successfully imported 2 holdings from Excel"));
+        });
     }
 
     console.log(`\n=================================================`);
