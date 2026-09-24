@@ -1647,6 +1647,251 @@ console.log("\n--- PART 4: Information Guide Modal & Chrome Tab Navigation ---")
             env.sandbox.loadFormData();
             assert.strictEqual(env.isSharesInputMode(), true); // restored from payload
         });
+
+        // =========================================================================
+        // PART 11: CSV Upload, Broker Adapters & Drag-and-Drop Invariants
+        // =========================================================================
+        console.log("\n--- PART 11: CSV Upload, Broker Adapters & Drag-and-Drop Invariants ---");
+
+        // 1. parseCsvText handles standard comma-separated and quoted lines
+        runTest("parseCsvText() parses standard, quoted, and multiline CSV lines", () => {
+            const raw = 'Holding,Quantity,Share Price,Weight\r\n"VOO, S&P 500",10,"$500.50",50%\nBND,25,$80.00,20%';
+            const rows = env.parseCsvText(raw);
+            assert.strictEqual(rows.length, 3);
+            assert.deepStrictEqual([...rows[0]], ["Holding", "Quantity", "Share Price", "Weight"]);
+            assert.strictEqual(rows[1][0], "VOO, S&P 500");
+            assert.strictEqual(rows[1][1], "10");
+            assert.strictEqual(rows[1][2], "$500.50");
+            assert.strictEqual(rows[1][3], "50%");
+            assert.strictEqual(rows[2][0], "BND");
+        });
+
+        // 2. parseCsvText strips UTF-8 BOM
+        runTest("parseCsvText() strips UTF-8 BOM and ignores empty rows", () => {
+            const raw = '\uFEFFHolding,Value,Weight\nVAS,10000,60\n\n\nVGS,6000,40\n';
+            const rows = env.parseCsvText(raw);
+            assert.strictEqual(rows.length, 3);
+            assert.strictEqual(rows[0][0], "Holding");
+            assert.strictEqual(rows[1][0], "VAS");
+            assert.strictEqual(rows[2][0], "VGS");
+        });
+
+        // 3. sanitizeCsvNumber strips currency signs and thousands commas
+        runTest("sanitizeCsvNumber() correctly sanitizes currency and thousands separators", () => {
+            assert.strictEqual(env.sanitizeCsvNumber("$1,250.50"), "1250.50");
+            assert.strictEqual(env.sanitizeCsvNumber("€500.00"), "500.00");
+            assert.strictEqual(env.sanitizeCsvNumber("£10,000"), "10000");
+            assert.strictEqual(env.sanitizeCsvNumber("45%"), "45");
+            assert.strictEqual(env.sanitizeCsvNumber("CHF 120"), "120");
+        });
+
+        // 4. BrokerRegistry manages adapters
+        runTest("BrokerRegistry allows registration and retrieval of custom adapters", () => {
+            const initialCount = env.BrokerRegistry.getAll().length;
+            assert.ok(initialCount >= 2);
+            assert.ok(env.BrokerRegistry.get("generic_shares"));
+            assert.ok(env.BrokerRegistry.get("generic_value"));
+
+            const testAdapter = new env.DeclarativeCsvAdapter({
+                id: "test_broker",
+                name: "Test Broker",
+                mode: "shares",
+                headers: { ticker: ["code"], shares: ["qty"], price: ["price"], weight: ["target"] },
+                guideHtml: "<p>Test Guide</p>"
+            });
+            env.BrokerRegistry.register(testAdapter);
+            assert.strictEqual(env.BrokerRegistry.get("test_broker").name, "Test Broker");
+        });
+
+        // 5. GenericSharesAdapter parses Share Quantity template
+        runTest("GenericSharesAdapter parses template: Holding, Quantity, Share Price, Weight", () => {
+            const adapter = env.BrokerRegistry.get("generic_shares");
+            const csv = "Holding,Quantity,Share Price,Weight\nVAS,50,95.50,40\nVGS,100,115.00,60";
+            const res = adapter.parse(csv);
+            assert.strictEqual(res.success, true);
+            assert.strictEqual(res.mode, "shares");
+            assert.strictEqual(res.holdings.length, 2);
+            assert.strictEqual(res.holdings[0].t, "VAS");
+            assert.strictEqual(res.holdings[0].q, "50");
+            assert.strictEqual(res.holdings[0].p, "95.50");
+            assert.strictEqual(res.holdings[0].v, "4775"); // 50 * 95.50
+            assert.strictEqual(res.holdings[0].w, "40");
+            assert.strictEqual(res.holdings[1].t, "VGS");
+            assert.strictEqual(res.holdings[1].v, "11500");
+        });
+
+        // 6. GenericSharesAdapter handles alternative headers: Asset, Number of shares, Shareprice, Weighting
+        runTest("GenericSharesAdapter parses alternative headers: Asset, Number of shares, Shareprice, Weighting", () => {
+            const adapter = env.BrokerRegistry.get("generic_shares");
+            const csv = "Asset,Number of shares,Shareprice,Weighting\nAAPL,10,$150.00,50%\nMSFT,5,$300.00,50%";
+            const res = adapter.parse(csv);
+            assert.strictEqual(res.success, true);
+            assert.strictEqual(res.holdings.length, 2);
+            assert.strictEqual(res.holdings[0].t, "AAPL");
+            assert.strictEqual(res.holdings[0].q, "10");
+            assert.strictEqual(res.holdings[0].p, "150.00");
+            assert.strictEqual(res.holdings[0].v, "1500");
+            assert.strictEqual(res.holdings[0].w, "50");
+        });
+
+        // 7. GenericSharesAdapter handles title row in cell A1 before headers
+        runTest("GenericSharesAdapter skips template title in row 1 and detects headers in row 2", () => {
+            const adapter = env.BrokerRegistry.get("generic_shares");
+            const csv = "Sample Generic CSV Share Quantity Template,,,\nHolding,Quantity,Share Price,Weight\nVOO,10,500,50\nVXUS,50,60,30\nBND,25,80,20";
+            const res = adapter.parse(csv);
+            assert.strictEqual(res.success, true);
+            assert.strictEqual(res.holdings.length, 3);
+            assert.strictEqual(res.holdings[0].t, "VOO");
+            assert.strictEqual(res.holdings[2].t, "BND");
+        });
+
+        // 8. GenericValueAdapter parses template: Holding, Value, Weight
+        runTest("GenericValueAdapter parses template: Holding, Value, Weight", () => {
+            const adapter = env.BrokerRegistry.get("generic_value");
+            const csv = 'Holding,Value,Weight\nVOO,"$5,000.00",50\nVXUS,"$3,000.00",30\nBND,"$2,000.00",20';
+            const res = adapter.parse(csv);
+            assert.strictEqual(res.success, true);
+            assert.strictEqual(res.mode, "value");
+            assert.strictEqual(res.holdings.length, 3);
+            assert.strictEqual(res.holdings[0].t, "VOO");
+            assert.strictEqual(res.holdings[0].v, "5000.00");
+            assert.strictEqual(res.holdings[0].w, "50");
+        });
+
+        // 9. GenericValueAdapter parses alternative headers: Asset, Value, Weighting
+        runTest("GenericValueAdapter parses alternative headers: Asset, Value, Weighting", () => {
+            const adapter = env.BrokerRegistry.get("generic_value");
+            const csv = "Asset,Value,Weighting\nIVV,8000,80%\nIXI,2000,20%";
+            const res = adapter.parse(csv);
+            assert.strictEqual(res.success, true);
+            assert.strictEqual(res.holdings.length, 2);
+            assert.strictEqual(res.holdings[0].t, "IVV");
+            assert.strictEqual(res.holdings[0].v, "8000");
+            assert.strictEqual(res.holdings[0].w, "80");
+        });
+
+        // 10. openCsvModal initializes overlay and guide
+        runTest("openCsvModal() opens overlay, sets overflow hidden, and populates guide", () => {
+            env.openCsvModal();
+            assert.strictEqual(env.getEl("csvModalOverlay").classList.contains("active"), true);
+            assert.strictEqual(env.sandbox.document.body.style.overflow, "hidden");
+            const guide = env.getEl("csvGuideContent");
+            assert.ok(guide.innerHTML.includes("Required Columns"));
+        });
+
+        // 11. closeCsvModal resets state and restores body scroll
+        runTest("closeCsvModal() closes overlay, restores overflow, and resets drop zone", () => {
+            env.openCsvModal();
+            env.closeCsvModal();
+            assert.strictEqual(env.getEl("csvModalOverlay").classList.contains("active"), false);
+            assert.strictEqual(env.sandbox.document.body.style.overflow, "");
+            assert.strictEqual(env.getEl("csvDropZone").classList.contains("has-file"), false);
+        });
+
+        // 12. handleCsvBackdropClick closes modal on backdrop click
+        runTest("handleCsvBackdropClick() closes modal on backdrop click", () => {
+            env.openCsvModal();
+            env.handleCsvBackdropClick({ target: { id: "csvModalOverlay" } });
+            assert.strictEqual(env.getEl("csvModalOverlay").classList.contains("active"), false);
+        });
+
+        // 13. Escape key closes csvModalOverlay
+        runTest("Escape keydown event closes csvModalOverlay when active", () => {
+            env.openCsvModal();
+            env.sandbox.document.dispatchEvent({ type: "keydown", key: "Escape" });
+            assert.strictEqual(env.getEl("csvModalOverlay").classList.contains("active"), false);
+        });
+
+        // 14. onCsvFormatChange updates guide dynamically
+        runTest("onCsvFormatChange() updates guide dynamically based on selected format", () => {
+            env.openCsvModal();
+            env.onCsvFormatChange("generic_value");
+            assert.ok(env.getEl("csvGuideContent").innerHTML.includes("Holding</code>, <code>Value</code>, <code>Weight"));
+
+            env.onCsvFormatChange("generic_shares");
+            assert.ok(env.getEl("csvGuideContent").innerHTML.includes("Holding</code>, <code>Quantity</code>, <code>Share Price"));
+        });
+
+        // 15. Drag over and leave toggle dragover class
+        runTest("handleCsvDragOver() and handleCsvDragLeave() toggle dragover class on drop zone", () => {
+            env.handleCsvDragOver({ preventDefault() {}, stopPropagation() {} });
+            assert.strictEqual(env.getEl("csvDropZone").classList.contains("dragover"), true);
+
+            env.handleCsvDragLeave({ preventDefault() {}, stopPropagation() {} });
+            assert.strictEqual(env.getEl("csvDropZone").classList.contains("dragover"), false);
+        });
+
+        // 16. processCsvText loads valid CSV and enables Import button
+        runTest("processCsvText() parses valid CSV and displays holding count badge", () => {
+            env.openCsvModal();
+            const csv = "Holding,Quantity,Share Price,Weight\nVAS,100,95,50\nVGS,100,115,50";
+            env.processCsvText(csv, "my_portfolio.csv", 1024);
+
+            assert.strictEqual(env.getEl("csvDropZone").classList.contains("has-file"), true);
+            assert.strictEqual(env.getEl("csvFileName").innerText, "my_portfolio.csv");
+            assert.ok(env.getEl("csvHoldingCountText").innerText.includes("2 holdings ready to import"));
+            assert.strictEqual(env.getEl("btnImportCsv").disabled, false);
+            assert.strictEqual(env.getStagedCsvHoldings().length, 2);
+        });
+
+        // 17. processCsvText with invalid format shows error banner
+        runTest("processCsvText() shows error banner for mismatched or empty CSV", () => {
+            env.openCsvModal();
+            env.processCsvText("Unrelated,Columns,Here\n1,2,3", "bad.csv", 500);
+
+            const errBanner = env.getEl("csvErrorBanner");
+            assert.strictEqual(errBanner.style.display, "flex");
+            assert.ok(errBanner.innerText.includes("Could not identify required columns"));
+            assert.strictEqual(env.getEl("btnImportCsv").disabled, true);
+        });
+
+        // 18. executeCsvImport sets holdingsData and switches input mode
+        runTest("executeCsvImport() applies holdings, switches input mode to shares, and saves state", () => {
+            env.openCsvModal();
+            env.onCsvFormatChange("generic_shares");
+            const csv = "Holding,Quantity,Share Price,Weight\nVOO,10,500,50\nVXUS,50,60,30\nBND,25,80,20";
+            env.processCsvText(csv, "three_fund.csv", 2048);
+            env.executeCsvImport();
+
+            // Modal closed
+            assert.strictEqual(env.getEl("csvModalOverlay").classList.contains("active"), false);
+
+            // Input mode switched to shares
+            assert.strictEqual(env.isSharesInputMode(), true);
+
+            // Holdings data updated
+            const holdings = env.getHoldings();
+            assert.strictEqual(holdings.length, 3);
+            assert.strictEqual(holdings[0].t, "VOO");
+            assert.strictEqual(holdings[0].p, "500");
+            assert.strictEqual(holdings[0].q, "10");
+            assert.strictEqual(holdings[0].v, "5000");
+            assert.strictEqual(holdings[0].w, "50");
+
+            // Feedback notice displayed
+            const notice = env.getEl("calcNotice");
+            assert.ok(notice.innerText.includes("Successfully imported 3 holdings from CSV"));
+        });
+
+        // 19. DeclarativeCsvAdapter supports custom filterRow functions
+        runTest("DeclarativeCsvAdapter filterRow ignores unwanted footer or cash lines", () => {
+            const adapter = new env.DeclarativeCsvAdapter({
+                id: "broker_with_footer",
+                name: "Broker With Footer",
+                mode: "value",
+                headers: { ticker: ["code"], value: ["value"], weight: ["target"] },
+                filterRow: (row, map) => {
+                    const code = (row[map.ticker] || "").toUpperCase();
+                    return code !== "TOTAL" && code !== "CASH";
+                }
+            });
+            const csv = "Code,Value,Target\nVAS,10000,50\nVGS,10000,50\nCASH,500,0\nTOTAL,20500,100";
+            const res = adapter.parse(csv);
+            assert.strictEqual(res.success, true);
+            assert.strictEqual(res.holdings.length, 2);
+            assert.strictEqual(res.holdings[0].t, "VAS");
+            assert.strictEqual(res.holdings[1].t, "VGS");
+        });
     }
 
     console.log(`\n=================================================`);

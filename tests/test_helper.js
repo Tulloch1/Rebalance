@@ -20,6 +20,8 @@ function createTestEnv() {
                 id,
                 value: '',
                 innerText: '',
+                get textContent() { return this.innerText; },
+                set textContent(val) { this.innerText = String(val); },
                 innerHTML: '',
                 style: {},
                 classList: {
@@ -118,6 +120,15 @@ function createTestEnv() {
         },
         navigator: {
             clipboard: { writeText: () => Promise.resolve() }
+        },
+        FileReader: class {
+            readAsText(file) {
+                setTimeout(() => {
+                    if (this.onload) {
+                        this.onload({ target: { result: file && file.content !== undefined ? file.content : '' } });
+                    }
+                }, 0);
+            }
         },
         setTimeout: (fn) => fn(),
         clearTimeout: () => {}
@@ -235,7 +246,29 @@ function createTestEnv() {
                 }
             }
             return errEl.innerText ? [errEl.innerText] : [];
-        }
+        },
+        openCsvModal: sandbox.openCsvModal,
+        closeCsvModal: sandbox.closeCsvModal,
+        handleCsvBackdropClick: sandbox.handleCsvBackdropClick,
+        populateCsvFormatDropdown: sandbox.populateCsvFormatDropdown,
+        onCsvFormatChange: sandbox.onCsvFormatChange,
+        updateCsvGuide: sandbox.updateCsvGuide,
+        triggerCsvFileInput: sandbox.triggerCsvFileInput,
+        handleCsvFileChange: sandbox.handleCsvFileChange,
+        handleCsvDragOver: sandbox.handleCsvDragOver,
+        handleCsvDragLeave: sandbox.handleCsvDragLeave,
+        handleCsvDrop: sandbox.handleCsvDrop,
+        handleCsvFileSelect: sandbox.handleCsvFileSelect,
+        processCsvText: sandbox.processCsvText,
+        removeSelectedCsv: sandbox.removeSelectedCsv,
+        resetCsvDropState: sandbox.resetCsvDropState,
+        executeCsvImport: sandbox.executeCsvImport,
+        parseCsvText: sandbox.parseCsvText,
+        sanitizeCsvNumber: sandbox.sanitizeCsvNumber,
+        BrokerRegistry: vm.runInContext('BrokerRegistry', sandbox),
+        DeclarativeCsvAdapter: vm.runInContext('DeclarativeCsvAdapter', sandbox),
+        getStagedCsvHoldings: () => vm.runInContext('stagedCsvHoldings', sandbox),
+        getStagedCsvMode: () => vm.runInContext('stagedCsvMode', sandbox)
     };
 }
 

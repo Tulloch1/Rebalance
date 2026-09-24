@@ -2196,6 +2196,316 @@
             border: 1px solid var(--danger-border);
             color: var(--danger);
         }
+
+        /* CSV Upload Button next to Portfolio Holdings */
+        .section-title-wrap {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .csv-upload-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: var(--radius-pill);
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            padding: 0;
+        }
+
+        .csv-upload-btn:hover {
+            color: var(--accent);
+            border-color: var(--accent-badge-border);
+            background: var(--accent-badge-bg);
+            transform: scale(1.06);
+        }
+
+        .csv-upload-btn svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        /* CSV Import Modal */
+        .csv-modal-card {
+            max-width: 520px;
+            padding: 24px !important;
+            background: var(--surface-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-outer);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6), 0 0 0 1px var(--border-subtle);
+            transform: scale(0.94) translateY(12px);
+            transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .modal-overlay.active .csv-modal-card {
+            transform: scale(1) translateY(0);
+        }
+
+        .csv-modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .csv-modal-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0;
+            letter-spacing: -0.02em;
+        }
+
+        .csv-select-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .csv-label {
+            font-size: 0.78rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+        }
+
+        /* Outlook-style Drag & Drop Zone */
+        .csv-drop-zone {
+            border: 2px dashed var(--border);
+            background: var(--surface-input);
+            border-radius: var(--radius-card);
+            padding: 26px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            user-select: none;
+            min-height: 140px;
+        }
+
+        .csv-drop-zone:hover {
+            border-color: var(--text-muted);
+            background: var(--surface);
+        }
+
+        .csv-drop-zone.dragover {
+            border-color: var(--accent);
+            background: var(--accent-badge-bg);
+            box-shadow: 0 0 0 3px rgba(36, 219, 161, 0.15);
+            transform: scale(1.01);
+        }
+
+        .csv-drop-zone.has-file {
+            border-style: solid;
+            border-color: var(--accent-badge-border);
+            background: rgba(36, 219, 161, 0.04);
+            padding: 18px;
+        }
+
+        .csv-drop-idle {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .csv-drop-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: var(--radius-pill);
+            background: var(--surface);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+            margin-bottom: 12px;
+            transition: transform 0.2s ease;
+        }
+
+        .csv-drop-zone:hover .csv-drop-icon,
+        .csv-drop-zone.dragover .csv-drop-icon {
+            transform: translateY(-2px);
+        }
+
+        .csv-drop-icon svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .csv-drop-main-text {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .csv-drop-sub-text {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .csv-browse-link {
+            color: var(--accent);
+            font-weight: 600;
+            text-decoration: underline;
+            text-underline-offset: 2px;
+        }
+
+        /* Active file display */
+        .csv-drop-active {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .csv-file-info-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            background: var(--surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-card);
+            padding: 10px 14px;
+            box-sizing: border-box;
+        }
+
+        .csv-file-icon {
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .csv-file-icon svg {
+            width: 22px;
+            height: 22px;
+        }
+
+        .csv-file-details {
+            flex: 1;
+            text-align: left;
+            min-width: 0;
+        }
+
+        .csv-file-name {
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .csv-file-size {
+            font-size: 0.74rem;
+            color: var(--text-muted);
+        }
+
+        .csv-file-remove-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.25rem;
+            cursor: pointer;
+            padding: 2px 6px;
+            border-radius: var(--radius-pill);
+            line-height: 1;
+            transition: all 0.15s ease;
+        }
+
+        .csv-file-remove-btn:hover {
+            color: var(--danger);
+            background: var(--danger-bg);
+        }
+
+        .csv-holding-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--accent);
+            background: var(--accent-badge-bg);
+            border: 1px solid var(--accent-badge-border);
+            padding: 4px 12px;
+            border-radius: var(--radius-pill);
+            margin-top: 10px;
+        }
+
+        /* Guide Card */
+        .csv-guide-box {
+            background: var(--surface-input);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-card);
+            padding: 14px 16px;
+        }
+
+        .csv-guide-header {
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .csv-guide-content {
+            font-size: 0.84rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .csv-guide-content code {
+            background: var(--surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: 4px;
+            padding: 1px 5px;
+            font-size: 0.82rem;
+            color: var(--text-primary);
+            font-family: var(--font-mono);
+        }
+
+        /* Error Banner */
+        .csv-error-banner {
+            background: var(--danger-bg);
+            border: 1px solid var(--danger-border);
+            color: var(--danger);
+            font-size: 0.82rem;
+            font-weight: 500;
+            padding: 8px 12px;
+            border-radius: var(--radius-card);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Modal Action Buttons */
+        .csv-modal-actions {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 4px;
+        }
     </style>
 </head>
 <body>
@@ -2268,7 +2578,16 @@
 
             <!-- Holdings Section -->
             <div class="section-header">
-                <span class="section-title">Portfolio Holdings</span>
+                <div class="section-title-wrap">
+                    <span class="section-title">Portfolio Holdings</span>
+                    <button type="button" class="csv-upload-btn" id="csvUploadBtn" title="Upload Portfolio CSV" onclick="openCsvModal()" aria-label="Upload Portfolio CSV">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="17 8 12 3 7 8"></polyline>
+                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                    </button>
+                </div>
                 <!-- Right-anchored Minimum Transaction Input -->
                 <div class="min-buy-container">
                     <!-- [REDUNDANT/UNUSED]: Kept for backwards compatibility; Minimum Transaction is always available -->
@@ -2907,6 +3226,91 @@
         </div>
     </div>
 </div>
+
+    <!-- CSV Import Modal Overlay -->
+    <div class="modal-overlay" id="csvModalOverlay" onclick="handleCsvBackdropClick(event)">
+        <div class="csv-modal-card card" role="dialog" aria-modal="true" aria-labelledby="csvModalTitle">
+            <div class="csv-modal-header">
+                <h3 class="csv-modal-title" id="csvModalTitle">Upload Portfolio CSV</h3>
+                <button type="button" class="modal-close-btn" id="csvModalCloseBtn" title="Close (Esc)" onclick="closeCsvModal()" aria-label="Close CSV upload modal">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Broker / CSV Format Selector -->
+            <div class="csv-select-group">
+                <label for="csvFormatSelect" class="csv-label">CSV Format / Broker</label>
+                <select id="csvFormatSelect" class="setting-select" onchange="onCsvFormatChange(this.value)">
+                    <!-- Populated dynamically by BrokerRegistry -->
+                </select>
+            </div>
+
+            <!-- Outlook-style Drag & Drop Zone -->
+            <div class="csv-drop-zone" id="csvDropZone" onclick="triggerCsvFileInput(event)" ondragover="handleCsvDragOver(event)" ondragleave="handleCsvDragLeave(event)" ondrop="handleCsvDrop(event)">
+                <input type="file" id="csvFileInput" accept=".csv,text/csv" style="display:none;" onchange="handleCsvFileChange(event)">
+                
+                <div id="csvDropIdleState" class="csv-drop-idle">
+                    <div class="csv-drop-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
+                        </svg>
+                    </div>
+                    <div class="csv-drop-main-text">Drag &amp; drop your CSV file here</div>
+                    <div class="csv-drop-sub-text">or <span class="csv-browse-link">browse files</span> from your device</div>
+                </div>
+
+                <div id="csvDropActiveState" class="csv-drop-active" style="display:none;">
+                    <div class="csv-file-info-row">
+                        <div class="csv-file-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                                <line x1="16" y1="13" x2="8" y2="13"></line>
+                                <line x1="16" y1="17" x2="8" y2="17"></line>
+                                <polyline points="10 9 9 9 8 9"></polyline>
+                            </svg>
+                        </div>
+                        <div class="csv-file-details">
+                            <div id="csvFileName" class="csv-file-name">holdings.csv</div>
+                            <div id="csvFileSize" class="csv-file-size">0 B</div>
+                        </div>
+                        <button type="button" class="csv-file-remove-btn" onclick="removeSelectedCsv(event)" title="Choose another file">&times;</button>
+                    </div>
+                    <div id="csvHoldingBadge" class="csv-holding-badge">
+                        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        <span id="csvHoldingCountText">0 holdings ready to import</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Error Banner -->
+            <div id="csvErrorBanner" class="csv-error-banner" style="display: none;"></div>
+
+            <!-- Guide Section (Changes dynamically with selected format) -->
+            <div class="csv-guide-box">
+                <div class="csv-guide-header">Guide</div>
+                <div id="csvGuideContent" class="csv-guide-content">
+                    <!-- Populated dynamically by active adapter -->
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="csv-modal-actions">
+                <button type="button" class="btn-secondary" onclick="closeCsvModal()">Cancel</button>
+                <button type="button" class="btn btn-calc" id="btnImportCsv" onclick="executeCsvImport()" disabled>
+                    Import Holdings
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
 
     <script>
         let holdingsData = [];
@@ -5037,6 +5441,536 @@ INSTRUCTIONS:
             closeSettingsModal();
         }
 
+        // =========================================================================
+        // CSV IMPORT & BROKER ADAPTER ENGINE
+        // Declarative Adapter Pattern for extensible broker formats
+        // =========================================================================
+
+        function parseCsvText(text) {
+            if (!text || typeof text !== 'string') return [];
+            const clean = text.replace(/^\uFEFF/, '').trim();
+            if (!clean) return [];
+
+            const lines = [];
+            let currentRow = [];
+            let currentField = '';
+            let insideQuotes = false;
+
+            for (let i = 0; i < clean.length; i++) {
+                const char = clean[i];
+                const nextChar = clean[i + 1];
+
+                if (char === '"') {
+                    if (insideQuotes && nextChar === '"') {
+                        currentField += '"';
+                        i++; // skip escaped quote
+                    } else {
+                        insideQuotes = !insideQuotes;
+                    }
+                } else if (char === ',' && !insideQuotes) {
+                    currentRow.push(currentField.trim());
+                    currentField = '';
+                } else if ((char === '\r' || char === '\n') && !insideQuotes) {
+                    if (char === '\r' && nextChar === '\n') {
+                        i++; // skip \n in CRLF
+                    }
+                    currentRow.push(currentField.trim());
+                    currentField = '';
+                    if (currentRow.some(c => c.length > 0)) {
+                        lines.push(currentRow);
+                    }
+                    currentRow = [];
+                } else {
+                    currentField += char;
+                }
+            }
+            if (currentField.length > 0 || currentRow.length > 0) {
+                currentRow.push(currentField.trim());
+                if (currentRow.some(c => c.length > 0)) {
+                    lines.push(currentRow);
+                }
+            }
+            return lines;
+        }
+
+        function sanitizeCsvNumber(str) {
+            if (str === null || str === undefined) return '';
+            let cleaned = String(str).trim()
+                .replace(/[$€£¥₹]/g, '')
+                .replace(/\bCHF\b/gi, '')
+                .replace(/%/g, '')
+                .replace(/,/g, '')
+                .trim();
+            return cleaned;
+        }
+
+        function formatBytes(bytes) {
+            if (!bytes || bytes === 0) return "0 B";
+            const k = 1024;
+            const sizes = ["B", "KB", "MB"];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + " " + sizes[i];
+        }
+
+        class DeclarativeCsvAdapter {
+            constructor({ id, name, mode, headers, guideHtml, filterRow }) {
+                this.id = id;
+                this.name = name;
+                this.mode = mode; // 'shares' | 'value'
+                this.headers = headers;
+                this.guideHtml = guideHtml;
+                this.filterRow = filterRow || (() => true);
+            }
+
+            parse(csvText) {
+                const rows = parseCsvText(csvText);
+                if (!rows || rows.length < 2) {
+                    return { success: false, error: "The selected CSV file appears to be empty or contains only a header." };
+                }
+
+                // Identify header row among first 5 rows
+                let headerRowIdx = -1;
+                let colMap = {};
+                for (let r = 0; r < Math.min(rows.length, 5); r++) {
+                    const candidateMap = this._mapHeaders(rows[r]);
+                    if (this.mode === 'shares') {
+                        if (candidateMap.ticker !== undefined && (candidateMap.shares !== undefined || candidateMap.price !== undefined || candidateMap.value !== undefined)) {
+                            headerRowIdx = r;
+                            colMap = candidateMap;
+                            break;
+                        }
+                    } else if (this.mode === 'value') {
+                        if (candidateMap.ticker !== undefined && candidateMap.value !== undefined) {
+                            headerRowIdx = r;
+                            colMap = candidateMap;
+                            break;
+                        }
+                    }
+                }
+
+                if (headerRowIdx === -1) {
+                    const expected = this.mode === 'shares'
+                        ? "Holding, Quantity, Share Price, Weight"
+                        : "Holding, Value, Weight";
+                    return {
+                        success: false,
+                        error: `Could not identify required columns. Expected headers like: ${expected}. Check the guide below.`
+                    };
+                }
+
+                const holdings = [];
+                for (let i = headerRowIdx + 1; i < rows.length; i++) {
+                    const row = rows[i];
+                    if (!row || row.length === 0) continue;
+
+                    const rawTicker = colMap.ticker !== undefined ? row[colMap.ticker] : '';
+                    const ticker = (rawTicker || '').trim();
+                    if (!ticker) continue;
+
+                    if (!this.filterRow(row, colMap)) continue;
+
+                    const rawShares = colMap.shares !== undefined ? sanitizeCsvNumber(row[colMap.shares]) : '';
+                    const rawPrice = colMap.price !== undefined ? sanitizeCsvNumber(row[colMap.price]) : '';
+                    let rawValue = colMap.value !== undefined ? sanitizeCsvNumber(row[colMap.value]) : '';
+                    const rawWeight = colMap.weight !== undefined ? sanitizeCsvNumber(row[colMap.weight]) : '';
+
+                    // In shares mode: auto-calculate value if price & quantity exist
+                    if (this.mode === 'shares' && (!rawValue || rawValue === '')) {
+                        const p = parseFloat(rawPrice);
+                        const q = parseFloat(rawShares);
+                        if (!isNaN(p) && !isNaN(q)) {
+                            rawValue = String(Math.round(p * q * 100) / 100);
+                        }
+                    }
+
+                    holdings.push({
+                        t: ticker.toUpperCase(),
+                        p: rawPrice,
+                        q: rawShares,
+                        v: rawValue,
+                        w: rawWeight
+                    });
+                }
+
+                if (holdings.length === 0) {
+                    return { success: false, error: "Matching column headers were found, but no holding rows containing data were detected." };
+                }
+
+                return {
+                    success: true,
+                    holdings,
+                    mode: this.mode,
+                    count: holdings.length
+                };
+            }
+
+            _mapHeaders(headerRow) {
+                const map = {};
+                const normalized = headerRow.map(h => String(h || '').trim().toLowerCase());
+
+                for (const [field, aliases] of Object.entries(this.headers)) {
+                    for (let i = 0; i < normalized.length; i++) {
+                        if (aliases.includes(normalized[i])) {
+                            map[field] = i;
+                            break;
+                        }
+                    }
+                }
+                return map;
+            }
+        }
+
+        const BrokerRegistry = {
+            _adapters: new Map(),
+
+            register(adapter) {
+                if (!adapter || !adapter.id) throw new Error("Adapter must have an id");
+                this._adapters.set(adapter.id, adapter);
+            },
+
+            get(id) {
+                return this._adapters.get(id);
+            },
+
+            getAll() {
+                return Array.from(this._adapters.values());
+            }
+        };
+
+        // Register default Generic Adapters
+        BrokerRegistry.register(new DeclarativeCsvAdapter({
+            id: "generic_shares",
+            name: "Generic Share Price & Quantity Table",
+            mode: "shares",
+            headers: {
+                ticker: ['holding', 'holdings', 'asset', 'assets', 'ticker', 'tickers', 'code', 'security', 'symbol', 'name'],
+                shares: ['quantity', 'qty', 'shares', 'units', 'number of shares', 'no. of shares', 'no of shares', 'balance', 'count'],
+                price:  ['share price', 'shareprice', 'price', 'last price', 'current price', 'purchase price', 'unit price', 'market price'],
+                weight: ['weight', 'weighting', 'weights', 'target', 'target %', 'target weight', 'target weighting', 'target allocation', 'allocation', 'allocation %', 'target percentage', 'target pct', '%'],
+                value:  ['value', 'current value', 'market value', 'total value', 'amount']
+            },
+            guideHtml: `
+                <p><strong>Required Columns:</strong> <code>Holding</code>, <code>Quantity</code>, <code>Share Price</code>, <code>Weight</code></p>
+                <p style="margin-top: 4px;">Alternatively accepts <code>Asset</code>, <code>Number of shares</code>, <code>Shareprice</code>, <code>Weighting</code>.</p>
+                <ul style="margin: 8px 0 0 18px; padding: 0; font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5;">
+                    <li><strong>Holding:</strong> Ticker symbol or asset name (e.g. <code>VOO</code>, <code>VAS</code>, <code>AAPL</code>).</li>
+                    <li><strong>Quantity:</strong> Number of shares owned (decimals supported).</li>
+                    <li><strong>Share Price:</strong> Current price per share (currency signs like $ are auto-stripped).</li>
+                    <li><strong>Weight:</strong> Target allocation percentage (e.g. <code>40</code> or <code>40%</code>).</li>
+                </ul>
+                <p style="margin-top: 8px; font-size: 0.8rem; color: var(--accent);">Tip: Importing this file will automatically set the calculator to Share Price &amp; Quantity mode.</p>
+            `
+        }));
+
+        BrokerRegistry.register(new DeclarativeCsvAdapter({
+            id: "generic_value",
+            name: "Generic Value per Holding Table",
+            mode: "value",
+            headers: {
+                ticker: ['holding', 'holdings', 'asset', 'assets', 'ticker', 'tickers', 'code', 'security', 'symbol', 'name'],
+                value:  ['value', 'current value', 'market value', 'total value', 'amount', 'holding value'],
+                weight: ['weight', 'weighting', 'weights', 'target', 'target %', 'target weight', 'target weighting', 'target allocation', 'allocation', 'allocation %', 'target percentage', 'target pct', '%']
+            },
+            guideHtml: `
+                <p><strong>Required Columns:</strong> <code>Holding</code>, <code>Value</code>, <code>Weight</code></p>
+                <p style="margin-top: 4px;">Alternatively accepts <code>Asset</code>, <code>Value</code>, <code>Weighting</code>.</p>
+                <ul style="margin: 8px 0 0 18px; padding: 0; font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5;">
+                    <li><strong>Holding:</strong> Ticker symbol or asset name (e.g. <code>VOO</code>, <code>VAS</code>, <code>AAPL</code>).</li>
+                    <li><strong>Value:</strong> Total monetary value of your holding (currency signs like $ are auto-stripped).</li>
+                    <li><strong>Weight:</strong> Target allocation percentage (e.g. <code>50</code> or <code>50%</code>).</li>
+                </ul>
+                <p style="margin-top: 8px; font-size: 0.8rem; color: var(--accent);">Tip: Importing this file will set the calculator to Current Value mode.</p>
+            `
+        }));
+
+        // CSV Modal & Staged State
+        let stagedCsvHoldings = null;
+        let stagedCsvMode = null;
+        let stagedCsvText = null;
+
+        function populateCsvFormatDropdown() {
+            const select = document.getElementById("csvFormatSelect");
+            if (!select) return;
+            const currentVal = select.value;
+            select.innerHTML = "";
+            const adapters = BrokerRegistry.getAll();
+            adapters.forEach(adapter => {
+                const opt = document.createElement("option");
+                opt.value = adapter.id;
+                opt.textContent = adapter.name;
+                select.appendChild(opt);
+            });
+            if (currentVal && BrokerRegistry.get(currentVal)) {
+                select.value = currentVal;
+            } else if (adapters.length > 0) {
+                select.value = adapters[0].id;
+            }
+        }
+
+        function updateCsvGuide(formatId) {
+            const guideEl = document.getElementById("csvGuideContent");
+            if (!guideEl) return;
+            const adapter = BrokerRegistry.get(formatId);
+            if (adapter && adapter.guideHtml) {
+                guideEl.innerHTML = adapter.guideHtml;
+            } else {
+                guideEl.innerHTML = "<p>Select a format above to view expected CSV columns and export instructions.</p>";
+            }
+        }
+
+        function openCsvModal() {
+            const overlay = document.getElementById("csvModalOverlay");
+            if (overlay) {
+                overlay.classList.add("active");
+                document.body.style.overflow = "hidden";
+                populateCsvFormatDropdown();
+                const select = document.getElementById("csvFormatSelect");
+                if (select) {
+                    updateCsvGuide(select.value);
+                }
+            }
+        }
+
+        function closeCsvModal() {
+            const overlay = document.getElementById("csvModalOverlay");
+            if (overlay) {
+                overlay.classList.remove("active");
+                document.body.style.overflow = "";
+            }
+            resetCsvDropState();
+            hideCsvError();
+        }
+
+        function handleCsvBackdropClick(event) {
+            if (event && event.target && event.target.id === "csvModalOverlay") {
+                closeCsvModal();
+            }
+        }
+
+        function onCsvFormatChange(formatId) {
+            updateCsvGuide(formatId);
+            if (stagedCsvText) {
+                const nameEl = document.getElementById("csvFileName");
+                const fileName = nameEl ? nameEl.textContent : "holdings.csv";
+                processCsvText(stagedCsvText, fileName, 0);
+            }
+        }
+
+        function triggerCsvFileInput(event) {
+            if (event && event.target && event.target.closest && event.target.closest(".csv-file-remove-btn")) {
+                return;
+            }
+            const fileInput = document.getElementById("csvFileInput");
+            if (fileInput) fileInput.click();
+        }
+
+        function handleCsvFileChange(event) {
+            if (event && event.target && event.target.files && event.target.files.length > 0) {
+                handleCsvFileSelect(event.target.files[0]);
+            }
+        }
+
+        function handleCsvDragOver(event) {
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            const dropZone = document.getElementById("csvDropZone");
+            if (dropZone) dropZone.classList.add("dragover");
+        }
+
+        function handleCsvDragLeave(event) {
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            const dropZone = document.getElementById("csvDropZone");
+            if (dropZone) dropZone.classList.remove("dragover");
+        }
+
+        function handleCsvDrop(event) {
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            const dropZone = document.getElementById("csvDropZone");
+            if (dropZone) dropZone.classList.remove("dragover");
+
+            if (event && event.dataTransfer && event.dataTransfer.files && event.dataTransfer.files.length > 0) {
+                handleCsvFileSelect(event.dataTransfer.files[0]);
+            }
+        }
+
+        function handleCsvFileSelect(file) {
+            if (!file) return;
+            hideCsvError();
+
+            const name = file.name || "";
+            if (!name.toLowerCase().endsWith(".csv") && file.type && !file.type.includes("csv") && !file.type.includes("text")) {
+                showCsvError("Please select a valid .csv file.");
+                return;
+            }
+
+            if (typeof FileReader !== 'undefined') {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const text = e.target.result;
+                    processCsvText(text, file.name, file.size || 0);
+                };
+                reader.onerror = function() {
+                    showCsvError("Failed to read the file from disk.");
+                };
+                reader.readAsText(file);
+            } else if (file.content) {
+                processCsvText(file.content, file.name, file.size || 0);
+            }
+        }
+
+        function processCsvText(text, fileName, fileSize) {
+            hideCsvError();
+            const select = document.getElementById("csvFormatSelect");
+            const formatId = select ? select.value : "generic_shares";
+            const adapter = BrokerRegistry.get(formatId);
+
+            if (!adapter) {
+                showCsvError("Selected format parser was not found.");
+                return;
+            }
+
+            const result = adapter.parse(text);
+            if (!result.success) {
+                showCsvError(result.error || "Failed to parse CSV file.");
+                resetCsvDropState();
+                return;
+            }
+
+            stagedCsvHoldings = result.holdings;
+            stagedCsvMode = result.mode;
+            stagedCsvText = text;
+
+            displayCsvFileLoaded(fileName, fileSize, result.holdings.length);
+        }
+
+        function displayCsvFileLoaded(fileName, fileSize, count) {
+            const dropZone = document.getElementById("csvDropZone");
+            const idleState = document.getElementById("csvDropIdleState");
+            const activeState = document.getElementById("csvDropActiveState");
+            const nameEl = document.getElementById("csvFileName");
+            const sizeEl = document.getElementById("csvFileSize");
+            const countEl = document.getElementById("csvHoldingCountText");
+            const btnImport = document.getElementById("btnImportCsv");
+
+            if (dropZone) dropZone.classList.add("has-file");
+            if (idleState) idleState.style.display = "none";
+            if (activeState) activeState.style.display = "flex";
+
+            if (nameEl) {
+                nameEl.textContent = fileName || "holdings.csv";
+                nameEl.innerText = fileName || "holdings.csv";
+            }
+            if (sizeEl) {
+                sizeEl.textContent = formatBytes(fileSize);
+                sizeEl.innerText = formatBytes(fileSize);
+            }
+            if (countEl) {
+                const countStr = `${count} holding${count === 1 ? '' : 's'} ready to import`;
+                countEl.textContent = countStr;
+                countEl.innerText = countStr;
+            }
+            if (btnImport) btnImport.disabled = false;
+        }
+
+        function removeSelectedCsv(event) {
+            if (event) event.stopPropagation();
+            resetCsvDropState();
+            hideCsvError();
+        }
+
+        function resetCsvDropState() {
+            stagedCsvHoldings = null;
+            stagedCsvMode = null;
+            stagedCsvText = null;
+
+            const dropZone = document.getElementById("csvDropZone");
+            const idleState = document.getElementById("csvDropIdleState");
+            const activeState = document.getElementById("csvDropActiveState");
+            const btnImport = document.getElementById("btnImportCsv");
+            const fileInput = document.getElementById("csvFileInput");
+
+            if (dropZone) {
+                dropZone.classList.remove("has-file");
+                dropZone.classList.remove("dragover");
+            }
+            if (idleState) idleState.style.display = "flex";
+            if (activeState) activeState.style.display = "none";
+            if (btnImport) btnImport.disabled = true;
+            if (fileInput) fileInput.value = "";
+        }
+
+        function showCsvError(msg) {
+            const banner = document.getElementById("csvErrorBanner");
+            if (banner) {
+                banner.textContent = msg;
+                banner.innerText = msg;
+                banner.style.display = "flex";
+            }
+        }
+
+        function hideCsvError() {
+            const banner = document.getElementById("csvErrorBanner");
+            if (banner) {
+                banner.textContent = "";
+                banner.innerText = "";
+                banner.style.display = "none";
+            }
+        }
+
+        function executeCsvImport() {
+            if (!stagedCsvHoldings || stagedCsvHoldings.length === 0) {
+                showCsvError("No holdings ready to import.");
+                return;
+            }
+
+            holdingsData = stagedCsvHoldings.map(h => ({
+                t: h.t || "",
+                v: h.v || "",
+                p: h.p || "",
+                q: h.q || "",
+                w: h.w || ""
+            }));
+
+            if (stagedCsvMode === "shares") {
+                onSettingInputModeToggle(true);
+                const toggle = document.getElementById("settingInputModeToggle");
+                if (toggle) toggle.checked = true;
+            } else if (stagedCsvMode === "value") {
+                onSettingInputModeToggle(false);
+                const toggle = document.getElementById("settingInputModeToggle");
+                if (toggle) toggle.checked = false;
+            }
+
+            renderTableHeaders();
+            renderRows();
+            updateWeightSummary();
+            saveFormData();
+
+            const count = holdingsData.length;
+            closeCsvModal();
+
+            const noticeEl = document.getElementById("calcNotice");
+            if (noticeEl) {
+                noticeEl.style.display = "block";
+                noticeEl.style.color = "var(--accent)";
+                noticeEl.textContent = `Successfully imported ${count} holdings from CSV`;
+                setTimeout(() => {
+                    if (noticeEl.textContent.includes("Successfully imported")) {
+                        noticeEl.style.display = "none";
+                        noticeEl.style.color = "";
+                    }
+                }, 4000);
+            }
+        }
+
         // Close active modals on Escape key
         document.addEventListener("keydown", function(e) {
             if (e.key === "Escape" || e.keyCode === 27) {
@@ -5051,6 +5985,10 @@ INSTRUCTIONS:
                 const setOverlay = document.getElementById("settingsModalOverlay");
                 if (setOverlay && setOverlay.classList.contains("active")) {
                     closeSettingsModal();
+                }
+                const csvOverlay = document.getElementById("csvModalOverlay");
+                if (csvOverlay && csvOverlay.classList.contains("active")) {
+                    closeCsvModal();
                 }
             }
         });
@@ -6434,6 +7372,26 @@ INSTRUCTIONS:
             window.addHolding = addHolding;
             window.removeHolding = removeHolding;
             window.calculateRebalance = calculateRebalance;
+            window.openCsvModal = openCsvModal;
+            window.closeCsvModal = closeCsvModal;
+            window.handleCsvBackdropClick = handleCsvBackdropClick;
+            window.populateCsvFormatDropdown = populateCsvFormatDropdown;
+            window.onCsvFormatChange = onCsvFormatChange;
+            window.updateCsvGuide = updateCsvGuide;
+            window.triggerCsvFileInput = triggerCsvFileInput;
+            window.handleCsvFileChange = handleCsvFileChange;
+            window.handleCsvDragOver = handleCsvDragOver;
+            window.handleCsvDragLeave = handleCsvDragLeave;
+            window.handleCsvDrop = handleCsvDrop;
+            window.handleCsvFileSelect = handleCsvFileSelect;
+            window.processCsvText = processCsvText;
+            window.removeSelectedCsv = removeSelectedCsv;
+            window.resetCsvDropState = resetCsvDropState;
+            window.executeCsvImport = executeCsvImport;
+            window.parseCsvText = parseCsvText;
+            window.sanitizeCsvNumber = sanitizeCsvNumber;
+            window.BrokerRegistry = BrokerRegistry;
+            window.DeclarativeCsvAdapter = DeclarativeCsvAdapter;
         }
     </script>
 </body>
