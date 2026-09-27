@@ -2371,6 +2371,15 @@
             text-underline-offset: 2px;
         }
 
+        .csv-supported-formats {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-align: center;
+            margin-top: -6px;
+            letter-spacing: 0.01em;
+            line-height: 1.4;
+        }
+
         /* Active file display */
         .csv-drop-active {
             width: 100%;
@@ -2978,6 +2987,9 @@
                                 </button>
                             </div>
 
+                            <!-- Dedicated Clean Slate Feedback Alert -->
+                            <div id="cleanSlateFeedback" style="display: none; padding: 8px 12px; border-radius: var(--radius-sm); font-size: 12px; margin-top: 10px; margin-bottom: 2px;"></div>
+
                             <!-- Clean Slate Account Reset Section (Option B) -->
                             <div id="cleanSlateSection" style="display: none; margin-top: 14px; padding: 12px; background: var(--surface-card); border: 1px solid var(--danger-border); border-radius: var(--radius-card);">
                                 <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 6px;">
@@ -3264,7 +3276,7 @@
                             <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
                         </svg>
                     </div>
-                    <div class="csv-drop-main-text">Drag &amp; drop your CSV or Excel (.xlsx, .xls, .xlsm) file here</div>
+                    <div class="csv-drop-main-text">Drag &amp; drop your CSV or Excel file here</div>
                     <div class="csv-drop-sub-text">or <span class="csv-browse-link">browse files</span> from your device</div>
                 </div>
 
@@ -3293,6 +3305,9 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Supported formats note -->
+            <div class="csv-supported-formats" id="csvSupportedFormats">File formats supported: .csv .xlsx .xlsm .xls</div>
 
             <!-- Error Banner -->
             <div id="csvErrorBanner" class="csv-error-banner" style="display: none;"></div>
@@ -4615,6 +4630,11 @@ INSTRUCTIONS:
         function resetCleanSlateForm() {
             const csSec = document.getElementById("cleanSlateSection");
             if (csSec) csSec.style.display = "none";
+            const csFb = document.getElementById("cleanSlateFeedback");
+            if (csFb) {
+                csFb.innerText = "";
+                csFb.style.display = "none";
+            }
             const s1 = document.getElementById("cleanSlateStep1");
             if (s1) s1.style.display = "block";
             const s2 = document.getElementById("cleanSlateStep2");
@@ -4671,6 +4691,12 @@ INSTRUCTIONS:
                     }
                     if (typeof csEmail.focus === 'function') csEmail.focus();
                 }
+            } else {
+                const csFb = document.getElementById("cleanSlateFeedback");
+                if (csFb) {
+                    csFb.innerText = "";
+                    csFb.style.display = "none";
+                }
             }
         }
 
@@ -4679,8 +4705,11 @@ INSTRUCTIONS:
             const topEmailInput = document.getElementById("signInEmail");
             const emailInput = (csEmailInput && csEmailInput.value.trim()) ? csEmailInput : (topEmailInput && topEmailInput.value.trim() ? topEmailInput : csEmailInput || topEmailInput);
             const email = emailInput ? emailInput.value.trim().toLowerCase() : "";
+            const siFb = document.getElementById("signInFeedback");
+            if (siFb) siFb.style.display = "none";
+
             if (!email || !email.includes("@")) {
-                showFeedback("signInFeedback", "Please enter your account email in the Email Address field.", true);
+                showFeedback("cleanSlateFeedback", "Please enter your account email in the Email Address field.", true);
                 if (csEmailInput && typeof csEmailInput.focus === 'function') csEmailInput.focus();
                 else if (emailInput && typeof emailInput.focus === 'function') emailInput.focus();
                 return;
@@ -4692,12 +4721,12 @@ INSTRUCTIONS:
             const resendBtn = document.getElementById("btnResendResetCode");
             if (isResend && resendBtn && resendBtn.disabled) return;
 
-            showFeedback("signInFeedback", "Sending verification code...", false);
+            showFeedback("cleanSlateFeedback", "Sending verification code...", false);
 
             try {
                 const res = await RebalanceSync.requestReset(email);
                 if (!res.success) {
-                    showFeedback("signInFeedback", res.error || "Failed to request reset code.", true);
+                    showFeedback("cleanSlateFeedback", res.error || "Failed to request reset code.", true);
                     return;
                 }
 
@@ -4723,7 +4752,7 @@ INSTRUCTIONS:
                     if (typeof codeInput.focus === 'function') codeInput.focus();
                 }
 
-                showFeedback("signInFeedback", "If an account exists with this email, a 6-digit verification code has been sent (expires in 15 mins).", false);
+                showFeedback("cleanSlateFeedback", "If an account exists with this email, a 6-digit verification code has been sent (expires in 15 mins).", false);
 
                 // Start 60-second cooldown on Resend button
                 let remainingSeconds = 60;
@@ -4761,7 +4790,7 @@ INSTRUCTIONS:
                 }
 
             } catch (err) {
-                showFeedback("signInFeedback", "Error requesting reset code: " + err.message, true);
+                showFeedback("cleanSlateFeedback", "Error requesting reset code: " + err.message, true);
             }
         }
 
@@ -4780,44 +4809,46 @@ INSTRUCTIONS:
             const cardLast4 = cardInput ? cardInput.value.trim() : "";
             const newPass = passInput ? passInput.value : "";
             const confirmPass = confirmInput ? confirmInput.value : "";
+            const siFb = document.getElementById("signInFeedback");
+            if (siFb) siFb.style.display = "none";
 
             if (!email || !email.includes("@")) {
-                showFeedback("signInFeedback", "Please enter your account email in the Email Address field.", true);
+                showFeedback("cleanSlateFeedback", "Please enter your account email in the Email Address field.", true);
                 if (csEmailInput && typeof csEmailInput.focus === 'function') csEmailInput.focus();
                 return;
             }
             if (!code || !/^\d{6}$/.test(code)) {
-                showFeedback("signInFeedback", "Please enter the 6-digit verification code sent to your email.", true);
+                showFeedback("cleanSlateFeedback", "Please enter the 6-digit verification code sent to your email.", true);
                 if (codeInput && typeof codeInput.focus === 'function') codeInput.focus();
                 return;
             }
             const isBillingRequired = billBox && billBox.style.display !== "none";
             if (isBillingRequired) {
                 if (!cardLast4 || !/^\d{4}$/.test(cardLast4)) {
-                    showFeedback("signInFeedback", "Please enter the last 4 digits of the payment card on file.", true);
+                    showFeedback("cleanSlateFeedback", "Please enter the last 4 digits of the payment card on file.", true);
                     if (cardInput && typeof cardInput.focus === 'function') cardInput.focus();
                     return;
                 }
             }
             if (!newPass || newPass.length < 8) {
-                showFeedback("signInFeedback", "New Master Password must be at least 8 characters long.", true);
+                showFeedback("cleanSlateFeedback", "New Master Password must be at least 8 characters long.", true);
                 if (passInput && typeof passInput.focus === 'function') passInput.focus();
                 return;
             }
             if (newPass !== confirmPass) {
-                showFeedback("signInFeedback", "New passwords do not match. Please verify and try again.", true);
+                showFeedback("cleanSlateFeedback", "New passwords do not match. Please verify and try again.", true);
                 if (confirmInput && typeof confirmInput.focus === 'function') confirmInput.focus();
                 return;
             }
 
-            showFeedback("signInFeedback", "Verifying credentials & executing clean slate reset...", false);
+            showFeedback("cleanSlateFeedback", "Verifying credentials & executing clean slate reset...", false);
 
             try {
                 const newKeys = await RebalanceCrypto.deriveKeys(email, newPass);
                 const res = await RebalanceSync.cleanSlateReset(email, code, newKeys.authHash, cardLast4);
 
                 if (!res.success) {
-                    showFeedback("signInFeedback", res.error || "Reset failed. Please try again.", true);
+                    showFeedback("cleanSlateFeedback", res.error || "Reset failed. Please try again.", true);
                     if (res.revoked) {
                         resetCleanSlateForm();
                     }
@@ -4857,7 +4888,7 @@ INSTRUCTIONS:
                 resetCleanSlateForm();
                 updateAccountUI();
 
-                showFeedback("signInFeedback", "Clean slate reset successful! Account credentials updated & Pro subscription preserved.", false);
+                showFeedback("cleanSlateFeedback", "Clean slate reset successful! Account credentials updated & Pro subscription preserved.", false);
 
                 setTimeout(() => {
                     switchAccountTab('status');
@@ -4865,7 +4896,7 @@ INSTRUCTIONS:
 
             } catch (err) {
                 console.error("Clean slate reset error:", err);
-                showFeedback("signInFeedback", "Failed to reset account: " + err.message, true);
+                showFeedback("cleanSlateFeedback", "Failed to reset account: " + err.message, true);
             }
         }
 
@@ -5661,7 +5692,7 @@ INSTRUCTIONS:
                     <li><strong>Holding:</strong> Ticker symbol or asset name (e.g. <code>VOO</code>, <code>VAS</code>, <code>AAPL</code>).</li>
                     <li><strong>Quantity:</strong> Number of shares owned (decimals supported).</li>
                     <li><strong>Share Price:</strong> Current price per share (currency signs like $ are auto-stripped).</li>
-                    <li><strong>Weight:</strong> Target allocation percentage (e.g. <code>40</code> or <code>40%</code>).</li>
+                    <li><strong>Weight:</strong> Target allocation percentage (e.g. <code>40</code> or <code>40%</code>, can be added later).</li>
                 </ul>
                 <p style="margin-top: 8px; font-size: 0.8rem; color: var(--accent);">Note: Importing this file will automatically set the calculator to Share Price &amp; Quantity mode.</p>
             `

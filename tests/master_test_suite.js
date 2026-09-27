@@ -1388,6 +1388,7 @@ console.log("\n--- PART 4: Information Guide Modal & Chrome Tab Navigation ---")
             env.getEl("signInEmail").value = "";
             await env.handleRequestResetCode();
             assert.ok(env.getEl("signInFeedback").innerText.includes("Please enter your account email"));
+            assert.ok(env.getEl("cleanSlateFeedback").innerText.includes("Please enter your account email"));
 
             // With valid email in cleanSlateEmail
             env.getEl("cleanSlateEmail").value = "clean_test@example.com";
@@ -1395,6 +1396,7 @@ console.log("\n--- PART 4: Information Guide Modal & Chrome Tab Navigation ---")
             assert.strictEqual(env.getEl("cleanSlateStep1").style.display, "none");
             assert.strictEqual(env.getEl("cleanSlateStep2").style.display, "block");
             assert.ok(env.getEl("signInFeedback").innerText.includes("verification code has been sent"));
+            assert.ok(env.getEl("cleanSlateFeedback").innerText.includes("verification code has been sent"));
         });
 
         await runTest("handleRequestResetCode() conditionally reveals Billing Challenge for Pro accounts", async () => {
@@ -1422,24 +1424,28 @@ console.log("\n--- PART 4: Information Guide Modal & Chrome Tab Navigation ---")
             env.getEl("cleanSlateCode").value = "12";
             await env.handleExecuteCleanSlate();
             assert.ok(env.getEl("signInFeedback").innerText.includes("6-digit verification code"));
+            assert.ok(env.getEl("cleanSlateFeedback").innerText.includes("6-digit verification code"));
 
             // Valid code, missing card last 4
             env.getEl("cleanSlateCode").value = "123456";
             env.getEl("cleanSlateCardLast4").value = "12";
             await env.handleExecuteCleanSlate();
             assert.ok(env.getEl("signInFeedback").innerText.includes("last 4 digits"));
+            assert.ok(env.getEl("cleanSlateFeedback").innerText.includes("last 4 digits"));
 
             // Valid card last 4, short password
             env.getEl("cleanSlateCardLast4").value = "4242";
             env.getEl("cleanSlateNewPassword").value = "short";
             await env.handleExecuteCleanSlate();
             assert.ok(env.getEl("signInFeedback").innerText.includes("at least 8 characters"));
+            assert.ok(env.getEl("cleanSlateFeedback").innerText.includes("at least 8 characters"));
 
             // Password mismatch
             env.getEl("cleanSlateNewPassword").value = "StrongPass123!";
             env.getEl("cleanSlateConfirmPassword").value = "DifferentPass!";
             await env.handleExecuteCleanSlate();
             assert.ok(env.getEl("signInFeedback").innerText.includes("do not match"));
+            assert.ok(env.getEl("cleanSlateFeedback").innerText.includes("do not match"));
         });
 
         await runTest("handleExecuteCleanSlate() wipes vault, updates credentials, and establishes session", async () => {
@@ -2149,6 +2155,16 @@ console.log("\n--- PART 4: Information Guide Modal & Chrome Tab Navigation ---")
             env.executeCsvImport();
             const notice = env.getEl("calcNotice");
             assert.ok(notice.innerText.includes("Successfully imported 2 holdings from Excel"));
+        });
+
+        // 26. csvSupportedFormats displays supported file formats note
+        runTest("csvSupportedFormats note displays supported formats below drop zone", () => {
+            const fs = require('fs');
+            const { htmlPath } = require('./test_helper');
+            const html = fs.readFileSync(htmlPath, 'utf8');
+            assert.ok(html.includes('id="csvSupportedFormats"'));
+            assert.ok(html.includes('File formats supported: .csv .xlsx .xlsm .xls'));
+            assert.ok(html.includes('.csv-supported-formats'));
         });
     }
 
