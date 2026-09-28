@@ -20,6 +20,8 @@ function createTestEnv() {
                 id,
                 value: '',
                 innerText: '',
+                get textContent() { return this.innerText; },
+                set textContent(val) { this.innerText = String(val); },
                 innerHTML: '',
                 style: {},
                 classList: {
@@ -74,6 +76,9 @@ function createTestEnv() {
         Promise,
         Uint8Array,
         ArrayBuffer,
+        DataView,
+        DecompressionStream: typeof DecompressionStream !== 'undefined' ? DecompressionStream : undefined,
+        Buffer: typeof Buffer !== 'undefined' ? Buffer : undefined,
         btoa,
         atob,
         TextEncoder,
@@ -118,6 +123,26 @@ function createTestEnv() {
         },
         navigator: {
             clipboard: { writeText: () => Promise.resolve() }
+        },
+        FileReader: class {
+            readAsText(file) {
+                setTimeout(() => {
+                    if (this.onload) {
+                        this.onload({ target: { result: file && file.content !== undefined ? file.content : '' } });
+                    }
+                }, 0);
+            }
+            readAsArrayBuffer(file) {
+                setTimeout(() => {
+                    if (this.onload) {
+                        let res = file && file.content !== undefined ? file.content : new ArrayBuffer(0);
+                        if (typeof Buffer !== 'undefined' && Buffer.isBuffer(res)) {
+                            res = res.buffer.slice(res.byteOffset, res.byteOffset + res.byteLength);
+                        }
+                        this.onload({ target: { result: res } });
+                    }
+                }, 0);
+            }
         },
         setTimeout: (fn) => fn(),
         clearTimeout: () => {}
@@ -235,7 +260,43 @@ function createTestEnv() {
                 }
             }
             return errEl.innerText ? [errEl.innerText] : [];
-        }
+        },
+        openCsvModal: sandbox.openCsvModal,
+        closeCsvModal: sandbox.closeCsvModal,
+        handleCsvBackdropClick: sandbox.handleCsvBackdropClick,
+        populateCsvFormatDropdown: sandbox.populateCsvFormatDropdown,
+        onCsvFormatChange: sandbox.onCsvFormatChange,
+        updateCsvGuide: sandbox.updateCsvGuide,
+        triggerCsvFileInput: sandbox.triggerCsvFileInput,
+        handleCsvFileChange: sandbox.handleCsvFileChange,
+        handleCsvDragOver: sandbox.handleCsvDragOver,
+        handleCsvDragLeave: sandbox.handleCsvDragLeave,
+        handleCsvDrop: sandbox.handleCsvDrop,
+        handleCsvFileSelect: sandbox.handleCsvFileSelect,
+        processCsvText: sandbox.processCsvText,
+        removeSelectedCsv: sandbox.removeSelectedCsv,
+        resetCsvDropState: sandbox.resetCsvDropState,
+        executeCsvImport: sandbox.executeCsvImport,
+        parseCsvText: sandbox.parseCsvText,
+        sanitizeCsvNumber: sandbox.sanitizeCsvNumber,
+        parseXlsxToCsv: sandbox.parseXlsxToCsv,
+        parseXlsxNative: sandbox.parseXlsxNative,
+        parseXlsToCsv: sandbox.parseXlsToCsv,
+        parseHtmlTableToCsv: sandbox.parseHtmlTableToCsv,
+        BrokerRegistry: vm.runInContext('BrokerRegistry', sandbox),
+        DeclarativeCsvAdapter: vm.runInContext('DeclarativeCsvAdapter', sandbox),
+        NabtradeCsvAdapter: vm.runInContext('NabtradeCsvAdapter', sandbox),
+        TransactionLedgerAdapter: vm.runInContext('TransactionLedgerAdapter', sandbox),
+        getCsvStrategyNoteState: () => {
+            const el = getOrCreateElement("csvStrategyNote");
+            return {
+                display: el.style.display || 'none',
+                innerHTML: el.innerHTML || '',
+                innerText: el.innerText || ''
+            };
+        },
+        getStagedCsvHoldings: () => vm.runInContext('stagedCsvHoldings', sandbox),
+        getStagedCsvMode: () => vm.runInContext('stagedCsvMode', sandbox)
     };
 }
 

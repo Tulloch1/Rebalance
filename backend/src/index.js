@@ -121,19 +121,24 @@ async function getCustomerCardLast4(customerId, env) {
 async function sendResetOtpEmail(email, code, env) {
     if (env.RESEND_API_KEY) {
         try {
-            await fetch("https://api.resend.com/emails", {
+            const fromAddr = env.EMAIL_FROM || "Portfolio Rebalancer <onboarding@resend.dev>";
+            const resp = await fetch("https://api.resend.com/emails", {
                 method: "POST",
                 headers: {
                     "Authorization": `Bearer ${env.RESEND_API_KEY}`,
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
-                    from: env.EMAIL_FROM || "Portfolio Rebalancer <security@rebalanceportfolio.app>",
+                    from: fromAddr,
                     to: [email],
                     subject: "Your Clean Slate Reset Code",
                     html: `<p>Your single-use verification code is: <strong style="font-size: 22px; letter-spacing: 2px;">${code}</strong></p><p>This code will expire in 15 minutes. If you did not request this, please ignore this email.</p>`
                 })
             });
+            if (!resp.ok) {
+                const errText = await resp.text();
+                console.error("Resend API rejected reset email:", resp.status, errText);
+            }
         } catch (err) {
             console.error("Failed to send email via Resend:", err);
         }
@@ -147,19 +152,24 @@ async function sendResetOtpEmail(email, code, env) {
 async function sendResetConfirmationEmail(email, env) {
     if (env.RESEND_API_KEY) {
         try {
-            await fetch("https://api.resend.com/emails", {
+            const fromAddr = env.EMAIL_FROM || "Portfolio Rebalancer <onboarding@resend.dev>";
+            const resp = await fetch("https://api.resend.com/emails", {
                 method: "POST",
                 headers: {
                     "Authorization": `Bearer ${env.RESEND_API_KEY}`,
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
-                    from: env.EMAIL_FROM || "Portfolio Rebalancer <security@rebalanceportfolio.app>",
+                    from: fromAddr,
                     to: [email],
                     subject: "Account Credentials Reset Confirmation",
                     html: `<p>Your account credentials have been successfully reset via verified billing authorization.</p><p>If you did not authorize this action, please contact security support immediately.</p>`
                 })
             });
+            if (!resp.ok) {
+                const errText = await resp.text();
+                console.error("Resend API rejected confirmation email:", resp.status, errText);
+            }
         } catch (err) {
             console.error("Failed to send confirmation email:", err);
         }
