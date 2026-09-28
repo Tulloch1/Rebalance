@@ -2166,6 +2166,659 @@ console.log("\n--- PART 4: Information Guide Modal & Chrome Tab Navigation ---")
             assert.ok(html.includes('File formats supported: .csv .xlsx .xlsm .xls'));
             assert.ok(html.includes('.csv-supported-formats'));
         });
+
+        // 27. BrokerRegistry includes Nabtrade adapter
+        runTest("BrokerRegistry includes Nabtrade adapter as 3rd registered option", () => {
+            const adapter = env.BrokerRegistry.get("nabtrade");
+            assert.ok(adapter);
+            assert.strictEqual(adapter.id, "nabtrade");
+            assert.strictEqual(adapter.name, "Nabtrade");
+            assert.ok(adapter.guideHtml.includes("Nabtrade Portfolio CSV Export"));
+        });
+
+        // 28. NabtradeCsvAdapter in Share Price & Quantity Mode
+        runTest("NabtradeCsvAdapter parses Code, Quantity, Mkt.Price in Share Price & Quantity mode", () => {
+            env.onSettingInputModeToggle(true);
+            const adapter = env.BrokerRegistry.get("nabtrade");
+            assert.strictEqual(adapter.mode, "shares");
+
+            const csv = "Code,Description,Quantity,Mkt.Price,Market value,Cost price\n" +
+                "VAS,Vanguard Australian Shares Index ETF,50,95.50,$4,775.00,$4,500.00\n" +
+                "VGS,Vanguard MSCI Index International Shares ETF,100,115.00,$11,500.00,$10,000.00";
+
+            const res = adapter.parse(csv);
+            assert.strictEqual(res.success, true);
+            assert.strictEqual(res.mode, "shares");
+            assert.strictEqual(res.holdings.length, 2);
+
+            // Holding 1: VAS
+            assert.strictEqual(res.holdings[0].t, "VAS");
+            assert.strictEqual(res.holdings[0].q, "50");
+            assert.strictEqual(res.holdings[0].p, "95.50");
+            assert.strictEqual(res.holdings[0].v, "4775");
+            assert.strictEqual(res.holdings[0].w, ""); // Weight left for user input
+
+            // Holding 2: VGS
+            assert.strictEqual(res.holdings[1].t, "VGS");
+            assert.strictEqual(res.holdings[1].q, "100");
+            assert.strictEqual(res.holdings[1].p, "115.00");
+            assert.strictEqual(res.holdings[1].v, "11500");
+            assert.strictEqual(res.holdings[1].w, ""); // Weight left for user input
+        });
+
+        // 29. NabtradeCsvAdapter in Value per Holding Mode
+        runTest("NabtradeCsvAdapter parses Code, Market value in Value per Holding mode", () => {
+            env.onSettingInputModeToggle(false);
+            const adapter = env.BrokerRegistry.get("nabtrade");
+            assert.strictEqual(adapter.mode, "value");
+
+            const csv = 'Code,Description,Quantity,Mkt.Price,Market value,Cost price\n' +
+                'VAS,Vanguard Australian Shares Index ETF,50,95.50,"$4,775.00","$4,500.00"\n' +
+                'VGS,Vanguard MSCI Index International Shares ETF,100,115.00,"$11,500.00","$10,000.00"';
+
+            const res = adapter.parse(csv);
+            assert.strictEqual(res.success, true);
+            assert.strictEqual(res.mode, "value");
+            assert.strictEqual(res.holdings.length, 2);
+
+            // Holding 1: VAS
+            assert.strictEqual(res.holdings[0].t, "VAS");
+            assert.strictEqual(res.holdings[0].v, "4775.00");
+            assert.strictEqual(res.holdings[0].p, "");
+            assert.strictEqual(res.holdings[0].q, "");
+            assert.strictEqual(res.holdings[0].w, "");
+
+            // Holding 2: VGS
+            assert.strictEqual(res.holdings[1].t, "VGS");
+            assert.strictEqual(res.holdings[1].v, "11500.00");
+            assert.strictEqual(res.holdings[1].p, "");
+            assert.strictEqual(res.holdings[1].q, "");
+            assert.strictEqual(res.holdings[1].w, "");
+        });
+
+        // 30. NabtradeCsvAdapter automatically excludes Cash Account and Total summary rows
+        runTest("NabtradeCsvAdapter automatically excludes Cash Account and Total summary rows", () => {
+            env.onSettingInputModeToggle(true);
+            const adapter = env.BrokerRegistry.get("nabtrade");
+
+            const csv = 'Code,Description,Quantity,Mkt.Price,Market value\n' +
+                'VAS,Vanguard Australian Shares,50,95.50,"$4,775.00"\n' +
+                'CASH,Nabtrade AUD Cash Account,,,1500.00\n' +
+                'TOTAL,Portfolio Total,,,6275.00';
+
+            const res = adapter.parse(csv);
+            assert.strictEqual(res.success, true);
+            assert.strictEqual(res.holdings.length, 1);
+            assert.strictEqual(res.holdings[0].t, "VAS");
+        });
+
+        // 31. Nabtrade CSV end-to-end import via processCsvText and executeCsvImport
+        runTest("Nabtrade CSV end-to-end import applies holdings and preserves input mode", () => {
+            env.onSettingInputModeToggle(true);
+            env.openCsvModal();
+            env.onCsvFormatChange("nabtrade");
+
+            const guide = env.getEl("csvGuideContent");
+            assert.ok(guide.innerHTML.includes("Nabtrade Portfolio CSV Export"));
+
+            const csv = "Code,Description,Quantity,Mkt.Price,Market value\n" +
+                "BHP,BHP Group Ltd,20,45.00,900.00\n" +
+                "CBA,Commonwealth Bank of Australia,10,120.00,1200.00";
+
+            env.processCsvText(csv, "nabtrade_export.csv", 1024);
+
+            assert.strictEqual(env.getEl("csvDropZone").classList.contains("has-file"), true);
+            assert.strictEqual(env.getEl("csvFileName").innerText, "nabtrade_export.csv");
+            assert.ok(env.getEl("csvHoldingCountText").innerText.includes("2 holdings ready to import"));
+            assert.strictEqual(env.getStagedCsvHoldings().length, 2);
+
+            env.executeCsvImport();
+
+            // Modal closed
+            assert.strictEqual(env.getEl("csvModalOverlay").classList.contains("active"), false);
+
+            // Input mode preserved
+            assert.strictEqual(env.isSharesInputMode(), true);
+
+            // Holdings data updated
+            const holdings = env.getHoldings();
+            assert.strictEqual(holdings.length, 2);
+            assert.strictEqual(holdings[0].t, "BHP");
+            assert.strictEqual(holdings[0].q, "20");
+            assert.strictEqual(holdings[0].p, "45.00");
+            assert.strictEqual(holdings[0].w, ""); // blank for user input
+            assert.strictEqual(holdings[1].t, "CBA");
+            assert.strictEqual(holdings[1].q, "10");
+            assert.strictEqual(holdings[1].p, "120.00");
+            assert.strictEqual(holdings[1].w, "");
+
+            // Notice displayed
+            const notice = env.getEl("calcNotice");
+            assert.ok(notice.innerText.includes("Successfully imported 2 holdings from CSV"));
+        });
+
+        // 32. executeCsvImport preserves target weights of existing holdings when imported CSV lacks weights
+        runTest("executeCsvImport() preserves target weights of existing holdings when imported CSV lacks weights", () => {
+            env.onSettingInputModeToggle(true);
+
+            // Establish existing portfolio with user-configured target weights
+            env.setHoldings([
+                { t: "VAS", v: "4000", p: "80.00", q: "50", w: "40" },
+                { t: "VGS", v: "6000", p: "100.00", q: "60", w: "60" }
+            ]);
+
+            env.openCsvModal();
+            env.onCsvFormatChange("nabtrade");
+
+            // Fresh export from Nabtrade has updated prices/quantities, no weights, plus a new holding (BND)
+            const csv = "Code,Description,Quantity,Mkt.Price,Market value\n" +
+                "VAS,Vanguard Australian Shares,60,95.00,5700.00\n" +
+                "VGS,Vanguard MSCI International,75,120.00,9000.00\n" +
+                "BND,Vanguard Total Bond Market,10,85.00,850.00";
+
+            env.processCsvText(csv, "monthly_update.csv", 1024);
+            env.executeCsvImport();
+
+            const holdings = env.getHoldings();
+            assert.strictEqual(holdings.length, 3);
+
+            // VAS: updated qty & price, preserved existing weight (40)
+            assert.strictEqual(holdings[0].t, "VAS");
+            assert.strictEqual(holdings[0].q, "60");
+            assert.strictEqual(holdings[0].p, "95.00");
+            assert.strictEqual(holdings[0].w, "40");
+
+            // VGS: updated qty & price, preserved existing weight (60)
+            assert.strictEqual(holdings[1].t, "VGS");
+            assert.strictEqual(holdings[1].q, "75");
+            assert.strictEqual(holdings[1].p, "120.00");
+            assert.strictEqual(holdings[1].w, "60");
+
+            // BND: brand new holding -> blank weight for user to input
+            assert.strictEqual(holdings[2].t, "BND");
+            assert.strictEqual(holdings[2].q, "10");
+            assert.strictEqual(holdings[2].p, "85.00");
+            assert.strictEqual(holdings[2].w, "");
+        });
+
+        // 33. executeCsvImport overwrites target weights when imported CSV explicitly provides weights
+        runTest("executeCsvImport() overwrites target weights when imported CSV explicitly provides weights", () => {
+            env.onSettingInputModeToggle(true);
+
+            // Existing portfolio with 40/60 allocation
+            env.setHoldings([
+                { t: "VAS", v: "4000", p: "80.00", q: "50", w: "40" },
+                { t: "VGS", v: "6000", p: "100.00", q: "60", w: "60" }
+            ]);
+
+            env.openCsvModal();
+            env.onCsvFormatChange("generic_shares");
+
+            // Generic template explicitly specifies 50 / 50 weights
+            const csv = "Holding,Quantity,Share Price,Weight\n" +
+                "VAS,50,90.00,50\n" +
+                "VGS,60,110.00,50";
+
+            env.processCsvText(csv, "explicit_weights.csv", 1024);
+            env.executeCsvImport();
+
+            const holdings = env.getHoldings();
+            assert.strictEqual(holdings.length, 2);
+            assert.strictEqual(holdings[0].t, "VAS");
+            assert.strictEqual(holdings[0].w, "50"); // Explicitly updated to 50
+            assert.strictEqual(holdings[1].t, "VGS");
+            assert.strictEqual(holdings[1].w, "50"); // Explicitly updated to 50
+        });
+
+        // 34. BrokerRegistry includes Betashares Direct adapter implementing TransactionLedgerAdapter
+        runTest("BrokerRegistry includes Betashares Direct adapter as 4th registered option", () => {
+            const adapter = env.BrokerRegistry.get("betashares_direct");
+            assert.ok(adapter);
+            assert.strictEqual(adapter.id, "betashares_direct");
+            assert.strictEqual(adapter.name, "Betashares Direct");
+            assert.strictEqual(adapter.isTransactionStrategy, true);
+            assert.strictEqual(adapter.mode, "shares");
+            assert.ok(adapter.guideHtml.includes("Betashares Direct Activity CSV Export"));
+        });
+
+        // 35. TransactionLedgerAdapter extensible strategy pattern can register custom brokers
+        runTest("TransactionLedgerAdapter extensible strategy pattern allows registering custom broker", () => {
+            const customAdapter = new env.TransactionLedgerAdapter({
+                id: "custom_crypto",
+                name: "Custom Crypto Ledger",
+                isDescendingOrder: false, // Ascending order
+                priceStrategy: "latest",
+                headers: {
+                    ticker: ["asset"],
+                    action: ["side"],
+                    units: ["amount"],
+                    price: ["rate"]
+                },
+                actionMap: {
+                    "B": 1,
+                    "S": -1
+                }
+            });
+
+            // Ascending order: first buy at 50, second buy at 60 (60 is latest price)
+            const csv = "Asset,Side,Amount,Rate\n" +
+                "BTC,B,0.500000,50000\n" +
+                "ETH,B,5.000000,3000\n" +
+                "BTC,B,0.250000,60000\n" +
+                "ETH,S,2.000000,3500";
+
+            const res = customAdapter.parse(csv);
+            assert.strictEqual(res.success, true);
+            assert.strictEqual(res.holdings.length, 2);
+
+            // BTC: 0.5 + 0.25 = 0.75, latest rate 60000
+            const btc = res.holdings.find(h => h.t === "BTC");
+            assert.ok(btc);
+            assert.strictEqual(btc.q, "0.75");
+            assert.strictEqual(btc.p, "60000");
+
+            // ETH: 5 - 2 = 3, latest rate 3500
+            const eth = res.holdings.find(h => h.t === "ETH");
+            assert.ok(eth);
+            assert.strictEqual(eth.q, "3");
+            assert.strictEqual(eth.p, "3500");
+        });
+
+        // 36. Betashares Direct aggregates multiple Buy and Auto-Invest transactions
+        runTest("Betashares Direct aggregates multiple Buy and Auto-Invest transactions", () => {
+            const adapter = env.BrokerRegistry.get("betashares_direct");
+
+            const csv = "Date,Activity Type,Symbol,Quantity,Price,Amount\n" +
+                "15/03/2026,Auto-Invest,DHHF,5.5000,35.00,192.50\n" +
+                "01/03/2026,Buy,DHHF,20.0000,34.00,680.00\n" +
+                "15/02/2026,Auto-Invest,DHHF,5.0000,33.50,167.50";
+
+            const res = adapter.parse(csv);
+            assert.strictEqual(res.success, true);
+            assert.strictEqual(res.holdings.length, 1);
+            assert.strictEqual(res.holdings[0].t, "DHHF");
+            assert.strictEqual(res.holdings[0].q, "30.5");
+            // Descending order: top row (15/03/2026) has latest price 35.00
+            assert.strictEqual(res.holdings[0].p, "35");
+        });
+
+        // 37. Betashares Direct treats Distribution Reinvestment as positive buy and ignores cash Distribution
+        runTest("Betashares Direct treats Distribution Reinvestment as buy and ignores cash Distribution", () => {
+            const adapter = env.BrokerRegistry.get("betashares_direct");
+
+            const csv = "Date,Activity Type,Symbol,Quantity,Price,Amount\n" +
+                "20/03/2026,Distribution,VAS,0,,50.00\n" +
+                "15/03/2026,Distribution Reinvestment,VAS,0.4852,103.00,50.00\n" +
+                "01/01/2026,Buy,VAS,50.0000,95.00,4750.00";
+
+            const res = adapter.parse(csv);
+            assert.strictEqual(res.success, true);
+            assert.strictEqual(res.holdings.length, 1);
+            assert.strictEqual(res.holdings[0].t, "VAS");
+            // 50 + 0.4852 = 50.4852
+            assert.strictEqual(res.holdings[0].q, "50.4852");
+            // Latest trade price was distribution reinvestment at 103
+            assert.strictEqual(res.holdings[0].p, "103");
+        });
+
+        // 38. Betashares Direct subtracts Sell orders and accurately tracks fractional units
+        runTest("Betashares Direct subtracts Sell orders and accurately tracks fractional units", () => {
+            const adapter = env.BrokerRegistry.get("betashares_direct");
+
+            const csv = "Date,Activity Type,Symbol,Quantity,Price,Amount\n" +
+                "15/03/2026,Sell,BGBL,2.1234,75.00,159.25\n" +
+                "01/02/2026,Buy,BGBL,12.3456,70.00,864.19";
+
+            const res = adapter.parse(csv);
+            assert.strictEqual(res.success, true);
+            assert.strictEqual(res.holdings.length, 1);
+            assert.strictEqual(res.holdings[0].t, "BGBL");
+            // 12.3456 - 2.1234 = 10.2222
+            assert.strictEqual(res.holdings[0].q, "10.2222");
+            assert.strictEqual(res.holdings[0].p, "75");
+        });
+
+        // 39. Betashares Direct excludes closed positions where net quantity <= 0
+        runTest("Betashares Direct excludes closed positions where net quantity is zero or closed", () => {
+            const adapter = env.BrokerRegistry.get("betashares_direct");
+
+            const csv = "Date,Activity Type,Symbol,Quantity,Price,Amount\n" +
+                "15/03/2026,Sell,NDQ,10.0000,42.00,420.00\n" +
+                "01/03/2026,Buy,A200,15.0000,130.00,1950.00\n" +
+                "01/01/2026,Buy,NDQ,10.0000,38.00,380.00";
+
+            const res = adapter.parse(csv);
+            assert.strictEqual(res.success, true);
+            // NDQ was completely closed (10 bought, 10 sold), only A200 remains
+            assert.strictEqual(res.holdings.length, 1);
+            assert.strictEqual(res.holdings[0].t, "A200");
+            assert.strictEqual(res.holdings[0].q, "15");
+        });
+
+        // 40. Betashares Direct captures latest trade execution price in descending order file
+        runTest("Betashares Direct captures latest trade execution price from descending order file", () => {
+            const adapter = env.BrokerRegistry.get("betashares_direct");
+
+            // Row 1 is a sell at 110.5, Row 2 is buy at 100, Row 3 is buy at 90
+            const csv = "Date,Activity Type,Symbol,Quantity,Price,Amount\n" +
+                "20/03/2026,Sell,IVV,2.0000,110.50,221.00\n" +
+                "10/02/2026,Buy,IVV,5.0000,100.00,500.00\n" +
+                "01/01/2026,Buy,IVV,10.0000,90.00,900.00";
+
+            const res = adapter.parse(csv);
+            assert.strictEqual(res.success, true);
+            assert.strictEqual(res.holdings[0].t, "IVV");
+            assert.strictEqual(res.holdings[0].q, "13");
+            // Must capture latest trade price 110.5, not 100 or 90
+            assert.strictEqual(res.holdings[0].p, "110.5");
+        });
+
+        // 41. updateCsvGuide toggles #csvStrategyNote for transaction strategy formats
+        runTest("updateCsvGuide() displays #csvStrategyNote for Betashares Direct and hides for snapshot formats", () => {
+            // Betashares Direct: strategy note should be visible
+            env.updateCsvGuide("betashares_direct");
+            let noteState = env.getCsvStrategyNoteState();
+            assert.strictEqual(noteState.display, "block");
+
+            // Generic Shares: note should be hidden
+            env.updateCsvGuide("generic_shares");
+            noteState = env.getCsvStrategyNoteState();
+            assert.strictEqual(noteState.display, "none");
+
+            // Nabtrade: note should be hidden
+            env.updateCsvGuide("nabtrade");
+            noteState = env.getCsvStrategyNoteState();
+            assert.strictEqual(noteState.display, "none");
+
+            // Switch back to Betashares Direct: note appears again
+            env.onCsvFormatChange("betashares_direct");
+            noteState = env.getCsvStrategyNoteState();
+            assert.strictEqual(noteState.display, "block");
+        });
+
+        // 42. Betashares Direct end-to-end import applies holdings, switches to shares mode, and preserves target weights
+        runTest("Betashares Direct end-to-end import applies holdings, switches to shares mode, and preserves target weights", () => {
+            // Existing portfolio configured in Value mode with 60/40 allocation
+            env.onSettingInputModeToggle(false);
+            env.setHoldings([
+                { t: "DHHF", v: "6000", w: "60" },
+                { t: "BGBL", v: "4000", w: "40" }
+            ]);
+
+            env.openCsvModal();
+            env.onCsvFormatChange("betashares_direct");
+
+            const guide = env.getEl("csvGuideContent");
+            assert.ok(guide.innerHTML.includes("Betashares Direct Activity CSV Export"));
+
+            const noteState = env.getCsvStrategyNoteState();
+            assert.strictEqual(noteState.display, "block");
+
+            const csv = "Date,Activity Type,Symbol,Quantity,Price,Amount\n" +
+                "15/03/2026,Auto-Invest,DHHF,10.2500,35.00,358.75\n" +
+                "10/03/2026,Buy,BGBL,5.5000,72.00,396.00\n" +
+                "01/03/2026,Buy,DHHF,50.0000,34.00,1700.00";
+
+            env.processCsvText(csv, "betashares_activity.csv", 2048);
+
+            assert.strictEqual(env.getEl("csvDropZone").classList.contains("has-file"), true);
+            assert.strictEqual(env.getStagedCsvHoldings().length, 2);
+            assert.strictEqual(env.getStagedCsvMode(), "shares");
+
+            env.executeCsvImport();
+
+            // Modal closed
+            assert.strictEqual(env.getEl("csvModalOverlay").classList.contains("active"), false);
+
+            // Mode switched to shares automatically
+            assert.strictEqual(env.isSharesInputMode(), true);
+
+            // Check imported holdings and preserved weights
+            const holdings = env.getHoldings();
+            assert.strictEqual(holdings.length, 2);
+
+            // DHHF: 50 + 10.25 = 60.25, price 35.00, weight preserved at 60
+            const dhhf = holdings.find(h => h.t === "DHHF");
+            assert.ok(dhhf);
+            assert.strictEqual(dhhf.q, "60.25");
+            assert.strictEqual(dhhf.p, "35");
+            assert.strictEqual(dhhf.w, "60");
+
+            // BGBL: 5.5, price 72.00, weight preserved at 40
+            const bgbl = holdings.find(h => h.t === "BGBL");
+            assert.ok(bgbl);
+            assert.strictEqual(bgbl.q, "5.5");
+            assert.strictEqual(bgbl.p, "72");
+            assert.strictEqual(bgbl.w, "40");
+        });
+
+        // 43. BrokerRegistry includes CommSec adapter as 5th registered option
+        runTest("BrokerRegistry includes CommSec adapter as 5th registered option", () => {
+            const adapter = env.BrokerRegistry.get("commsec");
+            assert.ok(adapter);
+            assert.strictEqual(adapter.id, "commsec");
+            assert.strictEqual(adapter.name, "CommSec");
+            assert.strictEqual(adapter.isTransactionStrategy, true);
+            assert.strictEqual(adapter.mode, "shares");
+            assert.ok(adapter.guideHtml.includes("CommSec Confirmations / Transactions CSV Export"));
+        });
+
+        // 44. CommSec adapter parses Security, Buy/Sell, Units, and Average Price
+        runTest("CommSec adapter parses Security, Buy/Sell, Units, and Average Price", () => {
+            const adapter = env.BrokerRegistry.get("commsec");
+
+            const csv = "Date,Confirmation,Security,Buy/Sell,Units,Average Price,Brokerage,Total\n" +
+                "15/03/2026,C1003,VAS,Buy,50,95.50,$10.00,$4785.00\n" +
+                "10/02/2026,C1002,CBA,Buy,20,120.00,$10.00,$2410.00\n" +
+                "01/02/2026,C1001,VAS,Sell,10,94.00,$10.00,$930.00\n" +
+                "15/01/2026,C1000,VAS,Buy,20,90.00,$10.00,$1810.00";
+
+            const res = adapter.parse(csv);
+            assert.strictEqual(res.success, true);
+            assert.strictEqual(res.holdings.length, 2);
+
+            // VAS: 50 - 10 + 20 = 60 units. Latest trade price (from top row) is 95.50
+            const vas = res.holdings.find(h => h.t === "VAS");
+            assert.ok(vas);
+            assert.strictEqual(vas.q, "60");
+            assert.strictEqual(vas.p, "95.5");
+            assert.strictEqual(vas.v, "5730");
+
+            // CBA: 20 units @ 120.00
+            const cba = res.holdings.find(h => h.t === "CBA");
+            assert.ok(cba);
+            assert.strictEqual(cba.q, "20");
+            assert.strictEqual(cba.p, "120");
+            assert.strictEqual(cba.v, "2400");
+        });
+
+        // 45. CommSec adapter handles shorthand B/S and alternative price headers
+        runTest("CommSec adapter handles shorthand B/S codes and Average Price ($) header", () => {
+            const adapter = env.BrokerRegistry.get("commsec");
+
+            const csv = "Date,Security,Buy / Sell,Units,Average Price ($)\n" +
+                "15/03/2026,BHP,S,15,$42.50\n" +
+                "01/02/2026,BHP,B,40,$40.00";
+
+            const res = adapter.parse(csv);
+            assert.strictEqual(res.success, true);
+            assert.strictEqual(res.holdings.length, 1);
+
+            const bhp = res.holdings[0];
+            assert.strictEqual(bhp.t, "BHP");
+            // 40 - 15 = 25 units
+            assert.strictEqual(bhp.q, "25");
+            // Latest trade price was the sell at 42.50
+            assert.strictEqual(bhp.p, "42.5");
+        });
+
+        // 46. updateCsvGuide displays #csvStrategyNote for CommSec
+        runTest("updateCsvGuide() displays #csvStrategyNote for CommSec", () => {
+            env.updateCsvGuide("commsec");
+            const noteState = env.getCsvStrategyNoteState();
+            assert.strictEqual(noteState.display, "block");
+        });
+
+        // 47. CommSec end-to-end import applies holdings, switches to shares mode, and preserves target weights
+        runTest("CommSec end-to-end import applies holdings, switches to shares mode, and preserves target weights", () => {
+            env.onSettingInputModeToggle(false);
+            env.setHoldings([
+                { t: "VAS", v: "5000", w: "70" },
+                { t: "CBA", v: "2000", w: "30" }
+            ]);
+
+            env.openCsvModal();
+            env.onCsvFormatChange("commsec");
+
+            const guide = env.getEl("csvGuideContent");
+            assert.ok(guide.innerHTML.includes("CommSec Confirmations / Transactions CSV Export"));
+
+            const csv = "Date,Confirmation,Security,Buy/Sell,Units,Average Price\n" +
+                "15/03/2026,C2001,VAS,Buy,30,96.00\n" +
+                "10/03/2026,C2000,CBA,Buy,15,122.50";
+
+            env.processCsvText(csv, "commsec_transactions.csv", 1024);
+            assert.strictEqual(env.getStagedCsvHoldings().length, 2);
+            assert.strictEqual(env.getStagedCsvMode(), "shares");
+
+            env.executeCsvImport();
+
+            assert.strictEqual(env.getEl("csvModalOverlay").classList.contains("active"), false);
+            assert.strictEqual(env.isSharesInputMode(), true);
+
+            const holdings = env.getHoldings();
+            assert.strictEqual(holdings.length, 2);
+
+            const vas = holdings.find(h => h.t === "VAS");
+            assert.ok(vas);
+            assert.strictEqual(vas.q, "30");
+            assert.strictEqual(vas.p, "96");
+            assert.strictEqual(vas.w, "70"); // Preserved existing weight
+
+            const cba = holdings.find(h => h.t === "CBA");
+            assert.ok(cba);
+            assert.strictEqual(cba.q, "15");
+            assert.strictEqual(cba.p, "122.5");
+            assert.strictEqual(cba.w, "30"); // Preserved existing weight
+        });
+
+        // 48. BrokerRegistry includes Pearler adapter as 6th registered option
+        runTest("BrokerRegistry includes Pearler adapter as 6th registered option", () => {
+            const adapter = env.BrokerRegistry.get("pearler");
+            assert.ok(adapter);
+            assert.strictEqual(adapter.id, "pearler");
+            assert.strictEqual(adapter.name, "Pearler");
+            assert.strictEqual(adapter.isTransactionStrategy, true);
+            assert.strictEqual(adapter.isDescendingOrder, false); // Ascending order
+            assert.strictEqual(adapter.mode, "shares");
+            assert.ok(adapter.guideHtml.includes("Pearler Transactions CSV Export"));
+        });
+
+        // 49. Pearler adapter parses Symbol, Trade Type, Quantity, Price with ascending chronological order
+        runTest("Pearler adapter correctly resolves latest price from ascending chronological order", () => {
+            const adapter = env.BrokerRegistry.get("pearler");
+
+            // Ascending order: earliest transactions first, newest transactions last
+            const csv = "Date,Symbol,Trade Type,Quantity,Price\n" +
+                "01/01/2026,DHHF,Buy,10,32.00\n" +
+                "01/02/2026,VGS,Buy,15,110.00\n" +
+                "15/02/2026,DHHF,Buy,20,33.50\n" +
+                "01/03/2026,DHHF,Sell,5,34.00\n" +
+                "15/03/2026,DHHF,Buy,10,35.50";
+
+            const res = adapter.parse(csv);
+            assert.strictEqual(res.success, true);
+            assert.strictEqual(res.holdings.length, 2);
+
+            // DHHF: 10 + 20 - 5 + 10 = 35 units.
+            // Latest trade price must be 35.50 (from the bottom row on 15/03/2026)
+            const dhhf = res.holdings.find(h => h.t === "DHHF");
+            assert.ok(dhhf);
+            assert.strictEqual(dhhf.q, "35");
+            assert.strictEqual(dhhf.p, "35.5");
+            assert.strictEqual(dhhf.v, "1242.5");
+
+            // VGS: 15 units @ 110.00
+            const vgs = res.holdings.find(h => h.t === "VGS");
+            assert.ok(vgs);
+            assert.strictEqual(vgs.q, "15");
+            assert.strictEqual(vgs.p, "110");
+            assert.strictEqual(vgs.v, "1650");
+        });
+
+        // 50. Pearler adapter handles fractional quantities and closed positions
+        runTest("Pearler adapter handles fractional quantities and excludes closed positions", () => {
+            const adapter = env.BrokerRegistry.get("pearler");
+
+            const csv = "Date,Symbol,Trade Type,Quantity,Price\n" +
+                "01/01/2026,NDQ,Buy,10,40.00\n" +
+                "15/01/2026,A200,Buy,12.3456,125.00\n" +
+                "01/02/2026,NDQ,Sell,10,42.00\n" +
+                "15/02/2026,A200,Sell,2.1234,130.00";
+
+            const res = adapter.parse(csv);
+            assert.strictEqual(res.success, true);
+            // NDQ was closed (10 buy, 10 sell), only A200 remains
+            assert.strictEqual(res.holdings.length, 1);
+
+            const a200 = res.holdings[0];
+            assert.strictEqual(a200.t, "A200");
+            // 12.3456 - 2.1234 = 10.2222
+            assert.strictEqual(a200.q, "10.2222");
+            // Latest price is the sell at 130
+            assert.strictEqual(a200.p, "130");
+        });
+
+        // 51. updateCsvGuide displays #csvStrategyNote for Pearler
+        runTest("updateCsvGuide() displays #csvStrategyNote for Pearler", () => {
+            env.updateCsvGuide("pearler");
+            const noteState = env.getCsvStrategyNoteState();
+            assert.strictEqual(noteState.display, "block");
+        });
+
+        // 52. Pearler end-to-end import applies holdings, switches to shares mode, and preserves target weights
+        runTest("Pearler end-to-end import applies holdings, switches to shares mode, and preserves target weights", () => {
+            env.onSettingInputModeToggle(false);
+            env.setHoldings([
+                { t: "DHHF", v: "8000", w: "80" },
+                { t: "VGS", v: "2000", w: "20" }
+            ]);
+
+            env.openCsvModal();
+            env.onCsvFormatChange("pearler");
+
+            const guide = env.getEl("csvGuideContent");
+            assert.ok(guide.innerHTML.includes("Pearler Transactions CSV Export"));
+
+            const csv = "Date,Symbol,Trade Type,Quantity,Price\n" +
+                "01/01/2026,DHHF,Buy,50,33.00\n" +
+                "15/01/2026,VGS,Buy,20,115.00\n" +
+                "01/02/2026,DHHF,Buy,25,35.00";
+
+            env.processCsvText(csv, "pearler_trades.csv", 1024);
+            assert.strictEqual(env.getStagedCsvHoldings().length, 2);
+            assert.strictEqual(env.getStagedCsvMode(), "shares");
+
+            env.executeCsvImport();
+
+            assert.strictEqual(env.getEl("csvModalOverlay").classList.contains("active"), false);
+            assert.strictEqual(env.isSharesInputMode(), true);
+
+            const holdings = env.getHoldings();
+            assert.strictEqual(holdings.length, 2);
+
+            const dhhf = holdings.find(h => h.t === "DHHF");
+            assert.ok(dhhf);
+            assert.strictEqual(dhhf.q, "75");
+            assert.strictEqual(dhhf.p, "35"); // Latest price from bottom row
+            assert.strictEqual(dhhf.w, "80"); // Preserved existing target weight
+
+            const vgs = holdings.find(h => h.t === "VGS");
+            assert.ok(vgs);
+            assert.strictEqual(vgs.q, "20");
+            assert.strictEqual(vgs.p, "115");
+            assert.strictEqual(vgs.w, "20"); // Preserved existing target weight
+        });
     }
 
     console.log(`\n=================================================`);

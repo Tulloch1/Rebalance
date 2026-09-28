@@ -79,6 +79,7 @@
             --radius-card: 18px;
             --radius-input: 12px;
             --radius-btn: 12px;
+            --radius-sm: 18px;
             --radius-pill: 9999px;
             
             --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -1806,6 +1807,14 @@
             border-color: var(--warning-border);
         }
 
+        .auth-feedback {
+            padding: 10px 14px;
+            border-radius: var(--radius-card);
+            font-size: 12px;
+            line-height: 1.45;
+            box-sizing: border-box;
+        }
+
         .account-status-card {
             background: var(--surface-input);
             border: 1px solid var(--border-subtle);
@@ -2957,7 +2966,7 @@
                                 Forgot Password?
                             </button>
                         </div>
-                        <div id="signInFeedback" style="display: none; padding: 8px 12px; border-radius: var(--radius-sm); font-size: 12px; margin-bottom: 12px;"></div>
+                        <div id="signInFeedback" class="auth-feedback" style="display: none; padding: 10px 14px; border-radius: var(--radius-card); font-size: 12px; margin-bottom: 12px; line-height: 1.45;"></div>
                         <button type="submit" class="btn-account-primary" id="btnSignInSubmit">
                             Sign In
                         </button>
@@ -2988,7 +2997,7 @@
                             </div>
 
                             <!-- Dedicated Clean Slate Feedback Alert -->
-                            <div id="cleanSlateFeedback" style="display: none; padding: 8px 12px; border-radius: var(--radius-sm); font-size: 12px; margin-top: 10px; margin-bottom: 2px;"></div>
+                            <div id="cleanSlateFeedback" class="auth-feedback" style="display: none; padding: 10px 14px; border-radius: var(--radius-card); font-size: 12px; margin-top: 10px; margin-bottom: 2px; line-height: 1.45;"></div>
 
                             <!-- Clean Slate Account Reset Section (Option B) -->
                             <div id="cleanSlateSection" style="display: none; margin-top: 14px; padding: 12px; background: var(--surface-card); border: 1px solid var(--danger-border); border-radius: var(--radius-card);">
@@ -3020,7 +3029,7 @@
                                     </div>
 
                                     <!-- Pro Tier Billing Challenge (Option B) -->
-                                    <div id="cleanSlateBillingChallenge" style="display: none; background: var(--surface-input); border: 1px solid var(--accent-badge-border); border-radius: var(--radius-sm); padding: 8px 10px; margin-bottom: 12px;">
+                                    <div id="cleanSlateBillingChallenge" style="display: none; background: var(--surface-input); border: 1px solid var(--accent-badge-border); border-radius: var(--radius-card); padding: 10px 14px; margin-bottom: 12px;">
                                         <label class="account-label" for="cleanSlateCardLast4" style="color: var(--accent); font-weight: 600;">
                                             💳 Security Check: Last 4 Digits of Card on File
                                         </label>
@@ -3075,7 +3084,7 @@
                             <label class="account-label" for="signUpConfirmPassword">Confirm Password</label>
                             <input type="password" class="account-input" id="signUpConfirmPassword" placeholder="••••••••••••" autocomplete="new-password" minlength="8" required>
                         </div>
-                        <div id="signUpFeedback" style="display: none; padding: 8px 12px; border-radius: var(--radius-sm); font-size: 12px; margin-bottom: 12px;"></div>
+                        <div id="signUpFeedback" class="auth-feedback" style="display: none; padding: 10px 14px; border-radius: var(--radius-card); font-size: 12px; margin-bottom: 12px; line-height: 1.45;"></div>
                         <button type="submit" class="btn-account-primary" id="btnSignUpSubmit">
                             Create Account
                         </button>
@@ -3318,6 +3327,11 @@
                 <div id="csvGuideContent" class="csv-guide-content">
                     <!-- Populated dynamically by active adapter -->
                 </div>
+            </div>
+
+            <!-- Strategy / Ledger Note (Visible when transaction-strategy formats are selected) -->
+            <div id="csvStrategyNote" style="display: none; margin-top: 10px; padding: 10px 14px; background: var(--accent-badge-bg); border: 1px solid var(--accent-badge-border); border-radius: var(--radius-card); font-size: 0.8rem; color: var(--accent); line-height: 1.45;">
+                💡 <strong>Note on Share Prices:</strong> This format calculates holdings from transaction history and pre-fills share prices from your latest transaction execution price. We recommend checking and updating share prices to current market rates for the most accurate rebalance.
             </div>
 
             <!-- Action Buttons -->
@@ -3793,6 +3807,7 @@
             if (!el) return;
             el.innerText = message;
             el.style.display = "block";
+            el.style.borderRadius = "var(--radius-card)";
             if (isError) {
                 el.style.background = "var(--danger-bg)";
                 el.style.border = "1px solid var(--danger-border)";
@@ -3801,6 +3816,10 @@
                 el.style.background = "var(--accent-badge-bg)";
                 el.style.border = "1px solid var(--accent-badge-border)";
                 el.style.color = "var(--accent)";
+            }
+            if (elementId === "cleanSlateFeedback") {
+                const si = document.getElementById("signInFeedback");
+                if (si) si.innerText = message;
             }
         }
 
@@ -5719,6 +5738,483 @@ INSTRUCTIONS:
             `
         }));
 
+        class NabtradeCsvAdapter {
+            constructor() {
+                this.id = "nabtrade";
+                this.name = "Nabtrade";
+            }
+
+            get mode() {
+                return isSharesInputMode() ? "shares" : "value";
+            }
+
+            get guideHtml() {
+                return `
+                    <p><strong>Nabtrade Portfolio CSV Export</strong></p>
+                    <p style="margin-top: 4px;">In Nabtrade, navigate to <em>Trading &gt; Portfolio</em> and click <strong>Export CSV</strong>.</p>
+                    <ul style="margin: 8px 0 0 18px; padding: 0; font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5;">
+                        <li><strong>Code:</strong> Mapped to <code>Holding</code> (e.g. <code>VAS</code>, <code>BHP</code>).</li>
+                        <li><strong>Share Price &amp; Quantity Mode (Enabled):</strong> Automatically maps <code>Quantity</code> and <code>Mkt.Price</code> (Share Price).</li>
+                        <li><strong>Value per Holding Mode (Disabled):</strong> Automatically maps <code>Market value</code> (Value).</li>
+                        <li><strong>Target Allocation:</strong> Weights are left blank so you can enter target percentages after importing.</li>
+                    </ul>
+                    <p style="margin-top: 8px; font-size: 0.8rem; color: var(--accent);">Note: Cash accounts and portfolio summary rows are automatically filtered out.</p>
+                `;
+            }
+
+            parse(csvText) {
+                const rows = parseCsvText(csvText);
+                if (!rows || rows.length < 2) {
+                    return { success: false, error: "The selected CSV file appears to be empty or contains only a header." };
+                }
+
+                const isShares = isSharesInputMode();
+                const effectiveMode = isShares ? "shares" : "value";
+
+                let headerRowIdx = -1;
+                let colMap = {};
+
+                const codeAliases = ['code', 'asx code', 'security code', 'holding', 'ticker'];
+                const qtyAliases = ['quantity', 'qty', 'units', 'shares', 'number of shares'];
+                const priceAliases = ['mkt.price', 'mkt price', 'market price', 'price', 'last price', 'unit price'];
+                const valAliases = ['market value', 'mkt value', 'marketvalue', 'value', 'current value', 'total value'];
+
+                for (let r = 0; r < Math.min(rows.length, 5); r++) {
+                    const row = rows[r];
+                    const normalized = row.map(h => String(h || '').trim().toLowerCase());
+                    const currentMap = {};
+
+                    for (let i = 0; i < normalized.length; i++) {
+                        const h = normalized[i];
+                        if (currentMap.code === undefined && codeAliases.includes(h)) currentMap.code = i;
+                        if (currentMap.qty === undefined && qtyAliases.includes(h)) currentMap.qty = i;
+                        if (currentMap.price === undefined && priceAliases.includes(h)) currentMap.price = i;
+                        if (currentMap.val === undefined && valAliases.includes(h)) currentMap.val = i;
+                    }
+
+                    if (isShares) {
+                        if (currentMap.code !== undefined && (currentMap.qty !== undefined || currentMap.price !== undefined)) {
+                            headerRowIdx = r;
+                            colMap = currentMap;
+                            break;
+                        }
+                    } else {
+                        if (currentMap.code !== undefined && currentMap.val !== undefined) {
+                            headerRowIdx = r;
+                            colMap = currentMap;
+                            break;
+                        }
+                    }
+                }
+
+                if (headerRowIdx === -1) {
+                    const expected = isShares ? "Code, Quantity, Mkt.Price" : "Code, Market value";
+                    return {
+                        success: false,
+                        error: `Could not identify required columns in Nabtrade CSV. Expected headers: ${expected}. Check the guide below.`
+                    };
+                }
+
+                if (isShares && (colMap.qty === undefined || colMap.price === undefined)) {
+                    return {
+                        success: false,
+                        error: "Could not identify required 'Quantity' and 'Mkt.Price' columns for Share Price & Quantity mode. Check the guide below."
+                    };
+                }
+
+                if (!isShares && colMap.val === undefined) {
+                    return {
+                        success: false,
+                        error: "Could not identify required 'Market value' column for Value mode. Check the guide below."
+                    };
+                }
+
+                const ignoredTickers = new Set([
+                    'TOTAL', 'TOTALS', 'TOTAL PORTFOLIO', 'PORTFOLIO TOTAL',
+                    'CASH', 'AUD CASH', 'CASH ACCOUNT', 'USD CASH', 'AUD', 'USD'
+                ]);
+
+                const holdings = [];
+                for (let i = headerRowIdx + 1; i < rows.length; i++) {
+                    const row = rows[i];
+                    if (!row || row.length === 0) continue;
+
+                    const rawCode = colMap.code !== undefined ? row[colMap.code] : '';
+                    const ticker = (rawCode || '').trim();
+                    if (!ticker) continue;
+
+                    const upperTicker = ticker.toUpperCase();
+                    if (ignoredTickers.has(upperTicker)) continue;
+                    if (upperTicker.startsWith('TOTAL') || upperTicker.startsWith('CASH')) continue;
+
+                    if (isShares) {
+                        const rawShares = colMap.qty !== undefined ? sanitizeCsvNumber(row[colMap.qty]) : '';
+                        const rawPrice = colMap.price !== undefined ? sanitizeCsvNumber(row[colMap.price]) : '';
+                        
+                        let rawValue = '';
+                        const p = parseFloat(rawPrice);
+                        const q = parseFloat(rawShares);
+                        if (!isNaN(p) && !isNaN(q)) {
+                            rawValue = String(Math.round(p * q * 100) / 100);
+                        }
+
+                        // Holding, quantity and share price kept. Weight empty for user input.
+                        holdings.push({
+                            t: upperTicker,
+                            p: rawPrice,
+                            q: rawShares,
+                            v: rawValue,
+                            w: ''
+                        });
+                    } else {
+                        const rawValue = colMap.val !== undefined ? sanitizeCsvNumber(row[colMap.val]) : '';
+
+                        // Holding and value kept. Quantity, price, weight empty.
+                        holdings.push({
+                            t: upperTicker,
+                            p: '',
+                            q: '',
+                            v: rawValue,
+                            w: ''
+                        });
+                    }
+                }
+
+                if (holdings.length === 0) {
+                    return {
+                        success: false,
+                        error: "Matching Nabtrade column headers were found, but no valid holding rows were detected."
+                    };
+                }
+
+                return {
+                    success: true,
+                    holdings,
+                    mode: effectiveMode,
+                    count: holdings.length
+                };
+            }
+        }
+
+        class TransactionLedgerAdapter {
+            constructor(config) {
+                this.id = config.id;
+                this.name = config.name;
+                this.mode = config.mode || 'shares';
+                this.isTransactionStrategy = true;
+                this.headers = config.headers || {};
+                this.actionMap = config.actionMap || {};
+                this.priceStrategy = config.priceStrategy || 'latest'; // 'latest' | 'blank'
+                this.isDescendingOrder = config.isDescendingOrder !== undefined ? config.isDescendingOrder : true;
+                this.filterRow = typeof config.filterRow === 'function' ? config.filterRow : null;
+                this.guideHtml = config.guideHtml || '';
+            }
+
+            classifyAction(rawAction) {
+                if (!rawAction) return 0;
+                const normalized = String(rawAction).trim().toUpperCase().replace(/\s+/g, ' ');
+                if (typeof this.actionMap === 'function') {
+                    return this.actionMap(normalized);
+                }
+                if (Object.prototype.hasOwnProperty.call(this.actionMap, normalized)) {
+                    return this.actionMap[normalized];
+                }
+                // Fuzzy / keyword fallbacks
+                if (normalized.includes('REINVEST')) return 1;
+                if (normalized.includes('BUY') || normalized.includes('PURCHASE') || normalized.includes('INVEST')) return 1;
+                if (normalized.includes('SELL') || normalized.includes('DISPOSAL')) return -1;
+                return 0;
+            }
+
+            parse(csvText) {
+                const rows = parseCsvText(csvText);
+                if (!rows || rows.length < 2) {
+                    return { success: false, error: "The selected CSV file appears to be empty or contains only a header." };
+                }
+
+                // Detect headers in top 5 rows
+                let headerRowIdx = -1;
+                let colMap = {};
+
+                const tickerAliases = this.headers.ticker || ['symbol', 'ticker', 'code', 'security code', 'holding'];
+                const actionAliases = this.headers.action || ['activity type', 'activity', 'type', 'action', 'transaction type', 'description'];
+                const qtyAliases = this.headers.units || ['quantity', 'units', 'qty', 'shares', 'number of shares'];
+                const priceAliases = this.headers.price || ['price', 'unit price', 'trade price', 'execution price'];
+                const dateAliases = this.headers.date || ['date', 'trade date', 'transaction date', 'settlement date', 'time'];
+
+                for (let r = 0; r < Math.min(rows.length, 5); r++) {
+                    const row = rows[r];
+                    const normalized = row.map(h => String(h || '').trim().toLowerCase());
+                    const currentMap = {};
+
+                    for (let i = 0; i < normalized.length; i++) {
+                        const h = normalized[i];
+                        if (currentMap.ticker === undefined && tickerAliases.includes(h)) currentMap.ticker = i;
+                        if (currentMap.action === undefined && actionAliases.includes(h)) currentMap.action = i;
+                        if (currentMap.units === undefined && qtyAliases.includes(h)) currentMap.units = i;
+                        if (currentMap.price === undefined && priceAliases.includes(h)) currentMap.price = i;
+                        if (currentMap.date === undefined && dateAliases.includes(h)) currentMap.date = i;
+                    }
+
+                    if (currentMap.ticker !== undefined && currentMap.units !== undefined) {
+                        headerRowIdx = r;
+                        colMap = currentMap;
+                        break;
+                    }
+                }
+
+                if (headerRowIdx === -1 || colMap.ticker === undefined || colMap.units === undefined) {
+                    return {
+                        success: false,
+                        error: `Could not identify required transaction columns in ${this.name} CSV. Expected columns for Symbol/Ticker and Quantity/Units. Check the guide below.`
+                    };
+                }
+
+                const ledger = new Map();
+
+                for (let i = headerRowIdx + 1; i < rows.length; i++) {
+                    const row = rows[i];
+                    if (!row || row.length === 0) continue;
+
+                    if (this.filterRow && !this.filterRow(row, colMap)) {
+                        continue;
+                    }
+
+                    const rawTicker = colMap.ticker !== undefined ? row[colMap.ticker] : '';
+                    const ticker = (rawTicker || '').trim().toUpperCase();
+                    if (!ticker || ticker === 'TOTAL' || ticker === 'CASH' || ticker === 'AUD' || ticker === 'USD') {
+                        continue;
+                    }
+
+                    const rawAction = colMap.action !== undefined ? row[colMap.action] : '';
+                    let direction = this.classifyAction(rawAction);
+                    if (direction === 0 && colMap.action === undefined) {
+                        const rawVal = parseFloat(colMap.units !== undefined ? sanitizeCsvNumber(row[colMap.units]) : '0');
+                        if (!isNaN(rawVal)) {
+                            direction = rawVal >= 0 ? 1 : -1;
+                        }
+                    }
+
+                    if (direction === 0) {
+                        continue;
+                    }
+
+                    const rawQtyStr = colMap.units !== undefined ? sanitizeCsvNumber(row[colMap.units]) : '0';
+                    const qty = Math.abs(parseFloat(rawQtyStr));
+                    if (isNaN(qty) || qty === 0) continue;
+
+                    const rawPriceStr = colMap.price !== undefined ? sanitizeCsvNumber(row[colMap.price]) : '';
+                    const price = parseFloat(rawPriceStr);
+                    const validPrice = (!isNaN(price) && price > 0) ? String(price) : '';
+
+                    if (!ledger.has(ticker)) {
+                        ledger.set(ticker, {
+                            units: 0,
+                            latestPrice: validPrice
+                        });
+                    }
+
+                    const entry = ledger.get(ticker);
+                    entry.units += (direction * qty);
+
+                    if (this.isDescendingOrder) {
+                        if (!entry.latestPrice && validPrice) {
+                            entry.latestPrice = validPrice;
+                        }
+                    } else {
+                        if (validPrice) {
+                            entry.latestPrice = validPrice;
+                        }
+                    }
+                }
+
+                const holdings = [];
+                for (const [ticker, data] of ledger.entries()) {
+                    const roundedUnits = Math.round(data.units * 1000000) / 1000000;
+                    if (roundedUnits <= 0.0001) {
+                        continue;
+                    }
+
+                    const qtyStr = parseFloat(roundedUnits.toFixed(6)).toString();
+                    const priceStr = (this.priceStrategy === 'latest' && data.latestPrice) ? data.latestPrice : '';
+
+                    let valueStr = '';
+                    const p = parseFloat(priceStr);
+                    const q = parseFloat(qtyStr);
+                    if (!isNaN(p) && !isNaN(q) && p > 0 && q > 0) {
+                        valueStr = String(Math.round(p * q * 100) / 100);
+                    }
+
+                    holdings.push({
+                        t: ticker,
+                        q: qtyStr,
+                        p: priceStr,
+                        v: valueStr,
+                        w: ''
+                    });
+                }
+
+                if (holdings.length === 0) {
+                    return {
+                        success: false,
+                        error: `Matching columns were found in ${this.name} CSV, but no open holdings were detected after processing transactions.`
+                    };
+                }
+
+                return {
+                    success: true,
+                    holdings,
+                    mode: 'shares',
+                    count: holdings.length
+                };
+            }
+        }
+
+        BrokerRegistry.register(new NabtradeCsvAdapter());
+        BrokerRegistry.register(new TransactionLedgerAdapter({
+            id: "betashares_direct",
+            name: "Betashares Direct",
+            isDescendingOrder: true,
+            priceStrategy: "latest",
+            headers: {
+                ticker: ['symbol', 'ticker', 'code', 'security code', 'holding'],
+                action: ['activity type', 'activity', 'type', 'action', 'transaction type', 'description'],
+                units:  ['quantity', 'units', 'qty', 'shares', 'number of shares'],
+                price:  ['price', 'unit price', 'trade price', 'execution price'],
+                date:   ['date', 'trade date', 'transaction date', 'settlement date', 'time']
+            },
+            actionMap: {
+                'DISTRIBUTION REINVESTMENT': 1,
+                'DISTRIBUTION RE-INVESTMENT': 1,
+                'DIVIDEND REINVESTMENT': 1,
+                'AUTO-INVEST': 1,
+                'AUTO INVEST': 1,
+                'REINVESTMENT': 1,
+                'DRP': 1,
+                'BUY': 1,
+                'PURCHASE': 1,
+                'APPLICATION': 1,
+                'TRANSFER IN': 1,
+                'SELL': -1,
+                'DISPOSAL': -1,
+                'TRANSFER OUT': -1,
+                'REDEMPTION': -1,
+                'DISTRIBUTION': 0,
+                'DIVIDEND': 0,
+                'DEPOSIT': 0,
+                'WITHDRAWAL': 0,
+                'INTEREST': 0,
+                'FEE': 0,
+                'CASH': 0
+            },
+            filterRow: (row, colMap) => {
+                const rawTicker = colMap.ticker !== undefined ? (row[colMap.ticker] || '').trim().toUpperCase() : '';
+                return rawTicker !== '' && rawTicker !== 'AUD' && rawTicker !== 'CASH' && rawTicker !== 'TOTAL';
+            },
+            guideHtml: `
+                <p><strong>Betashares Direct Activity CSV Export</strong></p>
+                <p style="margin-top: 4px;">In Betashares Direct, navigate to <em>Activity &gt; Transactions</em> and click <strong>Export CSV</strong>.</p>
+                <ul style="margin: 8px 0 0 18px; padding: 0; font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5;">
+                    <li><strong>Symbol:</strong> Mapped to <code>Holding</code> (e.g. <code>DHHF</code>, <code>BGBL</code>, <code>A200</code>).</li>
+                    <li><strong>Activity Type:</strong> Aggregates <code>Buy</code>, <code>Auto-Invest</code>, and <code>Distribution Reinvestment</code> as additions, and <code>Sell</code> as disposals. Cash-only distributions are ignored.</li>
+                    <li><strong>Quantity:</strong> Automatically calculates your net holdings, including fractional shares.</li>
+                    <li><strong>Share Price:</strong> Pre-fills with the execution price of your latest transaction as an editable starting point.</li>
+                </ul>
+                <p style="margin-top: 8px; font-size: 0.8rem; color: var(--accent);">Note: Fully closed positions (0 units remaining) are automatically excluded.</p>
+            `
+        }));
+
+        BrokerRegistry.register(new TransactionLedgerAdapter({
+            id: "commsec",
+            name: "CommSec",
+            isDescendingOrder: true,
+            priceStrategy: "latest",
+            headers: {
+                ticker: ['security', 'security code', 'symbol', 'ticker', 'code', 'holding'],
+                action: ['buy/sell', 'buy / sell', 'b/s', 'activity type', 'activity', 'type', 'action', 'transaction type', 'description'],
+                units:  ['units', 'quantity', 'qty', 'shares', 'number of shares'],
+                price:  ['average price', 'average price ($)', 'avg price', 'avg. price', 'price', 'unit price', 'trade price', 'execution price'],
+                date:   ['date', 'trade date', 'transaction date', 'settlement date', 'time']
+            },
+            actionMap: {
+                'BUY': 1,
+                'B': 1,
+                'PURCHASE': 1,
+                'SELL': -1,
+                'S': -1,
+                'DISPOSAL': -1,
+                'DIVIDEND': 0,
+                'DEPOSIT': 0,
+                'WITHDRAWAL': 0,
+                'INTEREST': 0,
+                'FEE': 0,
+                'CASH': 0
+            },
+            filterRow: (row, colMap) => {
+                const rawTicker = colMap.ticker !== undefined ? (row[colMap.ticker] || '').trim().toUpperCase() : '';
+                return rawTicker !== '' && rawTicker !== 'AUD' && rawTicker !== 'CASH' && rawTicker !== 'TOTAL';
+            },
+            guideHtml: `
+                <p><strong>CommSec Confirmations / Transactions CSV Export</strong></p>
+                <p style="margin-top: 4px;">In CommSec, navigate to <em>Portfolio &gt; Transactions</em> or <em>Trading &gt; Confirmations</em> and export your CSV.</p>
+                <ul style="margin: 8px 0 0 18px; padding: 0; font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5;">
+                    <li><strong>Security:</strong> Mapped to <code>Holding</code> (e.g. <code>VAS</code>, <code>CBA</code>).</li>
+                    <li><strong>Buy/Sell:</strong> Aggregates <code>Buy</code> orders as additions and <code>Sell</code> orders as disposals.</li>
+                    <li><strong>Units:</strong> Calculates your net holding quantity.</li>
+                    <li><strong>Average Price:</strong> Pre-fills with the execution price of your latest transaction as an editable starting point.</li>
+                </ul>
+                <p style="margin-top: 8px; font-size: 0.8rem; color: var(--accent);">Note: Fully closed positions (0 units remaining) are automatically excluded.</p>
+            `
+        }));
+
+        BrokerRegistry.register(new TransactionLedgerAdapter({
+            id: "pearler",
+            name: "Pearler",
+            isDescendingOrder: false,
+            priceStrategy: "latest",
+            headers: {
+                ticker: ['symbol', 'ticker', 'code', 'security', 'holding'],
+                action: ['trade type', 'tradetype', 'type', 'activity type', 'action', 'description'],
+                units:  ['quantity', 'units', 'qty', 'shares', 'number of shares'],
+                price:  ['price', 'unit price', 'trade price', 'execution price', 'average price'],
+                date:   ['date', 'trade date', 'transaction date', 'settlement date', 'time']
+            },
+            actionMap: {
+                'BUY': 1,
+                'B': 1,
+                'PURCHASE': 1,
+                'AUTO-INVEST': 1,
+                'AUTO INVEST': 1,
+                'REINVESTMENT': 1,
+                'DRP': 1,
+                'SELL': -1,
+                'S': -1,
+                'DISPOSAL': -1,
+                'DIVIDEND': 0,
+                'DISTRIBUTION': 0,
+                'DEPOSIT': 0,
+                'WITHDRAWAL': 0,
+                'INTEREST': 0,
+                'FEE': 0,
+                'CASH': 0
+            },
+            filterRow: (row, colMap) => {
+                const rawTicker = colMap.ticker !== undefined ? (row[colMap.ticker] || '').trim().toUpperCase() : '';
+                return rawTicker !== '' && rawTicker !== 'AUD' && rawTicker !== 'CASH' && rawTicker !== 'TOTAL';
+            },
+            guideHtml: `
+                <p><strong>Pearler Transactions CSV Export</strong></p>
+                <p style="margin-top: 4px;">In Pearler, navigate to <em>Track &gt; Transactions</em> and click <strong>Export CSV</strong>.</p>
+                <ul style="margin: 8px 0 0 18px; padding: 0; font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5;">
+                    <li><strong>Symbol:</strong> Mapped to <code>Holding</code> (e.g. <code>DHHF</code>, <code>VGS</code>).</li>
+                    <li><strong>Trade Type:</strong> Aggregates <code>Buy</code> orders as additions and <code>Sell</code> orders as disposals.</li>
+                    <li><strong>Quantity:</strong> Automatically calculates your net holdings, including fractional shares.</li>
+                    <li><strong>Price:</strong> Pre-fills with the execution price of your latest transaction as an editable starting point.</li>
+                </ul>
+                <p style="margin-top: 8px; font-size: 0.8rem; color: var(--accent);">Note: Fully closed positions (0 units remaining) are automatically excluded.</p>
+            `
+        }));
+
         // CSV Modal & Staged State
         let stagedCsvHoldings = null;
         let stagedCsvMode = null;
@@ -5753,6 +6249,10 @@ INSTRUCTIONS:
             } else {
                 guideEl.innerHTML = "<p>Select a format above to view expected CSV columns and export instructions.</p>";
             }
+            const noteEl = document.getElementById("csvStrategyNote");
+            if (noteEl) {
+                noteEl.style.display = (adapter && adapter.isTransactionStrategy) ? "block" : "none";
+            }
         }
 
         function openCsvModal() {
@@ -5785,6 +6285,10 @@ INSTRUCTIONS:
         }
 
         function onCsvFormatChange(formatId) {
+            const select = document.getElementById("csvFormatSelect");
+            if (select && formatId && select.value !== formatId) {
+                select.value = formatId;
+            }
             updateCsvGuide(formatId);
             if (stagedCsvText) {
                 const nameEl = document.getElementById("csvFileName");
@@ -6371,13 +6875,34 @@ INSTRUCTIONS:
                 return;
             }
 
-            holdingsData = stagedCsvHoldings.map(h => ({
-                t: h.t || "",
-                v: h.v || "",
-                p: h.p || "",
-                q: h.q || "",
-                w: h.w || ""
-            }));
+            // Build a lookup map of existing target weights by normalized ticker
+            const existingWeightMap = new Map();
+            if (Array.isArray(holdingsData)) {
+                holdingsData.forEach(h => {
+                    const ticker = (h.t || "").trim().toUpperCase();
+                    if (ticker && h.w !== undefined && h.w !== null && String(h.w).trim() !== "") {
+                        existingWeightMap.set(ticker, String(h.w).trim());
+                    }
+                });
+            }
+
+            holdingsData = stagedCsvHoldings.map(h => {
+                const ticker = (h.t || "").trim().toUpperCase();
+                let weight = (h.w !== undefined && h.w !== null) ? String(h.w).trim() : "";
+
+                // If imported holding has no weight specified, preserve existing weight if holding matches
+                if (weight === "" && existingWeightMap.has(ticker)) {
+                    weight = existingWeightMap.get(ticker);
+                }
+
+                return {
+                    t: h.t || "",
+                    v: h.v || "",
+                    p: h.p || "",
+                    q: h.q || "",
+                    w: weight
+                };
+            });
 
             if (stagedCsvMode === "shares") {
                 onSettingInputModeToggle(true);
@@ -7845,6 +8370,8 @@ INSTRUCTIONS:
             window.parseHtmlTableToCsv = parseHtmlTableToCsv;
             window.BrokerRegistry = BrokerRegistry;
             window.DeclarativeCsvAdapter = DeclarativeCsvAdapter;
+            window.NabtradeCsvAdapter = NabtradeCsvAdapter;
+            window.TransactionLedgerAdapter = TransactionLedgerAdapter;
         }
     </script>
 </body>

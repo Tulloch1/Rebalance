@@ -285,6 +285,16 @@ function createTestEnv() {
         parseHtmlTableToCsv: sandbox.parseHtmlTableToCsv,
         BrokerRegistry: vm.runInContext('BrokerRegistry', sandbox),
         DeclarativeCsvAdapter: vm.runInContext('DeclarativeCsvAdapter', sandbox),
+        NabtradeCsvAdapter: vm.runInContext('NabtradeCsvAdapter', sandbox),
+        TransactionLedgerAdapter: vm.runInContext('TransactionLedgerAdapter', sandbox),
+        getCsvStrategyNoteState: () => {
+            const el = getOrCreateElement("csvStrategyNote");
+            return {
+                display: el.style.display || 'none',
+                innerHTML: el.innerHTML || '',
+                innerText: el.innerText || ''
+            };
+        },
         getStagedCsvHoldings: () => vm.runInContext('stagedCsvHoldings', sandbox),
         getStagedCsvMode: () => vm.runInContext('stagedCsvMode', sandbox)
     };
