@@ -286,6 +286,7 @@ function createTestEnv() {
         BrokerRegistry: vm.runInContext('BrokerRegistry', sandbox),
         DeclarativeCsvAdapter: vm.runInContext('DeclarativeCsvAdapter', sandbox),
         NabtradeCsvAdapter: vm.runInContext('NabtradeCsvAdapter', sandbox),
+        VanguardCsvAdapter: vm.runInContext('VanguardCsvAdapter', sandbox),
         TransactionLedgerAdapter: vm.runInContext('TransactionLedgerAdapter', sandbox),
         getCsvStrategyNoteState: () => {
             const el = getOrCreateElement("csvStrategyNote");

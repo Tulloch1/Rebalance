@@ -2207,7 +2207,7 @@ console.log("\n--- PART 4: Information Guide Modal & Chrome Tab Navigation ---")
         });
 
         // 29. NabtradeCsvAdapter in Value per Holding Mode
-        runTest("NabtradeCsvAdapter parses Code, Market value in Value per Holding mode", () => {
+        runTest("NabtradeCsvAdapter parses Code, Market value in Value per Holding mode and preserves Price/Quantity", () => {
             env.onSettingInputModeToggle(false);
             const adapter = env.BrokerRegistry.get("nabtrade");
             assert.strictEqual(adapter.mode, "value");
@@ -2224,15 +2224,15 @@ console.log("\n--- PART 4: Information Guide Modal & Chrome Tab Navigation ---")
             // Holding 1: VAS
             assert.strictEqual(res.holdings[0].t, "VAS");
             assert.strictEqual(res.holdings[0].v, "4775.00");
-            assert.strictEqual(res.holdings[0].p, "");
-            assert.strictEqual(res.holdings[0].q, "");
+            assert.strictEqual(res.holdings[0].p, "95.50");
+            assert.strictEqual(res.holdings[0].q, "50");
             assert.strictEqual(res.holdings[0].w, "");
 
             // Holding 2: VGS
             assert.strictEqual(res.holdings[1].t, "VGS");
             assert.strictEqual(res.holdings[1].v, "11500.00");
-            assert.strictEqual(res.holdings[1].p, "");
-            assert.strictEqual(res.holdings[1].q, "");
+            assert.strictEqual(res.holdings[1].p, "115.00");
+            assert.strictEqual(res.holdings[1].q, "100");
             assert.strictEqual(res.holdings[1].w, "");
         });
 
@@ -2818,6 +2818,234 @@ console.log("\n--- PART 4: Information Guide Modal & Chrome Tab Navigation ---")
             assert.strictEqual(vgs.q, "20");
             assert.strictEqual(vgs.p, "115");
             assert.strictEqual(vgs.w, "20"); // Preserved existing target weight
+        });
+
+        // 53. BrokerRegistry includes Vanguard adapter as 7th registered option
+        runTest("BrokerRegistry includes Vanguard adapter as 7th registered option", () => {
+            const adapter = env.BrokerRegistry.get("vanguard");
+            assert.ok(adapter);
+            assert.strictEqual(adapter.id, "vanguard");
+            assert.strictEqual(adapter.name, "Vanguard");
+            assert.ok(adapter.guideHtml.includes("Vanguard Portfolio CSV Export"));
+        });
+
+        // 54. VanguardCsvAdapter in Share Price & Quantity Mode
+        runTest("VanguardCsvAdapter parses Product ID, Quantity, Price in Share Price & Quantity mode", () => {
+            env.onSettingInputModeToggle(true);
+            const adapter = env.BrokerRegistry.get("vanguard");
+            assert.strictEqual(adapter.mode, "shares");
+
+            const csv = "Product ID,Product Name,Quantity,Price,Value\n" +
+                "VAS,Vanguard Australian Shares Index ETF,60,96.50,$5790.00\n" +
+                "VGS,Vanguard MSCI Index International Shares ETF,120,118.00,$14160.00";
+
+            const res = adapter.parse(csv);
+            assert.strictEqual(res.success, true);
+            assert.strictEqual(res.mode, "shares");
+            assert.strictEqual(res.holdings.length, 2);
+
+            // Holding 1: VAS
+            assert.strictEqual(res.holdings[0].t, "VAS");
+            assert.strictEqual(res.holdings[0].q, "60");
+            assert.strictEqual(res.holdings[0].p, "96.50");
+            assert.strictEqual(res.holdings[0].v, "5790.00");
+            assert.strictEqual(res.holdings[0].w, "");
+
+            // Holding 2: VGS
+            assert.strictEqual(res.holdings[1].t, "VGS");
+            assert.strictEqual(res.holdings[1].q, "120");
+            assert.strictEqual(res.holdings[1].p, "118.00");
+            assert.strictEqual(res.holdings[1].v, "14160.00");
+            assert.strictEqual(res.holdings[1].w, "");
+
+            // Also parses when Value column is omitted, computing v = p * q
+            const csvNoVal = "Product ID,Quantity,Price\nVAS,60,96.50\nVGS,120,118.00";
+            const resNoVal = adapter.parse(csvNoVal);
+            assert.strictEqual(resNoVal.success, true);
+            assert.strictEqual(resNoVal.holdings[0].v, "5790");
+            assert.strictEqual(resNoVal.holdings[1].v, "14160");
+        });
+
+        // 55. VanguardCsvAdapter in Value per Holding Mode
+        runTest("VanguardCsvAdapter parses Product ID, Value in Value per Holding mode and preserves Price/Quantity", () => {
+            env.onSettingInputModeToggle(false);
+            const adapter = env.BrokerRegistry.get("vanguard");
+            assert.strictEqual(adapter.mode, "value");
+
+            const csv = 'Product ID,Product Name,Quantity,Price,Value\n' +
+                'VAS,Vanguard Australian Shares Index ETF,60,96.50,"$5,790.00"\n' +
+                'VGS,Vanguard MSCI Index International Shares ETF,120,118.00,"$14,160.00"';
+
+            const res = adapter.parse(csv);
+            assert.strictEqual(res.success, true);
+            assert.strictEqual(res.mode, "value");
+            assert.strictEqual(res.holdings.length, 2);
+
+            // Holding 1: VAS
+            assert.strictEqual(res.holdings[0].t, "VAS");
+            assert.strictEqual(res.holdings[0].v, "5790.00");
+            assert.strictEqual(res.holdings[0].p, "96.50");
+            assert.strictEqual(res.holdings[0].q, "60");
+            assert.strictEqual(res.holdings[0].w, "");
+
+            // Holding 2: VGS
+            assert.strictEqual(res.holdings[1].t, "VGS");
+            assert.strictEqual(res.holdings[1].v, "14160.00");
+            assert.strictEqual(res.holdings[1].p, "118.00");
+            assert.strictEqual(res.holdings[1].q, "120");
+            assert.strictEqual(res.holdings[1].w, "");
+        });
+
+        // 56. Toggling from Value Mode to Shares Mode retains pre-filled price and quantity from import
+        runTest("Toggling from Value Mode to Shares Mode cleanly pre-fills price and quantity inputs", () => {
+            env.onSettingInputModeToggle(false);
+            env.openCsvModal();
+            env.onCsvFormatChange("vanguard");
+
+            const csv = 'Product ID,Quantity,Price,Value\n' +
+                'A200,40,125.00,5000.00\n' +
+                'NDQ,50,42.00,2100.00';
+
+            env.processCsvText(csv, "vanguard_holdings.csv", 1024);
+            env.executeCsvImport();
+
+            // Value mode active
+            assert.strictEqual(env.isSharesInputMode(), false);
+            const containerVal = env.getEl("portfolioContainer");
+            assert.ok(containerVal.innerHTML.includes('value="5000.00"'));
+            assert.ok(containerVal.innerHTML.includes('value="2100.00"'));
+
+            // Check holdingsData internally has p and q preserved
+            const holdings = env.getHoldings();
+            assert.strictEqual(holdings[0].t, "A200");
+            assert.strictEqual(holdings[0].p, "125.00");
+            assert.strictEqual(holdings[0].q, "40");
+            assert.strictEqual(holdings[0].v, "5000.00");
+
+            // User switches setting to Share Price & Quantity Input
+            env.onSettingInputModeToggle(true);
+            assert.strictEqual(env.isSharesInputMode(), true);
+
+            // Price and Quantity inputs are cleanly populated without manual re-entry
+            const containerShares = env.getEl("portfolioContainer");
+            assert.strictEqual(containerShares.classList.contains("mode-shares"), true);
+            assert.ok(containerShares.innerHTML.includes('value="125.00"'));
+            assert.ok(containerShares.innerHTML.includes('value="40"'));
+            assert.ok(containerShares.innerHTML.includes('value="42.00"'));
+            assert.ok(containerShares.innerHTML.includes('value="50"'));
+        });
+
+        // 57. VanguardCsvAdapter automatically excludes Cash Account and Total summary rows
+        runTest("VanguardCsvAdapter automatically excludes Cash Account and Total summary rows", () => {
+            env.onSettingInputModeToggle(true);
+            const adapter = env.BrokerRegistry.get("vanguard");
+
+            const csv = 'Product ID,Quantity,Price,Value\n' +
+                'VAS,50,95.50,"$4,775.00"\n' +
+                'VANGUARD CASH ACCOUNT,,,2500.00\n' +
+                'TOTAL,,,7275.00';
+
+            const res = adapter.parse(csv);
+            assert.strictEqual(res.success, true);
+            assert.strictEqual(res.holdings.length, 1);
+            assert.strictEqual(res.holdings[0].t, "VAS");
+        });
+
+        // 58. Vanguard CSV end-to-end import applies holdings and preserves target weights
+        runTest("Vanguard CSV end-to-end import applies holdings and preserves target weights", () => {
+            env.onSettingInputModeToggle(true);
+            env.setHoldings([
+                { t: "VAS", p: "90", q: "40", w: "60" },
+                { t: "VGS", p: "110", q: "80", w: "40" }
+            ]);
+
+            env.openCsvModal();
+            env.onCsvFormatChange("vanguard");
+
+            const guide = env.getEl("csvGuideContent");
+            assert.ok(guide.innerHTML.includes("Vanguard Portfolio CSV Export"));
+
+            const csv = "Product ID,Product Name,Quantity,Price,Value\n" +
+                "VAS,Vanguard Australian Shares,70,97.00,6790.00\n" +
+                "VGS,Vanguard International Shares,100,120.00,12000.00";
+
+            env.processCsvText(csv, "vanguard_export.csv", 1024);
+            assert.strictEqual(env.getStagedCsvHoldings().length, 2);
+
+            env.executeCsvImport();
+
+            assert.strictEqual(env.getEl("csvModalOverlay").classList.contains("active"), false);
+
+            const holdings = env.getHoldings();
+            assert.strictEqual(holdings.length, 2);
+
+            const vas = holdings.find(h => h.t === "VAS");
+            assert.ok(vas);
+            assert.strictEqual(vas.q, "70");
+            assert.strictEqual(vas.p, "97.00");
+            assert.strictEqual(vas.w, "60"); // Weight preserved
+
+            const vgs = holdings.find(h => h.t === "VGS");
+            assert.ok(vgs);
+            assert.strictEqual(vgs.q, "100");
+            assert.strictEqual(vgs.p, "120.00");
+            assert.strictEqual(vgs.w, "40"); // Weight preserved
+        });
+
+        // 59. processCsvText auto-detects Vanguard CSV when dropdown is on generic_shares
+        runTest("processCsvText() auto-detects Vanguard CSV when dropdown is on generic_shares", () => {
+            env.openCsvModal();
+            env.onCsvFormatChange("generic_shares");
+            assert.strictEqual(env.getEl("csvFormatSelect").value, "generic_shares");
+
+            // User uploads the Vanguard export format from screenshot
+            const csv = 'Account name,Account number,Investment name,Product ID,Price date,Price,Quantity,Value\n' +
+                'William Tu,79944112,holdings.export.csv.v,,28-Sep-26,,,\n' +
+                ',,,,,,holdings.e,0\n' +
+                ',,,SOP,28-Sep-26,0.1,5000,500\n';
+
+            env.processCsvText(csv, "holdings.export.csv", 1024);
+
+            // Auto-detection should have switched format to vanguard and succeeded!
+            assert.strictEqual(env.getEl("csvFormatSelect").value, "vanguard");
+            assert.strictEqual(env.getEl("csvDropZone").classList.contains("has-file"), true);
+            assert.strictEqual(env.getStagedCsvHoldings().length, 1);
+            assert.strictEqual(env.getStagedCsvHoldings()[0].t, "SOP");
+            assert.strictEqual(env.getStagedCsvHoldings()[0].p, "0.1");
+            assert.strictEqual(env.getStagedCsvHoldings()[0].q, "5000");
+            assert.strictEqual(env.getStagedCsvHoldings()[0].v, "500");
+
+            // Supported formats text displays 'Vanguard Format Detected'
+            assert.strictEqual(env.getEl("csvSupportedFormats").textContent, "Vanguard Format Detected");
+            assert.strictEqual(env.getEl("csvSupportedFormats").classList.contains("detected"), true);
+
+            // Resetting drop state restores default note
+            env.resetCsvDropState();
+            assert.strictEqual(env.getEl("csvSupportedFormats").textContent, "File formats supported: .csv .xlsx .xlsm .xls");
+            assert.strictEqual(env.getEl("csvSupportedFormats").classList.contains("detected"), false);
+        });
+
+        // 60. Explicit broker selection never auto-switches on parse error
+        runTest("processCsvText() never auto-switches format when an explicit broker is selected", () => {
+            env.openCsvModal();
+            env.onCsvFormatChange("betashares_direct");
+            assert.strictEqual(env.getEl("csvFormatSelect").value, "betashares_direct");
+
+            // Upload a Vanguard CSV while Betashares Direct is selected
+            const csv = 'Account name,Account number,Investment name,Product ID,Price date,Price,Quantity,Value\n' +
+                'William Tu,79944112,holdings.export.csv.v,,28-Sep-26,,,\n' +
+                ',,,SOP,28-Sep-26,0.1,5000,500\n';
+
+            env.processCsvText(csv, "vanguard_on_betashares.csv", 1024);
+
+            // Format must remain strictly on Betashares Direct
+            assert.strictEqual(env.getEl("csvFormatSelect").value, "betashares_direct");
+            // Must not stage holdings
+            assert.strictEqual(env.getStagedCsvHoldings(), null);
+            // Error banner must be shown with Betashares error message
+            assert.ok(env.getEl("csvErrorBanner").innerText.includes("Betashares Direct"));
+            // Supported formats text must remain default
+            assert.strictEqual(env.getEl("csvSupportedFormats").textContent, "File formats supported: .csv .xlsx .xlsm .xls");
         });
     }
 
