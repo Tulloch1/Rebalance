@@ -8,6 +8,12 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        /* =========================================================================
+           SUB-SYSTEM 1: CSS DESIGN SYSTEM & THEME ENGINE
+           - Design tokens, CSS variables, Dark & Light theme definitions
+           - Layout, Typography, Modal overlays, Drag-and-drop zones, Responsive CSS
+           ========================================================================= */
+
         :root[data-theme="dark"] {
             --bg-base: #0B0C0E;
             --surface-card: #141619;
@@ -2561,6 +2567,12 @@
         }
     </style>
 </head>
+<!-- =========================================================================
+   SUB-SYSTEM 2: HTML DOM STRUCTURE & APPLICATION SHELL
+   - Application Shell, Header, Currency & Mode Selectors
+   - Portfolio Holdings Table & Action Bar
+   - Modals: Info, Account, Settings, CSV/Excel/PDF Import, Clean Slate
+   ========================================================================= -->
 <body>
 
     <div class="container">
@@ -3389,8 +3401,10 @@
         let holdingsData = [];
 
         // =========================================================================
-        // ZERO-KNOWLEDGE CLIENT CRYPTOGRAPHIC ENGINE
-        // Web Crypto API: AES-GCM (256-bit) + PBKDF2 (SHA-256)
+        // SUB-SYSTEM 3: ZERO-KNOWLEDGE CRYPTO & CLOUD SYNC ENGINE
+        // - PBKDF2 (100k iter SHA-256) Key Derivation & AES-256-GCM Vault Encryption
+        // - Emergency Recovery Keys & Clean Slate OTP Reset Verification
+        // - Cloudflare D1 Sync Service Adapter (Syncing, Conflict Resolution)
         // =========================================================================
         const RebalanceCrypto = {
             // Helper: Convert ArrayBuffer / Uint8Array to base64 string
@@ -5100,6 +5114,13 @@ INSTRUCTIONS:
             }
         }
 
+        // =========================================================================
+        // SUB-SYSTEM 4: UI STATE, SETTINGS & DOM EVENT CONTROLLERS
+        // - User Preferences (Theme, Currency, Whole-Dollar Rounding, Shares Mode)
+        // - Table Row Rendering, Input Validation & Real-Time Dynamic Updates
+        // - Modal Dialog Lifecycle (Open, Close, Backdrop Clicks, Escape Handling)
+        // =========================================================================
+
         // --- Settings & Preferences Management ---
         function getCurrencySymbol() {
             try {
@@ -5536,8 +5557,12 @@ INSTRUCTIONS:
         }
 
         // =========================================================================
-        // CSV IMPORT & BROKER ADAPTER ENGINE
-        // Declarative Adapter Pattern for extensible broker formats
+        // SUB-SYSTEM 5: CLIENT-SIDE DOCUMENT PARSERS & EXTENSIBLE BROKER ADAPTERS
+        // - RFC-4180 CSV Tokenizer & Sanitizer (parseCsvText)
+        // - Native OpenXML/XLSX Unzipper & Worksheet XML Parser (parseXlsxToCsv)
+        // - Native Flate PDF Stream Decompressor & ToUnicode CMap Font Decoder (parsePdfToCsv)
+        // - Declarative Broker Registry & Transaction Ledgers (CommSec, Pearler, Vanguard, etc.)
+        // - CSV/Excel/PDF Drag-and-Drop Zone Controller & Signature Auto-Detectors
         // =========================================================================
 
         function parseCsvText(text) {
@@ -8066,6 +8091,14 @@ INSTRUCTIONS:
                 }
             });
         }
+
+        // =========================================================================
+        // SUB-SYSTEM 6: MATHEMATICAL CORE REBALANCING ENGINE
+        // - DynaReb Allocation Algorithm (runDynaRebAlgorithm)
+        // - Complete Rebalancing (runCompleteRebalanceAlgorithm - buy/sell arbitrage)
+        // - Share Price & Quantity Mode (Integer Shares, Residual Cash Redistribution)
+        // - Dynamic Minimum Buy Thresholds & Real-Time Calculation Orchestration
+        // =========================================================================
 
         // --- Core Algorithm (Ported directly from dynaReb.c with dynamic minBuy) ---
         function calculateRebalance() {
