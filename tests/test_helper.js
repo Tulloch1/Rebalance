@@ -77,8 +77,10 @@ function createTestEnv() {
         Uint8Array,
         ArrayBuffer,
         DataView,
+        Response: typeof Response !== 'undefined' ? Response : undefined,
         DecompressionStream: typeof DecompressionStream !== 'undefined' ? DecompressionStream : undefined,
         Buffer: typeof Buffer !== 'undefined' ? Buffer : undefined,
+        require: typeof require !== 'undefined' ? require : undefined,
         btoa,
         atob,
         TextEncoder,
@@ -288,6 +290,10 @@ function createTestEnv() {
         NabtradeCsvAdapter: vm.runInContext('NabtradeCsvAdapter', sandbox),
         VanguardCsvAdapter: vm.runInContext('VanguardCsvAdapter', sandbox),
         TransactionLedgerAdapter: vm.runInContext('TransactionLedgerAdapter', sandbox),
+        downloadCsvTemplate: sandbox.downloadCsvTemplate,
+        extractPdfTextNative: sandbox.extractPdfTextNative,
+        parsePdfToCsv: sandbox.parsePdfToCsv,
+        decompressPdfBytes: sandbox.decompressPdfBytes,
         getCsvStrategyNoteState: () => {
             const el = getOrCreateElement("csvStrategyNote");
             return {

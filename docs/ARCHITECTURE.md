@@ -201,13 +201,13 @@ Testing is strictly deterministic and executes in Node.js using custom mock envi
 
 | Test Suite | File | Tests | Focus Area |
 | :--- | :--- | :---: | :--- |
-| **Master Deterministic Suite** | `tests/master_test_suite.js` | **111** | Core math, DOM rendering, whole-dollar rounding, storage persistence, Clean Slate flows, and Shares Mode. |
+| **Master Deterministic Suite** | `tests/master_test_suite.js` | **182** | Core math, DOM rendering, whole-dollar rounding, storage persistence, Clean Slate flows, Shares Mode, CSV/Excel/PDF parsing, and Broker Adapters. |
 | **Backend Edge Suite** | `tests/backend_test_suite.js` | **23** | Cloudflare Worker endpoints, D1 SQL queries, OTP rate limiting, billing challenges, and anti-enumeration. |
 | **Fuzz Invariant Suite** | `tests/fuzz_invariant_suite.js` | **Fuzz** | Property-based randomized fuzzing verifying cash-conservation and non-negativity invariants across millions of permutations. |
 
 ### Running the Tests:
 ```powershell
-node tests/master_test_suite.js    # Runs all 111 frontend & DOM unit tests
+node tests/master_test_suite.js    # Runs all 182 frontend & DOM unit tests
 node tests/backend_test_suite.js   # Runs all 23 Cloudflare Worker edge tests
 node tests/run_all.js              # Executes complete end-to-end verification
 ```
@@ -217,9 +217,11 @@ node tests/run_all.js              # Executes complete end-to-end verification
 ## 7. Development Guidelines & Commitments
 
 1. **Strict 0-Diff Parity:**
-   Any change made to `GitHub/Rebalance/index.html` must be immediately mirrored to `c:\Users\willi\Desktop\Rebalancing\index.html`.
+   Any change made to `GitHub/Rebalance/index.html` must be immediately mirrored to `c:\Users\willi\Desktop\Rebalancing\index.html` and verified via `fc.exe`.
 2. **Git Workflow:**
-   * All active development occurs on branch `dev`.
-   * **NEVER push to remote git.** Local commits are made on `dev`; the user controls when to push to GitHub.
+   * All active development occurs on branch `dev` or `main`.
+   * **NEVER push to remote git.** Local commits are made locally; the user controls when to push to GitHub.
 3. **Testing Gate:**
-   No feature or refactor is considered complete until all 134 automated tests pass with 100% success.
+   No feature or refactor is considered complete until all 205 automated tests pass with 100% success.
+4. **Client-Side Privacy:**
+   Document parsing (CSV, Excel, PDF) is executed entirely client-side using Web Streams and vanilla JS with zero external server dependencies.

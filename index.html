@@ -2282,12 +2282,35 @@
             gap: 6px;
         }
 
+        .csv-select-header-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
         .csv-label {
             font-size: 0.78rem;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.05em;
             color: var(--text-muted);
+        }
+
+        .csv-template-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.76rem;
+            font-weight: 600;
+            color: var(--accent);
+            text-decoration: none;
+            cursor: pointer;
+            transition: color 0.15s ease, opacity 0.15s ease;
+        }
+
+        .csv-template-link:hover {
+            color: var(--accent-hover, #2df0b1);
+            text-decoration: underline;
         }
 
         /* Outlook-style Drag & Drop Zone */
@@ -3275,7 +3298,17 @@
 
             <!-- Broker / CSV Format Selector -->
             <div class="csv-select-group">
-                <label for="csvFormatSelect" class="csv-label">Format / Broker</label>
+                <div class="csv-select-header-row">
+                    <label for="csvFormatSelect" class="csv-label">Format / Broker</label>
+                    <a href="javascript:void(0)" id="csvTemplateLink" class="csv-template-link" onclick="downloadCsvTemplate(event)" style="display: none;" title="Download sample CSV template">
+                        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        <span id="csvTemplateLinkText">Download Template (.csv)</span>
+                    </a>
+                </div>
                 <select id="csvFormatSelect" class="setting-select" onchange="onCsvFormatChange(this.value)">
                     <!-- Populated dynamically by BrokerRegistry -->
                 </select>
@@ -3283,7 +3316,7 @@
 
             <!-- Outlook-style Drag & Drop Zone -->
             <div class="csv-drop-zone" id="csvDropZone" onclick="triggerCsvFileInput(event)" ondragover="handleCsvDragOver(event)" ondragleave="handleCsvDragLeave(event)" ondrop="handleCsvDrop(event)">
-                <input type="file" id="csvFileInput" accept=".csv,text/csv,.xlsx,.xlsm,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel" style="display:none;" onchange="handleCsvFileChange(event)">
+                <input type="file" id="csvFileInput" accept=".csv,text/csv,.xlsx,.xlsm,.xls,.pdf,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,application/pdf" style="display:none;" onchange="handleCsvFileChange(event)">
                 
                 <div id="csvDropIdleState" class="csv-drop-idle">
                     <div class="csv-drop-icon">
@@ -3291,7 +3324,7 @@
                             <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
                         </svg>
                     </div>
-                    <div class="csv-drop-main-text">Drag &amp; drop your CSV or Excel file here</div>
+                    <div class="csv-drop-main-text">Drag &amp; drop your CSV, Excel, or PDF file here</div>
                     <div class="csv-drop-sub-text">or <span class="csv-browse-link">browse files</span> from your device</div>
                 </div>
 
@@ -3322,7 +3355,7 @@
             </div>
 
             <!-- Supported formats note -->
-            <div class="csv-supported-formats" id="csvSupportedFormats">File formats supported: .csv .xlsx .xlsm .xls</div>
+            <div class="csv-supported-formats" id="csvSupportedFormats">File formats supported: .csv .xlsx .xlsm .xls .pdf</div>
 
             <!-- Error Banner -->
             <div id="csvErrorBanner" class="csv-error-banner" style="display: none;"></div>
@@ -5720,6 +5753,12 @@ INSTRUCTIONS:
                     <li><strong>Weight:</strong> Target allocation percentage (e.g. <code>40</code> or <code>40%</code>, can be added later).</li>
                 </ul>
                 <p style="margin-top: 8px; font-size: 0.8rem; color: var(--accent);">Note: Importing this file will automatically set the calculator to Share Price &amp; Quantity mode.</p>
+                <div style="margin-top: 10px; padding-top: 8px; border-top: 1px dashed var(--border-subtle);">
+                    <a href="javascript:void(0)" class="csv-template-link" onclick="downloadCsvTemplate(event)">
+                        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                        Download sample Share Price &amp; Quantity template (.csv)
+                    </a>
+                </div>
             `
         }));
 
@@ -5741,6 +5780,12 @@ INSTRUCTIONS:
                     <li><strong>Weight:</strong> Target allocation percentage (e.g. <code>50</code> or <code>50%</code>).</li>
                 </ul>
                 <p style="margin-top: 8px; font-size: 0.8rem; color: var(--accent);">Note: Importing this file will set the calculator to Value per Holding mode.</p>
+                <div style="margin-top: 10px; padding-top: 8px; border-top: 1px dashed var(--border-subtle);">
+                    <a href="javascript:void(0)" class="csv-template-link" onclick="downloadCsvTemplate(event)">
+                        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                        Download sample Value per Holding template (.csv)
+                    </a>
+                </div>
             `
         }));
 
@@ -6407,6 +6452,46 @@ INSTRUCTIONS:
             }
         }
 
+        function downloadCsvTemplate(event, formatOverride) {
+            if (event && typeof event.preventDefault === 'function') {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            const select = document.getElementById("csvFormatSelect");
+            const formatId = formatOverride || (select ? select.value : "generic_shares");
+
+            let csvContent = "";
+            if (formatId === "generic_value") {
+                csvContent = ",Holding,Value,Weight\r\n1,,,\r\n2,,,\r\n3,,,\r\n4,,,\r\n5,,,\r\n6,,,\r\n7,,,\r\n8,,,\r\n9,,,\r\n10,,,\r\n";
+                fileName = "rebalance_template_value.csv";
+            } else {
+                // generic_shares or default
+                csvContent = ",Holding,Quantity,Share price,Weight\r\n1,,,,\r\n2,,,,\r\n3,,,,\r\n4,,,,\r\n5,,,,\r\n6,,,,\r\n7,,,,\r\n8,,,,\r\n9,,,,\r\n10,,,,\r\n";
+                fileName = "rebalance_template_shares.csv";
+            }
+
+            if (typeof Blob !== 'undefined' && typeof URL !== 'undefined' && typeof URL.createObjectURL === 'function') {
+                const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement("a");
+                link.href = url;
+                link.setAttribute("download", fileName);
+                if (document.body && typeof document.body.appendChild === 'function') {
+                    document.body.appendChild(link);
+                }
+                if (typeof link.click === 'function') {
+                    link.click();
+                }
+                if (document.body && typeof document.body.removeChild === 'function') {
+                    document.body.removeChild(link);
+                }
+                if (typeof URL.revokeObjectURL === 'function') {
+                    setTimeout(() => URL.revokeObjectURL(url), 500);
+                }
+            }
+            return { fileName, csvContent };
+        }
+
         function updateCsvGuide(formatId) {
             const guideEl = document.getElementById("csvGuideContent");
             if (!guideEl) return;
@@ -6419,6 +6504,22 @@ INSTRUCTIONS:
             const noteEl = document.getElementById("csvStrategyNote");
             if (noteEl) {
                 noteEl.style.display = (adapter && adapter.isTransactionStrategy) ? "block" : "none";
+            }
+            const isGeneric = (formatId === "generic_shares" || formatId === "generic_value");
+            const templateLink = document.getElementById("csvTemplateLink");
+            if (templateLink) {
+                templateLink.style.display = isGeneric ? "inline-flex" : "none";
+                if (isGeneric) {
+                    const textEl = document.getElementById("csvTemplateLinkText");
+                    if (textEl) {
+                        textEl.textContent = formatId === "generic_value"
+                            ? "Download Template (.csv)"
+                            : "Download Template (.csv)";
+                    }
+                    templateLink.setAttribute("title", formatId === "generic_value"
+                        ? "Download sample Value per Holding template CSV"
+                        : "Download sample Share Price & Quantity template CSV");
+                }
             }
         }
 
@@ -6767,6 +6868,304 @@ INSTRUCTIONS:
             return await parseXlsxNative(arrayBuffer);
         }
 
+        async function decompressPdfBytes(bytes) {
+            if (typeof Response !== 'undefined' && typeof DecompressionStream !== 'undefined') {
+                try {
+                    const stream = new Response(bytes).body.pipeThrough(new DecompressionStream('deflate'));
+                    const ab = await new Response(stream).arrayBuffer();
+                    return new Uint8Array(ab);
+                } catch (e1) {
+                    try {
+                        const stream = new Response(bytes).body.pipeThrough(new DecompressionStream('deflate-raw'));
+                        const ab = await new Response(stream).arrayBuffer();
+                        return new Uint8Array(ab);
+                    } catch (e2) {}
+                }
+            }
+            if (typeof require !== 'undefined') {
+                try {
+                    const zlib = require('zlib');
+                    let buf;
+                    try {
+                        buf = zlib.inflateSync(bytes);
+                    } catch (e) {
+                        buf = zlib.inflateRawSync(bytes);
+                    }
+                    return new Uint8Array(buf.buffer, buf.byteOffset, buf.byteLength);
+                } catch (e3) {}
+            }
+            return bytes;
+        }
+
+        async function extractPdfTextNative(arrayBuffer) {
+            const bytes = new Uint8Array(arrayBuffer);
+            const latin = new TextDecoder('latin1').decode(bytes);
+
+            const objRegex = /(\d+)\s+(\d+)\s+obj/g;
+            let m;
+            const objectStarts = [];
+            while ((m = objRegex.exec(latin)) !== null) {
+                objectStarts.push({ id: m[1], pos: m.index });
+            }
+
+            const objects = new Map();
+            for (let i = 0; i < objectStarts.length; i++) {
+                const cur = objectStarts[i];
+                const nextPos = i + 1 < objectStarts.length ? objectStarts[i + 1].pos : latin.length;
+                const body = latin.substring(cur.pos, nextPos);
+                objects.set(cur.id, { body, pos: cur.pos });
+            }
+
+            async function getStreamData(obj) {
+                if (!obj) return null;
+                const { body, pos } = obj;
+                const relStream = body.indexOf('stream');
+                if (relStream === -1) return null;
+                let dStart = pos + relStream + 6;
+                if (bytes[dStart] === 0x0d && bytes[dStart + 1] === 0x0a) dStart += 2;
+                else if (bytes[dStart] === 0x0a || bytes[dStart] === 0x0d) dStart += 1;
+
+                let len = -1;
+                const lenMatch = body.match(/\/Length\s+(\d+)/);
+                if (lenMatch) len = parseInt(lenMatch[1], 10);
+
+                let rawBytes;
+                if (len > 0) {
+                    rawBytes = bytes.slice(dStart, dStart + len);
+                } else {
+                    const relEnd = body.indexOf('endstream');
+                    if (relEnd === -1) return null;
+                    let dEnd = pos + relEnd;
+                    while (dEnd > dStart && (bytes[dEnd - 1] === 0x0a || bytes[dEnd - 1] === 0x0d || bytes[dEnd - 1] === 0x20)) {
+                        dEnd--;
+                    }
+                    rawBytes = bytes.slice(dStart, dEnd);
+                }
+
+                if (body.includes('/FlateDecode')) {
+                    return await decompressPdfBytes(rawBytes);
+                }
+                return rawBytes;
+            }
+
+            const fontToCMap = new Map();
+            for (const [id, obj] of objects.entries()) {
+                const body = obj.body;
+                if (body.includes('/Type /Font') || body.includes('/Type/Font') || body.includes('/ToUnicode')) {
+                    const uMatch = body.match(/\/ToUnicode\s+(\d+)\s+\d+\s+R/);
+                    if (uMatch) {
+                        const cmapStream = await getStreamData(objects.get(uMatch[1]));
+                        if (cmapStream) {
+                            const cmapText = new TextDecoder('latin1').decode(cmapStream);
+                            const charMap = new Map();
+
+                            const bfcharRegex = /beginbfchar([\s\S]*?)endbfchar/g;
+                            let bfMatch;
+                            while ((bfMatch = bfcharRegex.exec(cmapText)) !== null) {
+                                const lines = bfMatch[1].trim().split(/\s+/);
+                                for (let i = 0; i < lines.length - 1; i += 2) {
+                                    const src = lines[i].replace(/[<>]/g, '').toLowerCase();
+                                    const dstHex = lines[i+1].replace(/[<>]/g, '');
+                                    let str = '';
+                                    for (let j = 0; j < dstHex.length; j += 4) {
+                                        str += String.fromCharCode(parseInt(dstHex.substr(j, 4), 16));
+                                    }
+                                    charMap.set(src, str);
+                                }
+                            }
+
+                            const bfrangeRegex = /beginbfrange([\s\S]*?)endbfrange/g;
+                            let bfrMatch;
+                            while ((bfrMatch = bfrangeRegex.exec(cmapText)) !== null) {
+                                const tokens = bfrMatch[1].trim().split(/\s+/);
+                                let ti = 0;
+                                while (ti < tokens.length) {
+                                    const start = tokens[ti++].replace(/[<>]/g, '');
+                                    const end = tokens[ti++].replace(/[<>]/g, '');
+                                    const target = tokens[ti++];
+                                    if (!start || !end || !target) break;
+                                    const sCode = parseInt(start, 16);
+                                    const eCode = parseInt(end, 16);
+                                    let tCode = parseInt(target.replace(/[<>]/g, ''), 16);
+                                    for (let c = sCode; c <= eCode; c++) {
+                                        charMap.set(c.toString(16).padStart(start.length, '0').toLowerCase(), String.fromCharCode(tCode++));
+                                    }
+                                }
+                            }
+
+                            fontToCMap.set(id, charMap);
+                        }
+                    }
+                }
+            }
+
+            const fontResRegex = /\/([Ff]\d+)\s+(\d+)\s+\d+\s+R/g;
+            const fontResMap = new Map();
+            while ((m = fontResRegex.exec(latin)) !== null) {
+                fontResMap.set(m[1], m[2]);
+            }
+
+            const contentIds = [];
+            for (const [id, obj] of objects.entries()) {
+                const body = obj.body;
+                const cMatch = body.match(/\/Contents\s+(?:\[([^\]]+)\]|(\d+)\s+\d+\s+R)/);
+                if (cMatch) {
+                    if (cMatch[2]) {
+                        contentIds.push(cMatch[2]);
+                    } else if (cMatch[1]) {
+                        const sub = cMatch[1].match(/\d+/g);
+                        if (sub) {
+                            for (let s of sub) contentIds.push(s);
+                        }
+                    }
+                }
+            }
+
+            let fullText = '';
+            for (const cId of contentIds) {
+                const stream = await getStreamData(objects.get(cId));
+                if (!stream) continue;
+                const contentStr = new TextDecoder('latin1').decode(stream);
+
+                let currentFont = null;
+                const opRegex = /\/([Ff]\d+)\s+[\d.]+\s+Tf|<([0-9a-fA-F]+)>\s*Tj|\(([^)]*)\)\s*Tj|\[([^\]]*)\]\s*TJ|(-?[\d.]+)\s+(-?[\d.]+)\s+(?:Tm|Td|TD)|T\*|\/ActualText\s*<([0-9a-fA-F]+)>\s*>>\s*BDC|EMC/g;
+                let m2;
+                let inActual = false;
+                let actualText = '';
+                let lastY = null;
+                let curLine = '';
+
+                while ((m2 = opRegex.exec(contentStr)) !== null) {
+                    const [full, fontName, hexTj, strTj, arrayTJ, xVal, yVal, actualHex] = m2;
+                    if (fontName) {
+                        const fId = fontResMap.get(fontName);
+                        currentFont = fId ? fontToCMap.get(fId) : null;
+                    } else if (actualHex) {
+                        inActual = true;
+                        actualText = '';
+                        for (let i = 0; i < actualHex.length; i += 4) {
+                            actualText += String.fromCharCode(parseInt(actualHex.substr(i, 4), 16));
+                        }
+                    } else if (full === 'EMC') {
+                        if (inActual) {
+                            curLine += actualText;
+                            inActual = false;
+                        }
+                    } else if (hexTj) {
+                        if (inActual) continue;
+                        const h = hexTj.toLowerCase();
+                        if (currentFont) {
+                            for (let i = 0; i < h.length; i += 2) {
+                                curLine += currentFont.get(h.substr(i, 2)) || '';
+                            }
+                        }
+                    } else if (strTj) {
+                        if (inActual) continue;
+                        curLine += strTj;
+                    } else if (arrayTJ) {
+                        if (inActual) continue;
+                        const sub = /<([0-9a-fA-F]+)>|\(([^)]*)\)|(-?[\d.]+)/g;
+                        let sm;
+                        while ((sm = sub.exec(arrayTJ)) !== null) {
+                            if (sm[1] && currentFont) {
+                                const h = sm[1].toLowerCase();
+                                for (let i = 0; i < h.length; i += 2) {
+                                    curLine += currentFont.get(h.substr(i, 2)) || '';
+                                }
+                            } else if (sm[2]) {
+                                curLine += sm[2];
+                            } else if (sm[3]) {
+                                if (parseFloat(sm[3]) < -180 && !curLine.endsWith(' ')) curLine += ' ';
+                            }
+                        }
+                    } else if (yVal !== undefined) {
+                        const y = parseFloat(yVal);
+                        if (lastY !== null && Math.abs(y - lastY) > 4) {
+                            if (curLine.trim()) fullText += curLine.trim() + '\n';
+                            curLine = '';
+                        } else if (curLine && !curLine.endsWith(' ')) {
+                            curLine += ' ';
+                        }
+                        lastY = y;
+                    } else if (full === 'T*') {
+                        if (curLine.trim()) fullText += curLine.trim() + '\n';
+                        curLine = '';
+                    }
+                }
+                if (curLine.trim()) fullText += curLine.trim() + '\n';
+            }
+
+            return fullText;
+        }
+
+        async function parsePdfToCsv(arrayBuffer, fileName) {
+            const extractedText = await extractPdfTextNative(arrayBuffer);
+            if (!extractedText || !extractedText.trim()) {
+                throw new Error("Could not extract readable text from PDF. The file may be image-only or encrypted.");
+            }
+
+            const noSpaces = extractedText.replace(/\s+/g, '').toLowerCase();
+            const isPearler = noSpaces.includes('pearler') || 
+                              (noSpaces.includes('transactionstatement') && (noSpaces.includes('accountno') || noSpaces.includes('statementdate')));
+
+            if (isPearler) {
+                if (noSpaces.includes('notransactions') || noSpaces.includes('0transactions')) {
+                    return "PEARLER_STATEMENT_EMPTY:" + (fileName || "pearler-transaction-statement.pdf");
+                }
+
+                const rows = [];
+                const lines = extractedText.split('\n');
+                let inTransactions = false;
+
+                for (let line of lines) {
+                    const l = line.trim();
+                    if (!l) continue;
+                    if (l.toLowerCase().includes('date') && l.toLowerCase().includes('description')) {
+                        inTransactions = true;
+                        continue;
+                    }
+                    if (inTransactions) {
+                        if (l.toLowerCase().includes('generated on') || l.toLowerCase().includes('total') || l.toLowerCase().includes('page ')) {
+                            break;
+                        }
+                        const dateMatch = l.match(/\b(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4})\b/);
+                        const date = dateMatch ? dateMatch[1] : "";
+                        const lineWithoutDate = dateMatch ? l.replace(dateMatch[0], '') : l;
+
+                        const isBuy = /\b(buy|purchase|auto-invest|reinvest)\b/i.test(lineWithoutDate);
+                        const isSell = /\b(sell|disposal)\b/i.test(lineWithoutDate);
+
+                        const tickerCandidates = lineWithoutDate.match(/\b([A-Za-z0-9]{3,5})\b/g) || [];
+                        const reservedWords = new Set(['BUY', 'SELL', 'UNIT', 'UNITS', 'SHARE', 'SHARES', 'DATE', 'PRICE', 'TOTAL', 'AUD', 'USD', 'CASH']);
+                        let ticker = "";
+                        for (const cand of tickerCandidates) {
+                            if (!/^\d+$/.test(cand) && !reservedWords.has(cand.toUpperCase())) {
+                                ticker = cand.toUpperCase();
+                                break;
+                            }
+                        }
+
+                        const qtyMatch = lineWithoutDate.match(/(\d+(?:\.\d+)?)\s*(?:units|shares|@)/i) || lineWithoutDate.match(/(?:buy|sell)\s+(\d+(?:\.\d+)?)/i);
+                        const priceMatch = lineWithoutDate.match(/@\s*\$?(\d+(?:\.\d+)?)/i) || lineWithoutDate.match(/\$(\d+(?:\.\d+)?)/);
+
+                        if (ticker && (isBuy || isSell)) {
+                            const tradeType = isSell ? "Sell" : "Buy";
+                            const qty = qtyMatch ? qtyMatch[1] : "";
+                            const price = priceMatch ? priceMatch[1] : "";
+                            rows.push(`${date},${ticker},${tradeType},${qty},${price}`);
+                        }
+                    }
+                }
+
+                if (rows.length > 0) {
+                    return "Date,Symbol,Trade Type,Quantity,Price\n" + rows.join("\n");
+                }
+                return "PEARLER_STATEMENT_EMPTY:" + (fileName || "pearler-transaction-statement.pdf");
+            }
+
+            return extractedText;
+        }
+
         let sheetJsLoadingPromise = null;
         async function loadSheetJs() {
             if (typeof XLSX !== 'undefined' && typeof XLSX.read === 'function') {
@@ -6879,17 +7278,31 @@ INSTRUCTIONS:
                                  (file.type && file.type.includes("spreadsheetml"));
             const isXls = lowerName.endsWith(".xls") || 
                           (file.type && file.type.includes("ms-excel"));
+            const isPdf = lowerName.endsWith(".pdf") || 
+                          (file.type && file.type.includes("pdf"));
             const isCsv = lowerName.endsWith(".csv") || 
                           (file.type && (file.type.includes("csv") || file.type.includes("text"))) ||
-                          (!lowerName.includes(".") && !isXlsxOrXlsm && !isXls);
+                          (!lowerName.includes(".") && !isXlsxOrXlsm && !isXls && !isPdf);
 
-            if (!isCsv && !isXlsxOrXlsm && !isXls) {
-                showCsvError("Please select a valid CSV (.csv) or Excel (.xlsx, .xls, .xlsm) file.");
+            if (!isCsv && !isXlsxOrXlsm && !isXls && !isPdf) {
+                showCsvError("Please select a valid CSV (.csv), Excel (.xlsx, .xls, .xlsm), or PDF (.pdf) file.");
                 return;
             }
 
             try {
-                if (isXlsxOrXlsm) {
+                const fileSize = file.size || (file.content && (file.content.byteLength || file.content.length)) || 0;
+                if (isPdf) {
+                    let arrayBuffer;
+                    if (file.content instanceof ArrayBuffer) {
+                        arrayBuffer = file.content;
+                    } else if (typeof Buffer !== 'undefined' && Buffer.isBuffer(file.content)) {
+                        arrayBuffer = file.content.buffer.slice(file.content.byteOffset, file.content.byteOffset + file.content.byteLength);
+                    } else {
+                        arrayBuffer = await readFileAsArrayBuffer(file);
+                    }
+                    const csvText = await parsePdfToCsv(arrayBuffer, file.name);
+                    processCsvText(csvText, file.name, fileSize);
+                } else if (isXlsxOrXlsm) {
                     let arrayBuffer;
                     if (file.content instanceof ArrayBuffer) {
                         arrayBuffer = file.content;
@@ -6904,7 +7317,7 @@ INSTRUCTIONS:
                         resetCsvDropState();
                         return;
                     }
-                    processCsvText(csvText, file.name, file.size || 0);
+                    processCsvText(csvText, file.name, fileSize);
                 } else if (isXls) {
                     let arrayBuffer = null;
                     let text = null;
@@ -6923,7 +7336,7 @@ INSTRUCTIONS:
                         resetCsvDropState();
                         return;
                     }
-                    processCsvText(csvText, file.name, file.size || 0);
+                    processCsvText(csvText, file.name, fileSize);
                 } else {
                     let text;
                     if (typeof file.content === 'string') {
@@ -6931,7 +7344,7 @@ INSTRUCTIONS:
                     } else {
                         text = await readFileAsText(file);
                     }
-                    processCsvText(text, file.name, file.size || 0);
+                    processCsvText(text, file.name, fileSize);
                 }
             } catch (err) {
                 console.error("Error processing file:", err);
@@ -6943,7 +7356,29 @@ INSTRUCTIONS:
         function processCsvText(text, fileName, fileSize) {
             hideCsvError();
             const select = document.getElementById("csvFormatSelect");
-            let formatId = select ? select.value : "generic_shares";
+            let formatId = (select && select.value) ? select.value : "generic_shares";
+
+            if (typeof text === 'string' && text.startsWith("PEARLER_STATEMENT_EMPTY:")) {
+                if (select) {
+                    select.value = "pearler";
+                }
+                updateCsvGuide("pearler");
+                const supportedEl = document.getElementById("csvSupportedFormats");
+                if (supportedEl) {
+                    supportedEl.textContent = "Pearler PDF Statement Detected";
+                    supportedEl.classList.add("detected");
+                }
+                displayCsvFileLoaded(fileName, fileSize, 0);
+                const btnImport = document.getElementById("btnImportCsv");
+                if (btnImport) btnImport.disabled = true;
+                stagedCsvHoldings = null;
+                stagedCsvMode = null;
+                stagedCsvText = null;
+                stagedCsvFileName = fileName || "pearler-transaction-statement.pdf";
+                showCsvError("This Pearler statement contains no transactions or trade history to calculate holdings from.");
+                return;
+            }
+
             let adapter = BrokerRegistry.get(formatId);
 
             if (!adapter) {
@@ -6967,6 +7402,19 @@ INSTRUCTIONS:
                         if (!row || row.length === 0) continue;
                         const normalized = row.map(c => String(c || '').trim().toLowerCase());
 
+                        // Pearler signature: contains "trade type" column header
+                        if (normalized.includes('trade type') || normalized.includes('trade_type')) {
+                            const pAdapter = BrokerRegistry.get('pearler');
+                            if (pAdapter) {
+                                const pRes = pAdapter.parse(text);
+                                if (pRes && pRes.success) {
+                                    autoDetected = pAdapter;
+                                    autoResult = pRes;
+                                    break;
+                                }
+                            }
+                        }
+
                         // Betashares Direct signature: leftmost column has title "Effective Date"
                         if (normalized.length > 0 && normalized[0] === 'effective date') {
                             const bAdapter = BrokerRegistry.get('betashares_direct');
@@ -6975,6 +7423,19 @@ INSTRUCTIONS:
                                 if (bRes && bRes.success) {
                                     autoDetected = bAdapter;
                                     autoResult = bRes;
+                                    break;
+                                }
+                            }
+                        }
+
+                        // CommSec signature: leftmost column has title "Confirmation Number"
+                        if (normalized.length > 0 && (normalized[0] === 'confirmation number' || normalized[0] === 'confirmation no' || normalized[0] === 'confirmation no.')) {
+                            const cAdapter = BrokerRegistry.get('commsec');
+                            if (cAdapter) {
+                                const cRes = cAdapter.parse(text);
+                                if (cRes && cRes.success) {
+                                    autoDetected = cAdapter;
+                                    autoResult = cRes;
                                     break;
                                 }
                             }
@@ -7137,7 +7598,7 @@ INSTRUCTIONS:
             if (btnImport) btnImport.disabled = true;
             if (fileInput) fileInput.value = "";
             if (supportedEl) {
-                supportedEl.textContent = "File formats supported: .csv .xlsx .xlsm .xls";
+                supportedEl.textContent = "File formats supported: .csv .xlsx .xlsm .xls .pdf";
                 supportedEl.classList.remove("detected");
             }
         }
@@ -8664,6 +9125,10 @@ INSTRUCTIONS:
             window.NabtradeCsvAdapter = NabtradeCsvAdapter;
             window.VanguardCsvAdapter = VanguardCsvAdapter;
             window.TransactionLedgerAdapter = TransactionLedgerAdapter;
+            window.downloadCsvTemplate = downloadCsvTemplate;
+            window.extractPdfTextNative = extractPdfTextNative;
+            window.parsePdfToCsv = parsePdfToCsv;
+            window.decompressPdfBytes = decompressPdfBytes;
         }
     </script>
 </body>

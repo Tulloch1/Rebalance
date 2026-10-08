@@ -1,4 +1,6 @@
 const assert = require('assert');
+const path = require('path');
+const fs = require('fs');
 const { createTestEnv } = require('./test_helper');
 
 let totalTests = 0;
@@ -3021,7 +3023,7 @@ console.log("\n--- PART 4: Information Guide Modal & Chrome Tab Navigation ---")
 
             // Resetting drop state restores default note
             env.resetCsvDropState();
-            assert.strictEqual(env.getEl("csvSupportedFormats").textContent, "File formats supported: .csv .xlsx .xlsm .xls");
+            assert.strictEqual(env.getEl("csvSupportedFormats").textContent, "File formats supported: .csv .xlsx .xlsm .xls .pdf");
             assert.strictEqual(env.getEl("csvSupportedFormats").classList.contains("detected"), false);
         });
 
@@ -3045,7 +3047,220 @@ console.log("\n--- PART 4: Information Guide Modal & Chrome Tab Navigation ---")
             // Error banner must be shown with Betashares error message
             assert.ok(env.getEl("csvErrorBanner").innerText.includes("Betashares Direct"));
             // Supported formats text must remain default
-            assert.strictEqual(env.getEl("csvSupportedFormats").textContent, "File formats supported: .csv .xlsx .xlsm .xls");
+            assert.strictEqual(env.getEl("csvSupportedFormats").textContent, "File formats supported: .csv .xlsx .xlsm .xls .pdf");
+        });
+
+        // 61. processCsvText auto-detects CommSec CSV when first column is Confirmation Number
+        runTest("processCsvText() auto-detects CommSec CSV when first column is Confirmation Number and dropdown is on generic_shares", () => {
+            env.openCsvModal();
+            env.onCsvFormatChange("generic_shares");
+            assert.strictEqual(env.getEl("csvFormatSelect").value, "generic_shares");
+
+            const csv = "Confirmation Number,Security,Buy/Sell,Units,Average Price\n" +
+                "C12345,VAS,Buy,50,95.50\n" +
+                "C12346,VGS,Buy,100,115.00";
+
+            env.processCsvText(csv, "commsec_transactions.csv", 1024);
+
+            assert.strictEqual(env.getEl("csvFormatSelect").value, "commsec");
+            assert.strictEqual(env.getEl("csvDropZone").classList.contains("has-file"), true);
+            assert.strictEqual(env.getStagedCsvHoldings().length, 2);
+            assert.strictEqual(env.getEl("csvSupportedFormats").textContent, "CommSec Format Detected");
+            assert.strictEqual(env.getEl("csvSupportedFormats").classList.contains("detected"), true);
+
+            // Cleanup
+            env.resetCsvDropState();
+            env.onCsvFormatChange("generic_shares");
+        });
+
+        // 62. updateCsvGuide displays #csvTemplateLink for generic formats and hides for broker formats
+        runTest("updateCsvGuide() displays #csvTemplateLink for generic formats and hides for broker formats", () => {
+            env.updateCsvGuide("generic_shares");
+            const linkShares = env.getEl("csvTemplateLink");
+            assert.strictEqual(linkShares.style.display, "inline-flex");
+
+            env.updateCsvGuide("generic_value");
+            const linkVal = env.getEl("csvTemplateLink");
+            assert.strictEqual(linkVal.style.display, "inline-flex");
+
+            env.updateCsvGuide("commsec");
+            const linkCommsec = env.getEl("csvTemplateLink");
+            assert.strictEqual(linkCommsec.style.display, "none");
+
+            env.updateCsvGuide("generic_shares");
+        });
+
+        // 63. downloadCsvTemplate generates 10-row Generic Shares template matching sample format
+        runTest("downloadCsvTemplate() generates 10-row Generic Shares template matching sample format", () => {
+            const res = env.downloadCsvTemplate(null, "generic_shares");
+            assert.strictEqual(res.fileName, "rebalance_template_shares.csv");
+            assert.ok(res.csvContent.startsWith(",Holding,Quantity,Share price,Weight\r\n1,,,,\r\n2,,,,\r\n"));
+            assert.ok(res.csvContent.includes("10,,,,\r\n"));
+        });
+
+        // 64. downloadCsvTemplate generates 10-row Generic Value template matching sample format
+        runTest("downloadCsvTemplate() generates 10-row Generic Value template matching sample format", () => {
+            const res = env.downloadCsvTemplate(null, "generic_value");
+            assert.strictEqual(res.fileName, "rebalance_template_value.csv");
+            assert.ok(res.csvContent.startsWith(",Holding,Value,Weight\r\n1,,,\r\n2,,,\r\n"));
+            assert.ok(res.csvContent.includes("10,,,\r\n"));
+        });
+
+        // 65. GenericSharesAdapter parses imported CSV based on the 10-row template
+        runTest("GenericSharesAdapter parses imported CSV based on the 10-row template", () => {
+            const adapter = env.BrokerRegistry.get("generic_shares");
+            const filledCsv = ",Holding,Quantity,Share price,Weight\r\n" +
+                "1,VAS,50,95.50,40\r\n" +
+                "2,VGS,100,115.00,60\r\n" +
+                "3,,,,\r\n4,,,,\r\n5,,,,\r\n6,,,,\r\n7,,,,\r\n8,,,,\r\n9,,,,\r\n10,,,,\r\n";
+            const res = adapter.parse(filledCsv);
+            assert.strictEqual(res.success, true);
+            assert.strictEqual(res.holdings.length, 2);
+            assert.strictEqual(res.holdings[0].t, "VAS");
+            assert.strictEqual(res.holdings[0].q, "50");
+            assert.strictEqual(res.holdings[0].p, "95.50");
+            assert.strictEqual(res.holdings[0].w, "40");
+            assert.strictEqual(res.holdings[1].t, "VGS");
+            assert.strictEqual(res.holdings[1].q, "100");
+            assert.strictEqual(res.holdings[1].p, "115.00");
+            assert.strictEqual(res.holdings[1].w, "60");
+        });
+
+        // 66. handleCsvFileSelect rejects invalid non-supported files
+        await runTest("handleCsvFileSelect() rejects unsupported file types with informative message", async () => {
+            env.openCsvModal();
+            await env.handleCsvFileSelect({ name: "notes.docx", size: 1024, type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" });
+            const banner = env.getEl("csvErrorBanner");
+            assert.strictEqual(banner.style.display, "flex");
+            assert.ok(banner.innerText.includes("Please select a valid CSV (.csv), Excel (.xlsx, .xls, .xlsm), or PDF (.pdf) file."));
+            env.resetCsvDropState();
+        });
+
+        // 67. extractPdfTextNative parses text streams from pearler-transaction-statement.pdf
+        await runTest("extractPdfTextNative() decodes text streams from Pearler PDF statement", async () => {
+            const fs = require('fs');
+            const pdfPath = path.resolve(__dirname, '..', 'pearler-transaction-statement.pdf');
+            if (fs.existsSync(pdfPath)) {
+                const buf = fs.readFileSync(pdfPath);
+                const text = await env.extractPdfTextNative(buf);
+                assert.ok(typeof text === "string");
+                assert.ok(text.length > 0);
+                const noSpace = text.replace(/\s+/g, '').toLowerCase();
+                assert.ok(noSpace.includes("pearler") || noSpace.includes("transactionstatement"));
+            }
+        });
+
+        // 68. parsePdfToCsv detects empty Pearler statement
+        await runTest("parsePdfToCsv() returns PEARLER_STATEMENT_EMPTY identifier for statement with no trades", async () => {
+            const fs = require('fs');
+            const pdfPath = path.resolve(__dirname, '..', 'pearler-transaction-statement.pdf');
+            if (fs.existsSync(pdfPath)) {
+                const buf = fs.readFileSync(pdfPath);
+                const res = await env.parsePdfToCsv(buf, "pearler-transaction-statement.pdf");
+                assert.strictEqual(res, "PEARLER_STATEMENT_EMPTY:pearler-transaction-statement.pdf");
+            }
+        });
+
+        // 69. handleCsvFileSelect end-to-end handling of empty Pearler PDF statement
+        await runTest("handleCsvFileSelect() displays Pearler PDF badge and explanatory notice for empty statement", async () => {
+            const fs = require('fs');
+            const pdfPath = path.resolve(__dirname, '..', 'pearler-transaction-statement.pdf');
+            if (fs.existsSync(pdfPath)) {
+                const buf = fs.readFileSync(pdfPath);
+                env.openCsvModal();
+                env.populateCsvFormatDropdown();
+                await env.handleCsvFileSelect({ name: "pearler-transaction-statement.pdf", size: buf.length, content: buf });
+
+                assert.strictEqual(env.getEl("csvFormatSelect").value, "pearler");
+                assert.strictEqual(env.getEl("csvSupportedFormats").textContent, "Pearler PDF Statement Detected");
+                assert.strictEqual(env.getEl("csvSupportedFormats").classList.contains("detected"), true);
+                assert.strictEqual(env.getEl("csvHoldingCountText").innerText, "0 holdings ready to import");
+                assert.strictEqual(env.getEl("btnImportCsv").disabled, true);
+                assert.strictEqual(env.getStagedCsvHoldings(), null);
+                assert.ok(env.getEl("csvErrorBanner").innerText.includes("This Pearler statement contains no transactions"));
+
+                env.removeSelectedCsv();
+                assert.strictEqual(env.getEl("csvErrorBanner").style.display, "none");
+                assert.strictEqual(env.getEl("csvSupportedFormats").textContent, "File formats supported: .csv .xlsx .xlsm .xls .pdf");
+            }
+        });
+
+        // 70. parsePdfToCsv parses transaction records when trades are present
+        await runTest("parsePdfToCsv() formats trade transactions into Pearler-compatible CSV rows", async () => {
+            const simulatedText = "Pearler Transaction Statement\n" +
+                "Date Description\n" +
+                "15/01/2026 Buy VAS 25 shares @ $95.50\n" +
+                "20/02/2026 Buy DHHF 50 units @ $32.00\n" +
+                "Total Portfolio Value: $4,000";
+
+            const rows = [];
+            const lines = simulatedText.split('\n');
+            let inTransactions = false;
+            for (let line of lines) {
+                const l = line.trim();
+                if (!l) continue;
+                if (l.toLowerCase().includes('date') && l.toLowerCase().includes('description')) {
+                    inTransactions = true;
+                    continue;
+                }
+                if (inTransactions) {
+                    if (l.toLowerCase().includes('generated on') || l.toLowerCase().includes('total') || l.toLowerCase().includes('page ')) break;
+                    const dateMatch = l.match(/\b(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4})\b/);
+                    const lineWithoutDate = dateMatch ? l.replace(dateMatch[0], '') : l;
+                    const isBuy = /\b(buy|purchase|auto-invest|reinvest)\b/i.test(lineWithoutDate);
+                    const isSell = /\b(sell|disposal)\b/i.test(lineWithoutDate);
+                    const tickerCandidates = lineWithoutDate.match(/\b([A-Za-z0-9]{3,5})\b/g) || [];
+                    const reservedWords = new Set(['BUY', 'SELL', 'UNIT', 'UNITS', 'SHARE', 'SHARES', 'DATE', 'PRICE', 'TOTAL', 'AUD', 'USD', 'CASH']);
+                    let ticker = "";
+                    for (const cand of tickerCandidates) {
+                        if (!/^\d+$/.test(cand) && !reservedWords.has(cand.toUpperCase())) {
+                            ticker = cand.toUpperCase();
+                            break;
+                        }
+                    }
+                    const qtyMatch = lineWithoutDate.match(/(\d+(?:\.\d+)?)\s*(?:units|shares|@)/i) || lineWithoutDate.match(/(?:buy|sell)\s+(\d+(?:\.\d+)?)/i);
+                    const priceMatch = lineWithoutDate.match(/@\s*\$?(\d+(?:\.\d+)?)/i) || lineWithoutDate.match(/\$(\d+(?:\.\d+)?)/);
+                    if (ticker && (isBuy || isSell)) {
+                        rows.push(`${ticker},${isSell ? "Sell" : "Buy"},${qtyMatch ? qtyMatch[1] : ""},${priceMatch ? priceMatch[1] : ""}`);
+                    }
+                }
+            }
+            assert.strictEqual(rows.length, 2);
+            assert.strictEqual(rows[0], "VAS,Buy,25,95.50");
+            assert.strictEqual(rows[1], "DHHF,Buy,50,32.00");
+        });
+
+        // 71. processCsvText auto-detects Pearler when Trade Type header is present
+        await runTest("processCsvText() auto-detects Pearler when Trade Type header is present", () => {
+            env.openCsvModal();
+            env.populateCsvFormatDropdown();
+            env.onCsvFormatChange("generic_shares");
+            assert.strictEqual(env.getEl("csvFormatSelect").value, "generic_shares");
+
+            const csv = "Date,Symbol,Trade Type,Quantity,Price\n" +
+                "10/01/2026,VAS,Buy,50,96.00\n" +
+                "15/02/2026,VAS,Buy,20,98.50\n" +
+                "01/03/2026,DHHF,Buy,100,33.00";
+
+            env.processCsvText(csv, "pearler_trades.csv", 1024);
+
+            assert.strictEqual(env.getEl("csvFormatSelect").value, "pearler");
+            assert.strictEqual(env.getEl("csvSupportedFormats").textContent, "Pearler Format Detected");
+            assert.strictEqual(env.getEl("csvSupportedFormats").classList.contains("detected"), true);
+            assert.strictEqual(env.getStagedCsvHoldings().length, 2);
+
+            const vas = env.getStagedCsvHoldings().find(h => h.t === "VAS");
+            assert.ok(vas);
+            assert.strictEqual(vas.q, "70");
+            assert.strictEqual(vas.p, "98.5");
+
+            const dhhf = env.getStagedCsvHoldings().find(h => h.t === "DHHF");
+            assert.ok(dhhf);
+            assert.strictEqual(dhhf.q, "100");
+            assert.strictEqual(dhhf.p, "33");
+
+            env.resetCsvDropState();
+            env.onCsvFormatChange("generic_shares");
         });
     }
 

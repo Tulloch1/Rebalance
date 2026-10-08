@@ -80,8 +80,9 @@
 ---
 
 ## 5. Development Rules for AI Agents & Developers
-1. **Never Push to Git:** Run commits locally on branch `dev`. The user pushes to GitHub.
+1. **Never Push to Git:** Run commits locally on branch `dev` or `main`. The user pushes to GitHub.
 2. **Preserve User Code:** Do not revert user edits, and strictly preserve version tags (currently **`v1.2.2`**).
-3. **Strict Parity:** Always mirror changes between `c:\Users\willi\Desktop\Rebalancing\index.html` and `c:\Users\willi\Desktop\Rebalancing\GitHub\Rebalance\index.html`.
-4. **All Tests Green:** Run `node tests/master_test_suite.js` (137 tests) and `node tests/backend_test_suite.js` (23 tests) before finishing any task. All 160 tests must pass.
+3. **Strict Parity:** Always mirror changes between `c:\Users\willi\Desktop\Rebalancing\index.html` and `c:\Users\willi\Desktop\Rebalancing\GitHub\Rebalance\index.html`. Verify with `fc.exe`.
+4. **All Tests Green:** Run `node tests/master_test_suite.js` (182 tests) and `node tests/backend_test_suite.js` (23 tests) before finishing any task. All 205 tests must pass.
+5. **Zero-Knowledge & Client-Side File Parsing:** CSV, Excel (.xlsx, .xlsm, .xls), and PDF (.pdf) parsing must remain 100% client-side and offline-capable without sending user financial files to any remote server.
 
