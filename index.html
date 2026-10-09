@@ -3673,6 +3673,23 @@
             },
 
             /**
+             * Derive zero-knowledge recovery proof (sent to edge backend during recovery to prove key ownership)
+             * @param {string} email
+             * @param {string} recoveryKey
+             * @returns {Promise<string>}
+             */
+            async deriveRecoveryProof(email, recoveryKey) {
+                if (!email || !recoveryKey) return "";
+                const cleanKey = recoveryKey.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+                const normalizedEmail = email.toLowerCase().trim();
+                const cryptoObj = this.getCrypto();
+                const encoder = new TextEncoder();
+                const data = encoder.encode(cleanKey + ':rebalance:recovery_proof:' + normalizedEmail);
+                const hashBuf = await cryptoObj.subtle.digest('SHA-256', data);
+                return this.bufferToHex(hashBuf);
+            },
+
+            /**
              * Check if platform biometrics / WebAuthn Passkeys are supported on the client
              * @returns {Promise<boolean>}
              */
@@ -4039,15 +4056,29 @@
                 }
             },
 
-            async getAccount(email) {
+            async getAccount(email, authHash = null) {
                 if (!email) return null;
                 const normalizedEmail = email.trim().toLowerCase();
+                const accounts = getStoredAccounts();
+                const resolvedAuthHash = authHash || 
+                    (currentAccount && currentAccount.email && currentAccount.email.toLowerCase() === normalizedEmail && currentAccount.keys ? currentAccount.keys.authHash : null) ||
+                    (accounts[normalizedEmail] ? accounts[normalizedEmail].authHash : null);
+
                 if (this.apiBaseUrl) {
                     try {
-                        const res = await fetch(`${this.apiBaseUrl}/api/account?email=${encodeURIComponent(normalizedEmail)}`);
+                        const headers = {};
+                        if (resolvedAuthHash) {
+                            headers["Authorization"] = `Bearer ${resolvedAuthHash}`;
+                        }
+                        const res = await fetch(`${this.apiBaseUrl}/api/account?email=${encodeURIComponent(normalizedEmail)}`, {
+                            headers
+                        });
                         if (res.ok) {
                             const remoteAcc = await res.json();
-                            const accounts = getStoredAccounts();
+                            // Preserve local authHash if remote redacted it
+                            if (!remoteAcc.authHash && accounts[normalizedEmail] && accounts[normalizedEmail].authHash) {
+                                remoteAcc.authHash = accounts[normalizedEmail].authHash;
+                            }
                             accounts[normalizedEmail] = remoteAcc;
                             setStoredAccounts(accounts);
                             return remoteAcc;
@@ -4058,7 +4089,6 @@
                         console.warn("Cloud backend unreachable, using local storage mirror:", netErr);
                     }
                 }
-                const accounts = getStoredAccounts();
                 return accounts[normalizedEmail] || null;
             },
 
@@ -4090,7 +4120,7 @@
                 return account;
             },
 
-            async syncVault(email, encryptedVault, vaultVersion = null, recoveryEnvelope = undefined) {
+            async syncVault(email, encryptedVault, vaultVersion = null, recoveryEnvelope = undefined, authHash = null) {
                 if (!email) return null;
                 const normalizedEmail = email.trim().toLowerCase();
                 // Always persist locally
@@ -4113,11 +4143,24 @@
 
                 if (this.apiBaseUrl) {
                     try {
-                        const payload = { email: normalizedEmail, vault: encryptedVault, vaultVersion };
+                        const resolvedAuthHash = authHash ||
+                            (currentAccount && currentAccount.email && currentAccount.email.toLowerCase() === normalizedEmail && currentAccount.keys ? currentAccount.keys.authHash : null) ||
+                            (accounts[normalizedEmail] ? accounts[normalizedEmail].authHash : null);
+
+                        const payload = {
+                            email: normalizedEmail,
+                            vault: encryptedVault,
+                            vaultVersion,
+                            authHash: resolvedAuthHash
+                        };
                         if (recoveryEnvelope !== undefined) payload.recoveryEnvelope = recoveryEnvelope;
+                        const headers = { "Content-Type": "application/json" };
+                        if (resolvedAuthHash) {
+                            headers["Authorization"] = `Bearer ${resolvedAuthHash}`;
+                        }
                         const res = await fetch(`${this.apiBaseUrl}/api/vault`, {
                             method: "PUT",
-                            headers: { "Content-Type": "application/json" },
+                            headers: headers,
                             body: JSON.stringify(payload)
                         });
                         if (res.ok) {
@@ -4130,15 +4173,17 @@
                 return updatedLocal;
             },
 
-            async recoverAccount(email, authHash, vault, vaultVersion = null) {
+            async recoverAccount(email, authHash, vault, vaultVersion = null, recoveryProof = null) {
                 if (!email) return null;
                 const normalizedEmail = email.trim().toLowerCase();
                 if (this.apiBaseUrl) {
                     try {
+                        const payload = { email: normalizedEmail, authHash, vault, vaultVersion };
+                        if (recoveryProof) payload.recoveryProof = recoveryProof;
                         const res = await fetch(`${this.apiBaseUrl}/api/recover`, {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({ email: normalizedEmail, authHash, vault, vaultVersion })
+                            body: JSON.stringify(payload)
                         });
                         if (res.ok) return await res.json();
                     } catch (netErr) {
@@ -4542,8 +4587,10 @@
 
                 // Derive key & create zero-knowledge recoveryEnvelope of current portfolio state
                 const recEncKey = await RebalanceCrypto.deriveRecoveryEncryptionKey(currentAccount.email, recoveryKey);
+                const recoveryProof = await RebalanceCrypto.deriveRecoveryProof(currentAccount.email, recoveryKey);
                 const currentState = getCurrentPortfolioState();
                 const recoveryEnvelope = await RebalanceCrypto.encryptPortfolio(currentState, recEncKey);
+                recoveryEnvelope.recoveryProof = recoveryProof;
 
                 // Save recoveryEnvelope into account record
                 const account = await RebalanceSync.getAccount(currentAccount.email);
@@ -4648,8 +4695,9 @@ INSTRUCTIONS:
             }
 
             try {
-                // 1. Derive key from recoveryKey + email
+                // 1. Derive key & recoveryProof from recoveryKey + email
                 const recEncKey = await RebalanceCrypto.deriveRecoveryEncryptionKey(email, recoveryKey);
+                const recoveryProof = await RebalanceCrypto.deriveRecoveryProof(email, recoveryKey);
                 
                 // 2. Decrypt the recoveryEnvelope
                 const restoredPortfolio = await RebalanceCrypto.decryptPortfolio(account.recoveryEnvelope, recEncKey);
@@ -4667,7 +4715,7 @@ INSTRUCTIONS:
                 account.updatedAt = new Date().toISOString();
                 account.lastLoginAt = new Date().toISOString();
                 await RebalanceSync.saveAccount(account);
-                await RebalanceSync.recoverAccount(email, newKeys.authHash, newVault, account.vaultVersion);
+                await RebalanceSync.recoverAccount(email, newKeys.authHash, newVault, account.vaultVersion, recoveryProof);
 
                 // 6. Sign in with the recovered session
                 currentAccount = {

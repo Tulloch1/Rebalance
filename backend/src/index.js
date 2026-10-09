@@ -34,7 +34,7 @@ function isValidEmail(email) {
     return re.test(email.trim());
 }
 
-function normalizeAccountRow(row) {
+function normalizeAccountRow(row, isCallerAuthenticated = true) {
     if (!row) return null;
     let vault = null;
     let recoveryEnvelope = null;
@@ -58,9 +58,8 @@ function normalizeAccountRow(row) {
         preferences = { currency: "USD", theme: "auto", autoSync: true };
     }
 
-    return {
+    const result = {
         email: row.email,
-        authHash: row.auth_hash,
         schemaVersion: Number(row.schema_version) || 2,
         vaultVersion: Number(row.vault_version) || 1,
         vault: vault,
@@ -74,6 +73,12 @@ function normalizeAccountRow(row) {
         updatedAt: row.updated_at,
         lastLoginAt: row.last_login_at
     };
+
+    if (isCallerAuthenticated) {
+        result.authHash = row.auth_hash;
+    }
+
+    return result;
 }
 
 function generateOtpCode() {
@@ -236,7 +241,13 @@ export default {
                     return errorResponse("Account not found.", 404, request);
                 }
 
-                return jsonResponse(normalizeAccountRow(row), 200, request);
+                const authHeader = request.headers.get("Authorization");
+                const authHashFromHeader = authHeader && authHeader.startsWith("Bearer ") ? authHeader.slice(7).trim() : null;
+                const authHashFromQuery = url.searchParams.get("authHash");
+                const providedAuthHash = authHashFromHeader || authHashFromQuery;
+                const isAuthenticated = Boolean(providedAuthHash && providedAuthHash === row.auth_hash);
+
+                return jsonResponse(normalizeAccountRow(row, isAuthenticated), 200, request);
             }
 
             // Route: POST /api/account (Registration)
@@ -316,6 +327,16 @@ export default {
                     return errorResponse("Account not found.", 404, request);
                 }
 
+                // Broken Access Control Fix: Require authenticating authHash via Bearer header or body.authHash
+                const authHeader = request.headers.get("Authorization");
+                const authHashFromHeader = authHeader && authHeader.startsWith("Bearer ") ? authHeader.slice(7).trim() : null;
+                const authHashFromBody = body && body.authHash ? String(body.authHash).trim() : null;
+                const providedAuthHash = authHashFromHeader || authHashFromBody;
+
+                if (!providedAuthHash || providedAuthHash !== account.auth_hash) {
+                    return errorResponse("Unauthorized: Missing or invalid authentication token.", 401, request);
+                }
+
                 const now = new Date().toISOString();
                 const vaultCiphertext = body.vault !== undefined ? JSON.stringify(body.vault) : account.vault_ciphertext;
                 const recoveryEnvelope = body.recoveryEnvelope !== undefined ? JSON.stringify(body.recoveryEnvelope) : account.recovery_envelope;
@@ -339,7 +360,7 @@ export default {
                 ).run();
 
                 const updated = await env.DB.prepare("SELECT * FROM accounts WHERE email = ?").bind(email).first();
-                return jsonResponse(normalizeAccountRow(updated), 200, request);
+                return jsonResponse(normalizeAccountRow(updated, true), 200, request);
             }
 
             // Route: POST /api/recover (Account Recovery via Emergency Key)
@@ -368,6 +389,21 @@ export default {
                     return errorResponse("No emergency recovery key configured for this account.", 400, request);
                 }
 
+                // Verify recovery proof if configured in the recovery envelope
+                let envelopeObj = null;
+                try {
+                    envelopeObj = JSON.parse(account.recovery_envelope);
+                } catch (e) {
+                    envelopeObj = null;
+                }
+
+                if (envelopeObj && envelopeObj.recoveryProof) {
+                    const providedProof = body && body.recoveryProof ? String(body.recoveryProof).trim() : "";
+                    if (!providedProof || providedProof !== envelopeObj.recoveryProof) {
+                        return errorResponse("Unauthorized: Invalid recovery key proof.", 401, request);
+                    }
+                }
+
                 const now = new Date().toISOString();
                 const newVaultCiphertext = body.vault ? JSON.stringify(body.vault) : account.vault_ciphertext;
                 const nextVersion = (Number(account.vault_version) || 1) + 1;
@@ -390,7 +426,7 @@ export default {
                 ).run();
 
                 const updated = await env.DB.prepare("SELECT * FROM accounts WHERE email = ?").bind(email).first();
-                return jsonResponse(normalizeAccountRow(updated), 200, request);
+                return jsonResponse(normalizeAccountRow(updated, true), 200, request);
             }
 
             // Route: POST /api/account/request-reset (Initiate Clean Slate OTP Reset)

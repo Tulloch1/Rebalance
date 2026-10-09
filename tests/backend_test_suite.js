@@ -159,14 +159,24 @@ async function runAllBackendTests() {
     });
 
     // --- 4. Account Lookup: GET /api/account ---
-    await runTest("GET /api/account retrieves registered user and parses encrypted blobs", async () => {
+    await runTest("GET /api/account redacts authHash for unauthenticated callers (Broken Access Control fix)", async () => {
         const res = await request(`/api/account?email=${encodeURIComponent(testUser.email)}`);
         assert.strictEqual(res.status, 200);
         const data = await res.json();
         assert.strictEqual(data.email, testUser.email);
-        assert.strictEqual(data.authHash, testUser.authHash);
+        assert.strictEqual(data.authHash, undefined, "authHash must be redacted for unauthenticated callers");
         assert.deepStrictEqual(data.vault, testUser.vault);
         assert.strictEqual(data.schemaVersion, 2);
+    });
+
+    await runTest("GET /api/account returns authHash for authenticated callers with Bearer token", async () => {
+        const res = await request(`/api/account?email=${encodeURIComponent(testUser.email)}`, {
+            headers: { "Authorization": `Bearer ${testUser.authHash}` }
+        });
+        assert.strictEqual(res.status, 200);
+        const data = await res.json();
+        assert.strictEqual(data.email, testUser.email);
+        assert.strictEqual(data.authHash, testUser.authHash);
     });
 
     await runTest("GET /api/account returns 404 for unknown user", async () => {
@@ -175,10 +185,36 @@ async function runAllBackendTests() {
     });
 
     // --- 5. Vault Auto-Sync: PUT /api/vault ---
-    await runTest("PUT /api/vault updates encrypted vault and increments vaultVersion", async () => {
+    await runTest("PUT /api/vault rejects unauthenticated request with 401 Unauthorized", async () => {
+        const res = await request("/api/vault", {
+            method: "PUT",
+            body: {
+                email: testUser.email,
+                vault: { v: 1, iv: "iv_unauth", data: "data_unauth" }
+            }
+        });
+        assert.strictEqual(res.status, 401);
+        const data = await res.json();
+        assert.ok(data.error.includes("Unauthorized"));
+    });
+
+    await runTest("PUT /api/vault rejects invalid authentication token with 401 Unauthorized", async () => {
+        const res = await request("/api/vault", {
+            method: "PUT",
+            headers: { "Authorization": "Bearer wrong_token_123456789012345678901234567890" },
+            body: {
+                email: testUser.email,
+                vault: { v: 1, iv: "iv_unauth", data: "data_unauth" }
+            }
+        });
+        assert.strictEqual(res.status, 401);
+    });
+
+    await runTest("PUT /api/vault updates encrypted vault with valid Bearer token and increments vaultVersion", async () => {
         const newVault = { v: 1, iv: "iv_updated", data: "data_updated" };
         const res = await request("/api/vault", {
             method: "PUT",
+            headers: { "Authorization": `Bearer ${testUser.authHash}` },
             body: {
                 email: testUser.email,
                 vault: newVault
@@ -190,12 +226,15 @@ async function runAllBackendTests() {
         assert.deepStrictEqual(data.vault, newVault);
     });
 
-    await runTest("PUT /api/vault updates recovery envelope when key is generated", async () => {
-        const recoveryEnvelope = { v: 1, iv: "rec_iv", data: "rec_data" };
+    const mockRecoveryProof = "mock_sha256_recovery_proof_hex_value";
+    const recoveryEnvelope = { v: 1, iv: "rec_iv", data: "rec_data", recoveryProof: mockRecoveryProof };
+
+    await runTest("PUT /api/vault updates recovery envelope with recovery proof when authorized", async () => {
         const res = await request("/api/vault", {
             method: "PUT",
             body: {
                 email: testUser.email,
+                authHash: testUser.authHash,
                 recoveryEnvelope: recoveryEnvelope
             }
         });
@@ -205,7 +244,22 @@ async function runAllBackendTests() {
     });
 
     // --- 6. Account Recovery: POST /api/recover ---
-    await runTest("POST /api/recover resets credentials and updates vault on emergency recovery", async () => {
+    await runTest("POST /api/recover rejects recovery attempt with invalid or missing recovery proof (401)", async () => {
+        const res = await request("/api/recover", {
+            method: "POST",
+            body: {
+                email: testUser.email,
+                authHash: "f".repeat(64),
+                vault: { v: 1, iv: "hacked_iv", data: "hacked_data" },
+                recoveryProof: "wrong_recovery_proof"
+            }
+        });
+        assert.strictEqual(res.status, 401);
+        const data = await res.json();
+        assert.ok(data.error.includes("Invalid recovery key proof"));
+    });
+
+    await runTest("POST /api/recover resets credentials and updates vault with valid recovery proof", async () => {
         const newAuthHash = "f".repeat(64);
         const restoredVault = { v: 1, iv: "restored_iv", data: "restored_data" };
 
@@ -214,7 +268,8 @@ async function runAllBackendTests() {
             body: {
                 email: testUser.email,
                 authHash: newAuthHash,
-                vault: restoredVault
+                vault: restoredVault,
+                recoveryProof: mockRecoveryProof
             }
         });
         assert.strictEqual(res.status, 200);
