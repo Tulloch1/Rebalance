@@ -235,17 +235,26 @@ function createTestEnv() {
         onSettingInputModeToggle: sandbox.onSettingInputModeToggle,
         renderTableHeaders: sandbox.renderTableHeaders,
         renderRows: sandbox.renderRows,
+        onSortFieldChange: sandbox.onSortFieldChange,
+        onToggleSortDirection: sandbox.onToggleSortDirection,
+        applyHoldingsSort: sandbox.applyHoldingsSort,
+        getCurrentSortField: sandbox.getCurrentSortField,
+        getCurrentSortDirection: sandbox.getCurrentSortDirection,
+        setCurrentSortState: (field, dir) => {
+            vm.runInContext(`currentSortField = ${JSON.stringify(field)}; currentSortDirection = ${JSON.stringify(dir || 'desc')};`, sandbox);
+        },
         updateHolding: sandbox.updateHolding,
         addHolding: sandbox.addHolding,
         removeHolding: sandbox.removeHolding,
         dispatchDocumentEvent: (event) => sandbox.document.dispatchEvent(event),
         setHoldings(holdings) {
-            const formatted = holdings.map(h => ({
+            const formatted = holdings.map((h, idx) => ({
                 t: h.t !== undefined ? h.t : (h.name || ""),
                 v: h.v !== undefined ? h.v : (h.value !== undefined ? String(h.value) : ""),
                 p: h.p !== undefined ? h.p : (h.price !== undefined ? String(h.price) : ""),
                 q: h.q !== undefined ? h.q : (h.quantity !== undefined ? String(h.quantity) : (h.shares !== undefined ? String(h.shares) : "")),
-                w: h.w !== undefined ? h.w : (h.weight !== undefined ? String(h.weight) : (h.targ_weight !== undefined ? String(h.targ_weight * 100) : ""))
+                w: h.w !== undefined ? h.w : (h.weight !== undefined ? String(h.weight) : (h.targ_weight !== undefined ? String(h.targ_weight * 100) : "")),
+                _originalIndex: h._originalIndex !== undefined ? h._originalIndex : idx
             }));
             vm.runInContext(`holdingsData = ${JSON.stringify(formatted)};`, sandbox);
         },

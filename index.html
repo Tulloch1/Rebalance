@@ -635,6 +635,92 @@
             border-color: rgba(36, 219, 161, 0.4);
         }
 
+        /* Holdings Table Sort By Control */
+        .sort-header-cell {
+            position: relative;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            width: 100%;
+        }
+
+        .sort-pill-container {
+            position: absolute;
+            right: 0;
+            display: inline-flex;
+            align-items: center;
+            background: var(--surface-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-pill);
+            padding: 1px 4px 1px 7px;
+            height: 24px;
+            gap: 2px;
+            white-space: nowrap;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+            transition: all 0.15s ease;
+            z-index: 2;
+        }
+
+        .sort-pill-container:hover {
+            border-color: var(--border-hover);
+        }
+
+        .sort-select {
+            appearance: none;
+            -webkit-appearance: none;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: var(--text-secondary);
+            font-size: 11px;
+            font-weight: 600;
+            font-family: var(--font-sans);
+            cursor: pointer;
+            padding: 0 2px;
+            text-transform: none;
+            letter-spacing: normal;
+        }
+
+        .sort-select:focus {
+            color: var(--accent);
+        }
+
+        .sort-select option {
+            background: var(--surface-card);
+            color: var(--text-primary);
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: none;
+            letter-spacing: normal;
+        }
+
+        .sort-dir-btn {
+            background: transparent;
+            border: none;
+            padding: 0;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            cursor: pointer;
+            color: var(--text-primary);
+            transition: all 0.15s ease;
+        }
+
+        .sort-dir-btn:not(.disabled):hover {
+            color: var(--accent);
+            background: var(--accent-badge-bg);
+        }
+
+        .sort-dir-btn.disabled {
+            color: var(--text-muted);
+            opacity: 0.35;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
         .row-index {
             font-family: var(--font-mono);
             font-size: 12px;
@@ -1956,6 +2042,13 @@
                 right: 6px;
                 font-size: 11px;
             }
+            .sort-pill-container {
+                height: 22px;
+                padding: 1px 3px 1px 5px;
+            }
+            .sort-select {
+                font-size: 10px;
+            }
             .stat-grid {
                 grid-template-columns: 1fr;
             }
@@ -2687,7 +2780,19 @@
                 <div>Asset</div>
                 <div>Current Value</div>
                 <div>Target</div>
-                <div></div>
+                <div class="sort-header-cell">
+                    <div class="sort-pill-container" title="Sort holdings">
+                        <select id="sortFieldSelect" class="sort-select" onchange="onSortFieldChange(this.value)" aria-label="Sort holdings by">
+                            <option value="none">--select--</option>
+                            <option value="alpha">Alphabetical</option>
+                            <option value="target">Target Weight</option>
+                            <option value="value">Value</option>
+                        </select>
+                        <button type="button" id="sortDirBtn" class="sort-dir-btn disabled" onclick="onToggleSortDirection()" title="Select a variable to sort" disabled aria-label="Toggle sort direction">
+                            <svg viewBox="0 0 10 10" width="8" height="8" aria-hidden="true"><polygon points="1,3 9,3 5,8" fill="currentColor"/></svg>
+                        </button>
+                    </div>
+                </div>
             </div>
 
             <div id="portfolioContainer" class="holdings-list">
@@ -5346,10 +5451,148 @@ INSTRUCTIONS:
             }
         }
 
+        let currentSortField = "none";
+        let currentSortDirection = "desc";
+
+        function ensureHoldingsOriginalIndices() {
+            let nextIdx = 0;
+            if (!Array.isArray(holdingsData)) return;
+            holdingsData.forEach(h => {
+                if (typeof h._originalIndex === 'number' && !isNaN(h._originalIndex)) {
+                    if (h._originalIndex >= nextIdx) {
+                        nextIdx = h._originalIndex + 1;
+                    }
+                }
+            });
+            holdingsData.forEach(h => {
+                if (typeof h._originalIndex !== 'number' || isNaN(h._originalIndex)) {
+                    h._originalIndex = nextIdx++;
+                }
+            });
+        }
+
+        function renderSortControlHtml(isShares) {
+            const isNone = (currentSortField === "none");
+            const isAsc = (currentSortDirection === "asc");
+            const arrowSvg = isAsc
+                ? `<svg viewBox="0 0 10 10" width="8" height="8" aria-hidden="true"><polygon points="1,7 9,7 5,2" fill="currentColor"/></svg>`
+                : `<svg viewBox="0 0 10 10" width="8" height="8" aria-hidden="true"><polygon points="1,3 9,3 5,8" fill="currentColor"/></svg>`;
+            
+            let sharesOptions = "";
+            if (isShares) {
+                sharesOptions = `
+                    <option value="price"${currentSortField === "price" ? " selected" : ""}>Share Price</option>
+                    <option value="qty"${currentSortField === "qty" ? " selected" : ""}>Quantity</option>
+                `;
+            }
+
+            return `
+                <div class="sort-header-cell">
+                    <div class="sort-pill-container" title="Sort holdings">
+                        <select id="sortFieldSelect" class="sort-select" onchange="onSortFieldChange(this.value)" aria-label="Sort holdings by">
+                            <option value="none"${currentSortField === "none" ? " selected" : ""}>--select--</option>
+                            <option value="alpha"${currentSortField === "alpha" ? " selected" : ""}>Alphabetical</option>
+                            <option value="target"${currentSortField === "target" ? " selected" : ""}>Target Weight</option>
+                            <option value="value"${currentSortField === "value" ? " selected" : ""}>Value</option>
+                            ${sharesOptions}
+                        </select>
+                        <button type="button" id="sortDirBtn" class="sort-dir-btn${isNone ? " disabled" : ""}" onclick="onToggleSortDirection()" title="${isNone ? "Select a variable to sort" : (isAsc ? "Ascending (click for Descending)" : "Descending (click for Ascending)")}" ${isNone ? "disabled" : ""} aria-label="Toggle sort direction">
+                            ${arrowSvg}
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function applyHoldingsSort() {
+            if (!Array.isArray(holdingsData) || holdingsData.length <= 1) return;
+            ensureHoldingsOriginalIndices();
+
+            if (currentSortField === "none") {
+                holdingsData.sort((a, b) => (a._originalIndex ?? 0) - (b._originalIndex ?? 0));
+                return;
+            }
+
+            const isDesc = (currentSortDirection === "desc");
+            const mult = isDesc ? -1 : 1;
+
+            holdingsData.sort((a, b) => {
+                let diff = 0;
+                if (currentSortField === "alpha") {
+                    const nameA = (a.t || "").trim();
+                    const nameB = (b.t || "").trim();
+                    if (!nameA && nameB) return 1;
+                    if (nameA && !nameB) return -1;
+                    diff = nameA.localeCompare(nameB, undefined, { sensitivity: "base", numeric: true });
+                } else if (currentSortField === "target") {
+                    const valA = parseFloat(a.w) || 0;
+                    const valB = parseFloat(b.w) || 0;
+                    diff = valA - valB;
+                } else if (currentSortField === "value") {
+                    const valA = parseFloat(a.v) || 0;
+                    const valB = parseFloat(b.v) || 0;
+                    diff = valA - valB;
+                } else if (currentSortField === "price") {
+                    const valA = parseFloat(a.p) || 0;
+                    const valB = parseFloat(b.p) || 0;
+                    diff = valA - valB;
+                } else if (currentSortField === "qty") {
+                    const valA = parseFloat(a.q) || 0;
+                    const valB = parseFloat(b.q) || 0;
+                    diff = valA - valB;
+                }
+
+                if (diff !== 0) {
+                    return diff * mult;
+                }
+                return (a._originalIndex ?? 0) - (b._originalIndex ?? 0);
+            });
+        }
+
+        function getCurrentSortField() {
+            return currentSortField;
+        }
+
+        function getCurrentSortDirection() {
+            return currentSortDirection;
+        }
+
+        function onSortFieldChange(field) {
+            const prevField = currentSortField;
+            currentSortField = field;
+            if (field === "none") {
+                ensureHoldingsOriginalIndices();
+                holdingsData.sort((a, b) => (a._originalIndex ?? 0) - (b._originalIndex ?? 0));
+            } else {
+                if (field !== prevField) {
+                    currentSortDirection = (field === "alpha" ? "asc" : "desc");
+                }
+                applyHoldingsSort();
+            }
+            renderTableHeaders();
+            renderRows();
+            saveFormData();
+        }
+
+        function onToggleSortDirection() {
+            if (currentSortField === "none") return;
+            currentSortDirection = (currentSortDirection === "asc" ? "desc" : "asc");
+            applyHoldingsSort();
+            renderTableHeaders();
+            renderRows();
+            saveFormData();
+        }
+
         function onSettingInputModeToggle(isShares) {
             try {
                 localStorage.setItem("rebalancer_input_mode", isShares ? "shares" : "value");
             } catch (e) {}
+
+            if (!isShares && (currentSortField === "price" || currentSortField === "qty")) {
+                currentSortField = "none";
+                ensureHoldingsOriginalIndices();
+                holdingsData.sort((a, b) => (a._originalIndex ?? 0) - (b._originalIndex ?? 0));
+            }
 
             renderTableHeaders();
             renderRows();
@@ -5374,7 +5617,7 @@ INSTRUCTIONS:
                     <div>Share Price</div>
                     <div>Quantity</div>
                     <div>Target</div>
-                    <div></div>
+                    ${renderSortControlHtml(true)}
                 `;
             } else {
                 th.classList.remove("mode-shares");
@@ -5383,8 +5626,20 @@ INSTRUCTIONS:
                     <div>Asset / Ticker</div>
                     <div>Current Value</div>
                     <div>Target</div>
-                    <div></div>
+                    ${renderSortControlHtml(false)}
                 `;
+            }
+
+            const sortSel = document.getElementById("sortFieldSelect");
+            if (sortSel) sortSel.value = currentSortField;
+            const sortBtn = document.getElementById("sortDirBtn");
+            if (sortBtn) {
+                sortBtn.disabled = (currentSortField === "none");
+                if (currentSortField === "none") {
+                    sortBtn.classList.add("disabled");
+                } else {
+                    sortBtn.classList.remove("disabled");
+                }
             }
         }
 
@@ -5693,10 +5948,12 @@ INSTRUCTIONS:
             if (typeof confirm === 'function' && !confirm("Reset portfolio to example assets? This will overwrite your current holdings.")) {
                 return;
             }
+            currentSortField = "none";
+            currentSortDirection = "desc";
             holdingsData = [
-                { t: "VOO", p: "500", q: "10", v: "5000", w: "50" },
-                { t: "VXUS", p: "60", q: "50", v: "3000", w: "30" },
-                { t: "BND", p: "80", q: "25", v: "2000", w: "20" }
+                { t: "VOO", p: "500", q: "10", v: "5000", w: "50", _originalIndex: 0 },
+                { t: "VXUS", p: "60", q: "50", v: "3000", w: "30", _originalIndex: 1 },
+                { t: "BND", p: "80", q: "25", v: "2000", w: "20", _originalIndex: 2 }
             ];
             if (document.getElementById("deposit")) {
                 document.getElementById("deposit").value = "1000";
@@ -7831,7 +8088,9 @@ INSTRUCTIONS:
                 });
             }
 
-            holdingsData = stagedCsvHoldings.map(h => {
+            currentSortField = "none";
+            currentSortDirection = "desc";
+            holdingsData = stagedCsvHoldings.map((h, idx) => {
                 const ticker = (h.t || "").trim().toUpperCase();
                 let weight = (h.w !== undefined && h.w !== null) ? String(h.w).trim() : "";
 
@@ -7845,7 +8104,8 @@ INSTRUCTIONS:
                     v: h.v || "",
                     p: h.p || "",
                     q: h.q || "",
-                    w: weight
+                    w: weight,
+                    _originalIndex: idx
                 };
             });
 
@@ -8003,14 +8263,19 @@ INSTRUCTIONS:
         }
 
         function addHolding(ticker = "", value = "", weight = "", price = "", quantity = "") {
-            holdingsData.push({ t: ticker, v: value, p: price, q: quantity, w: weight });
+            ensureHoldingsOriginalIndices();
+            const nextIdx = holdingsData.length > 0 ? Math.max(...holdingsData.map(h => h._originalIndex ?? 0)) + 1 : 0;
+            holdingsData.push({ t: ticker, v: value, p: price, q: quantity, w: weight, _originalIndex: nextIdx });
+            if (currentSortField !== "none") {
+                applyHoldingsSort();
+            }
             renderRows();
             saveFormData();
         }
 
         function removeHolding(index) {
             if (holdingsData.length <= 1) {
-                holdingsData[0] = { t: "", v: "", p: "", q: "", w: "" };
+                holdingsData[0] = { t: "", v: "", p: "", q: "", w: "", _originalIndex: 0 };
             } else {
                 holdingsData.splice(index, 1);
             }
@@ -8125,6 +8390,8 @@ INSTRUCTIONS:
                 minBuy: (minBuyEl && minBuyEl.value !== undefined && minBuyEl.value !== "") ? minBuyEl.value : "0",
                 completeRebalance: completeEl ? completeEl.checked : false,
                 inputMode: isSharesInputMode() ? "shares" : "value",
+                sortField: currentSortField,
+                sortDirection: currentSortDirection,
                 holdings: holdingsData
             };
             localStorage.setItem("rebalancer_state", JSON.stringify(payload));
@@ -8152,6 +8419,12 @@ INSTRUCTIONS:
                             localStorage.setItem("rebalancer_input_mode", data.inputMode === "shares" ? "shares" : "value");
                         } catch (e) {}
                     }
+                    if (data.sortField) {
+                        currentSortField = data.sortField;
+                    }
+                    if (data.sortDirection) {
+                        currentSortDirection = data.sortDirection;
+                    }
                     if (document.getElementById("deposit")) {
                         document.getElementById("deposit").value = data.deposit || "";
                     }
@@ -8163,6 +8436,7 @@ INSTRUCTIONS:
                     }
                     if (Array.isArray(data.holdings) && data.holdings.length > 0) {
                         holdingsData = data.holdings;
+                        ensureHoldingsOriginalIndices();
                     } else {
                         initDefaultHoldings();
                     }
@@ -8179,11 +8453,13 @@ INSTRUCTIONS:
 
         function initDefaultHoldings() {
             holdingsData = [
-                { t: "", v: "", p: "", q: "", w: "" }
+                { t: "", v: "", p: "", q: "", w: "", _originalIndex: 0 }
             ];
         }
 
         function resetPage() {
+            currentSortField = "none";
+            currentSortDirection = "desc";
             document.getElementById("deposit").value = "";
             document.getElementById("minBuy").value = "0";
             if (document.getElementById("completeRebalance")) {
@@ -9297,6 +9573,12 @@ INSTRUCTIONS:
             window.onSettingInputModeToggle = onSettingInputModeToggle;
             window.renderTableHeaders = renderTableHeaders;
             window.renderRows = renderRows;
+            window.onSortFieldChange = onSortFieldChange;
+            window.onToggleSortDirection = onToggleSortDirection;
+            window.applyHoldingsSort = applyHoldingsSort;
+            window.ensureHoldingsOriginalIndices = ensureHoldingsOriginalIndices;
+            window.getCurrentSortField = () => currentSortField;
+            window.getCurrentSortDirection = () => currentSortDirection;
             window.updateHolding = updateHolding;
             window.addHolding = addHolding;
             window.removeHolding = removeHolding;

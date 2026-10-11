@@ -3302,6 +3302,240 @@ console.log("\n--- PART 4: Information Guide Modal & Chrome Tab Navigation ---")
             env.resetCsvDropState();
             env.onCsvFormatChange("generic_shares");
         });
+
+        // =========================================================================
+        // PART 12: Holdings Sort By Feature
+        // =========================================================================
+        console.log("\n--- PART 12: Holdings Sort By Feature ---");
+
+        // 1. Initial sort state defaults to '--select--' with disabled direction arrow
+        runTest("Holdings sort control initializes with '--select--' and disabled direction button", () => {
+            env.onSortFieldChange("none");
+            env.renderTableHeaders();
+            assert.strictEqual(env.getCurrentSortField(), "none");
+            assert.strictEqual(env.getEl("sortFieldSelect").value, "none");
+            assert.strictEqual(env.getEl("sortDirBtn").disabled, true);
+            assert.strictEqual(env.getEl("sortDirBtn").classList.contains("disabled"), true);
+        });
+
+        // 2. renderTableHeaders() conditionally shows Share Price and Quantity in Shares mode only
+        runTest("renderTableHeaders() displays Share Price and Quantity options only in Shares mode", () => {
+            // Value mode
+            env.onSettingInputModeToggle(false);
+            env.renderTableHeaders();
+            const valueHtml = env.getEl("tableHeaders").innerHTML;
+            assert.strictEqual(valueHtml.includes('value="price"'), false);
+            assert.strictEqual(valueHtml.includes('value="qty"'), false);
+            assert.strictEqual(valueHtml.includes('value="alpha"'), true);
+            assert.strictEqual(valueHtml.includes('value="target"'), true);
+            assert.strictEqual(valueHtml.includes('value="value"'), true);
+
+            // Shares mode
+            env.onSettingInputModeToggle(true);
+            env.renderTableHeaders();
+            const sharesHtml = env.getEl("tableHeaders").innerHTML;
+            assert.strictEqual(sharesHtml.includes('value="price"'), true);
+            assert.strictEqual(sharesHtml.includes('value="qty"'), true);
+
+            // Cleanup back to value mode
+            env.onSettingInputModeToggle(false);
+        });
+
+        // 3. Alphabetical sort (A-Z ascending, Z-A descending)
+        runTest("Alphabetical sort orders holdings A -> Z (ascending) and Z -> A (descending)", () => {
+            env.setHoldings([
+                { t: "VGS", v: "100", w: "20", _originalIndex: 0 },
+                { t: "A200", v: "200", w: "30", _originalIndex: 1 },
+                { t: "NDQ", v: "150", w: "50", _originalIndex: 2 }
+            ]);
+
+            env.onSortFieldChange("alpha");
+            assert.strictEqual(env.getCurrentSortField(), "alpha");
+            assert.strictEqual(env.getCurrentSortDirection(), "asc");
+            assert.strictEqual(env.getEl("sortDirBtn").disabled, false);
+
+            let holdings = env.getHoldings();
+            assert.strictEqual(holdings[0].t, "A200");
+            assert.strictEqual(holdings[1].t, "NDQ");
+            assert.strictEqual(holdings[2].t, "VGS");
+
+            // Toggle direction to descending
+            env.onToggleSortDirection();
+            assert.strictEqual(env.getCurrentSortDirection(), "desc");
+
+            holdings = env.getHoldings();
+            assert.strictEqual(holdings[0].t, "VGS");
+            assert.strictEqual(holdings[1].t, "NDQ");
+            assert.strictEqual(holdings[2].t, "A200");
+        });
+
+        // 4. Target Weight sort (descending and ascending)
+        runTest("Target Weight sorting orders holdings descending and ascending", () => {
+            env.setHoldings([
+                { t: "A", w: "15", _originalIndex: 0 },
+                { t: "B", w: "50", _originalIndex: 1 },
+                { t: "C", w: "35", _originalIndex: 2 }
+            ]);
+
+            env.onSortFieldChange("target");
+            assert.strictEqual(env.getCurrentSortDirection(), "desc");
+
+            let holdings = env.getHoldings();
+            assert.strictEqual(holdings[0].t, "B");
+            assert.strictEqual(holdings[1].t, "C");
+            assert.strictEqual(holdings[2].t, "A");
+
+            // Toggle direction to ascending
+            env.onToggleSortDirection();
+            assert.strictEqual(env.getCurrentSortDirection(), "asc");
+
+            holdings = env.getHoldings();
+            assert.strictEqual(holdings[0].t, "A");
+            assert.strictEqual(holdings[1].t, "C");
+            assert.strictEqual(holdings[2].t, "B");
+        });
+
+        // 5. Value sort (descending and ascending)
+        runTest("Value sorting orders holdings descending and ascending", () => {
+            env.setHoldings([
+                { t: "A", v: "1500", _originalIndex: 0 },
+                { t: "B", v: "5000", _originalIndex: 1 },
+                { t: "C", v: "2500", _originalIndex: 2 }
+            ]);
+
+            env.onSortFieldChange("value");
+            assert.strictEqual(env.getCurrentSortDirection(), "desc");
+
+            let holdings = env.getHoldings();
+            assert.strictEqual(holdings[0].t, "B");
+            assert.strictEqual(holdings[1].t, "C");
+            assert.strictEqual(holdings[2].t, "A");
+
+            // Toggle direction to ascending
+            env.onToggleSortDirection();
+            assert.strictEqual(env.getCurrentSortDirection(), "asc");
+
+            holdings = env.getHoldings();
+            assert.strictEqual(holdings[0].t, "A");
+            assert.strictEqual(holdings[1].t, "C");
+            assert.strictEqual(holdings[2].t, "B");
+        });
+
+        // 6. Shares Mode sorts dynamically by Share Price and Quantity
+        runTest("Shares Mode sorts dynamically by Share Price and Quantity", () => {
+            env.onSettingInputModeToggle(true);
+            env.setHoldings([
+                { t: "A", p: "120", q: "10", v: "1200", _originalIndex: 0 },
+                { t: "B", p: "25", q: "100", v: "2500", _originalIndex: 1 },
+                { t: "C", p: "80", q: "5", v: "400", _originalIndex: 2 }
+            ]);
+
+            // Sort by share price descending
+            env.onSortFieldChange("price");
+            let holdings = env.getHoldings();
+            assert.strictEqual(holdings[0].t, "A");
+            assert.strictEqual(holdings[1].t, "C");
+            assert.strictEqual(holdings[2].t, "B");
+
+            // Sort by quantity descending
+            env.onSortFieldChange("qty");
+            holdings = env.getHoldings();
+            assert.strictEqual(holdings[0].t, "B");
+            assert.strictEqual(holdings[1].t, "A");
+            assert.strictEqual(holdings[2].t, "C");
+
+            // Cleanup back to value mode
+            env.onSettingInputModeToggle(false);
+        });
+
+        // 7. Switching sort back to '--select--' restores the original user insertion order
+        runTest("Switching sort back to '--select--' restores the original user insertion order", () => {
+            env.setHoldings([
+                { t: "Alpha", v: "300", _originalIndex: 0 },
+                { t: "Beta", v: "100", _originalIndex: 1 },
+                { t: "Gamma", v: "200", _originalIndex: 2 }
+            ]);
+
+            // Sort by value (Beta 100, Gamma 200, Alpha 300)
+            env.onSortFieldChange("value");
+            let holdings = env.getHoldings();
+            assert.strictEqual(holdings[0].t, "Alpha"); // 300
+            assert.strictEqual(holdings[1].t, "Gamma"); // 200
+            assert.strictEqual(holdings[2].t, "Beta");  // 100
+
+            // Revert to '--select--'
+            env.onSortFieldChange("none");
+            assert.strictEqual(env.getCurrentSortField(), "none");
+            assert.strictEqual(env.getEl("sortDirBtn").disabled, true);
+
+            holdings = env.getHoldings();
+            assert.strictEqual(holdings[0].t, "Alpha");
+            assert.strictEqual(holdings[1].t, "Beta");
+            assert.strictEqual(holdings[2].t, "Gamma");
+        });
+
+        // 8. Toggling from Shares Mode to Value Mode resets sort if sorted by price or quantity
+        runTest("Toggling from Shares Mode to Value Mode resets sort if sorted by price or quantity", () => {
+            env.onSettingInputModeToggle(true);
+            env.onSortFieldChange("price");
+            assert.strictEqual(env.getCurrentSortField(), "price");
+
+            // Toggling back to Value mode must reset sortField to "none"
+            env.onSettingInputModeToggle(false);
+            assert.strictEqual(env.getCurrentSortField(), "none");
+
+            // Test same for qty
+            env.onSettingInputModeToggle(true);
+            env.onSortFieldChange("qty");
+            assert.strictEqual(env.getCurrentSortField(), "qty");
+
+            env.onSettingInputModeToggle(false);
+            assert.strictEqual(env.getCurrentSortField(), "none");
+        });
+
+        // 9. Adding a new holding maintains sort order and assigns proper _originalIndex
+        runTest("addHolding() assigns proper _originalIndex and respects active sort", () => {
+            env.onSortFieldChange("none");
+            env.setHoldings([
+                { t: "A", v: "100", _originalIndex: 0 },
+                { t: "B", v: "200", _originalIndex: 1 }
+            ]);
+
+            env.addHolding();
+            const holdings = env.getHoldings();
+            assert.strictEqual(holdings.length, 3);
+            assert.strictEqual(holdings[2]._originalIndex, 2);
+        });
+
+        // 10. saveFormData() and loadFormData() persist and restore sort configuration and original indices
+        runTest("saveFormData() and loadFormData() persist and restore sort configuration and original indices", () => {
+            env.setHoldings([
+                { t: "VAS", v: "2000", w: "40", _originalIndex: 0 },
+                { t: "VGS", v: "3000", w: "60", _originalIndex: 1 }
+            ]);
+            env.onSortFieldChange("target");
+            env.onToggleSortDirection(); // sets to asc
+            assert.strictEqual(env.getCurrentSortField(), "target");
+            assert.strictEqual(env.getCurrentSortDirection(), "asc");
+
+            env.sandbox.saveFormData();
+            const savedRaw = env.sandbox.localStorage.getItem("rebalancer_state");
+            assert.ok(savedRaw);
+            const parsed = JSON.parse(savedRaw);
+            assert.strictEqual(parsed.sortField, "target");
+            assert.strictEqual(parsed.sortDirection, "asc");
+
+            // Reset sort in-memory to simulate page reload
+            env.setCurrentSortState("none", "desc");
+            assert.strictEqual(env.getCurrentSortField(), "none");
+
+            env.sandbox.loadFormData();
+            assert.strictEqual(env.getCurrentSortField(), "target");
+            assert.strictEqual(env.getCurrentSortDirection(), "asc");
+
+            // Reset back to none for cleanliness
+            env.onSortFieldChange("none");
+        });
     }
 
     console.log(`\n=================================================`);
