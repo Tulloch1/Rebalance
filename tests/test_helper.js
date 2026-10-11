@@ -123,6 +123,12 @@ function createTestEnv() {
             setItem(key, val) { this._store[key] = String(val); },
             removeItem(key) { delete this._store[key]; }
         },
+        sessionStorage: {
+            _store: {},
+            getItem(key) { return this._store[key] || null; },
+            setItem(key, val) { this._store[key] = String(val); },
+            removeItem(key) { delete this._store[key]; }
+        },
         navigator: {
             clipboard: { writeText: () => Promise.resolve() }
         },
@@ -176,6 +182,7 @@ function createTestEnv() {
         clearSession: sandbox.clearSession,
         getSession: sandbox.getSession,
         restoreSession: sandbox.restoreSession,
+        onToggleStatusRememberMe: sandbox.onToggleStatusRememberMe,
         updateAccountUI: sandbox.updateAccountUI,
         exportEncryptedBackupData: sandbox.exportEncryptedBackupData,
         importEncryptedBackupData: sandbox.importEncryptedBackupData,

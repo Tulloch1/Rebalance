@@ -1198,10 +1198,13 @@ console.log("\n--- PART 4: Information Guide Modal & Chrome Tab Navigation ---")
         });
 
         // 11. handleSignOut() removes session and returns to Guest mode
-        await runTest("handleSignOut() clears localStorage session and resets UI to guest", () => {
+        await runTest("handleSignOut() clears both sessionStorage and localStorage and resets UI to guest", () => {
+            env.sandbox.sessionStorage.setItem("rebalance_session", JSON.stringify({ email: "temp@example.com" }));
             env.handleSignOut();
             assert.strictEqual(env.getCurrentAccount(), null);
-            assert.strictEqual(env.getSession(), null, "rebalance_session should be removed");
+            assert.strictEqual(env.getSession(), null, "rebalance_session should be removed from all storage");
+            assert.strictEqual(env.sandbox.sessionStorage.getItem("rebalance_session"), null);
+            assert.strictEqual(env.sandbox.localStorage.getItem("rebalance_session"), null);
             assert.strictEqual(env.getEl("accountBtn").classList.contains("logged-in"), false);
             assert.strictEqual(env.getEl("accStatusBadge").innerText, "Stored Locally");
         });
@@ -1213,6 +1216,43 @@ console.log("\n--- PART 4: Information Guide Modal & Chrome Tab Navigation ---")
             assert.strictEqual(result, null, "Tampered session should fail to restore");
             assert.strictEqual(env.getCurrentAccount(), null);
             assert.strictEqual(env.getSession(), null, "Invalid session should be removed");
+        });
+
+        // 13. Dual-Tier Session: Ephemeral vs Persistent storage routing
+        await runTest("Ephemeral session (rememberMe: false) is stored in sessionStorage only and not localStorage", async () => {
+            env.handleSignOut();
+            env.getEl("signInEmail").value = "future_proof@example.com";
+            env.getEl("signInPassword").value = "BrandNewMasterPassword2026!";
+            env.getEl("signInRememberMe").checked = false; // Ephemeral mode
+            await env.handleSignInSubmit();
+
+            assert.ok(env.getCurrentAccount() !== null);
+            assert.strictEqual(env.sandbox.localStorage.getItem("rebalance_session"), null, "localStorage must be empty in ephemeral mode");
+            assert.ok(env.sandbox.sessionStorage.getItem("rebalance_session") !== null, "sessionStorage must contain ephemeral session");
+
+            const ephemeralSession = env.getSession();
+            assert.strictEqual(ephemeralSession.email, "future_proof@example.com");
+            assert.strictEqual(ephemeralSession.rememberMe, false);
+        });
+
+        // 14. onToggleStatusRememberMe() transitions between sessionStorage and localStorage
+        await runTest("onToggleStatusRememberMe() dynamically promotes/demotes session storage without logout", () => {
+            // Currently ephemeral in sessionStorage
+            assert.ok(env.sandbox.sessionStorage.getItem("rebalance_session") !== null);
+            assert.strictEqual(env.sandbox.localStorage.getItem("rebalance_session"), null);
+
+            // Promote to persistent (user checks toggle in Account Status)
+            env.onToggleStatusRememberMe(true);
+            assert.strictEqual(env.sandbox.sessionStorage.getItem("rebalance_session"), null, "sessionStorage should be cleared upon promotion");
+            assert.ok(env.sandbox.localStorage.getItem("rebalance_session") !== null, "localStorage should now hold persistent session");
+
+            // Demote back to ephemeral (user unchecks toggle in Account Status)
+            env.onToggleStatusRememberMe(false);
+            assert.ok(env.sandbox.sessionStorage.getItem("rebalance_session") !== null, "sessionStorage should now hold ephemeral session");
+            assert.strictEqual(env.sandbox.localStorage.getItem("rebalance_session"), null, "localStorage should be cleared upon demotion");
+
+            // Clean up back to clean signed out state
+            env.handleSignOut();
         });
         // =========================================================================
         // PART 8: SETTINGS & PREFERENCES MODAL, CURRENCY & VALUE-CONSERVING ROUNDING

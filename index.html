@@ -2962,6 +2962,18 @@
                                 </button>
                             </div>
                         </div>
+
+                        <!-- Stay Signed In on this Device Toggle (When Authenticated) -->
+                        <div id="statusRememberMeRow" style="display: none; align-items: center; justify-content: space-between; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border-subtle);">
+                            <div>
+                                <div style="font-size: 12px; font-weight: 600; color: var(--text-primary);">Stay signed in on this device</div>
+                                <div style="font-size: 11px; color: var(--text-muted);">Keep session active across browser restarts</div>
+                            </div>
+                            <label class="toggle-switch" for="statusRememberMeToggle" title="Toggle Stay Signed In">
+                                <input type="checkbox" id="statusRememberMeToggle" onchange="onToggleStatusRememberMe(this.checked)">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
                     </div>
 
                     <div style="display: flex; flex-direction: column; gap: 10px;">
@@ -3006,6 +3018,10 @@
                             <button type="button" onclick="toggleRecoverySection()" id="btnForgotPass" style="background: none; border: none; padding: 0; color: var(--accent); font-size: 11.5px; cursor: pointer; text-decoration: underline;">
                                 Forgot Password?
                             </button>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px; margin-top: -4px; margin-bottom: 12px;">
+                            <input type="checkbox" id="signInRememberMe" checked style="accent-color: var(--primary); cursor: pointer; width: 14px; height: 14px;">
+                            <label for="signInRememberMe" style="font-size: 12px; color: var(--text-secondary); cursor: pointer; user-select: none;">Keep me signed in on this device</label>
                         </div>
                         <div id="signInFeedback" class="auth-feedback" style="display: none; padding: 10px 14px; border-radius: var(--radius-card); font-size: 12px; margin-bottom: 12px; line-height: 1.45;"></div>
                         <button type="submit" class="btn-account-primary" id="btnSignInSubmit">
@@ -3124,6 +3140,10 @@
                         <div class="account-field-group">
                             <label class="account-label" for="signUpConfirmPassword">Confirm Password</label>
                             <input type="password" class="account-input" id="signUpConfirmPassword" placeholder="••••••••••••" autocomplete="new-password" minlength="8" required>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px; margin-top: 2px; margin-bottom: 12px;">
+                            <input type="checkbox" id="signUpRememberMe" checked style="accent-color: var(--primary); cursor: pointer; width: 14px; height: 14px;">
+                            <label for="signUpRememberMe" style="font-size: 12px; color: var(--text-secondary); cursor: pointer; user-select: none;">Keep me signed in on this device</label>
                         </div>
                         <div id="signUpFeedback" class="auth-feedback" style="display: none; padding: 10px 14px; border-radius: var(--radius-card); font-size: 12px; margin-bottom: 12px; line-height: 1.45;"></div>
                         <button type="submit" class="btn-account-primary" id="btnSignUpSubmit">
@@ -3958,6 +3978,13 @@
                         btnGenRecovery.innerText = "Generate Emergency Recovery Key";
                     }
                 }
+                const rememberRow = document.getElementById("statusRememberMeRow");
+                const rememberToggle = document.getElementById("statusRememberMeToggle");
+                if (rememberRow && rememberToggle) {
+                    rememberRow.style.display = "flex";
+                    const session = getSession();
+                    rememberToggle.checked = Boolean(session && session.rememberMe !== false && typeof localStorage !== 'undefined' && localStorage.getItem("rebalance_session"));
+                }
             } else {
                 if (accountBtn) accountBtn.classList.remove("logged-in");
                 if (tabBar) tabBar.style.display = "flex";
@@ -3983,6 +4010,10 @@
                 }
                 if (recBox) {
                     recBox.style.display = "none";
+                }
+                const rememberRow = document.getElementById("statusRememberMeRow");
+                if (rememberRow) {
+                    rememberRow.style.display = "none";
                 }
             }
         }
@@ -4364,7 +4395,9 @@
                     keys: keys
                 };
 
-                saveSession(email, keys.rawKeyHex, keys.authHash);
+                const remSignUpEl = document.getElementById("signUpRememberMe");
+                const rememberMeSignUp = remSignUpEl ? remSignUpEl.checked : true;
+                saveSession(email, keys.rawKeyHex, keys.authHash, rememberMeSignUp);
 
                 updateAccountUI();
                 const signUpForm = document.getElementById("signUpForm");
@@ -4436,7 +4469,9 @@
                     keys: keys
                 };
 
-                saveSession(email, keys.rawKeyHex, keys.authHash);
+                const remSignInEl = document.getElementById("signInRememberMe");
+                const rememberMeSignIn = remSignInEl ? remSignInEl.checked : true;
+                saveSession(email, keys.rawKeyHex, keys.authHash, rememberMeSignIn);
 
                 if (account.vault) {
                     try {
@@ -4469,16 +4504,30 @@
             switchAccountTab('status');
         }
 
-        // --- Persistent Session Management ---
-        function saveSession(email, rawKeyHex, authHash) {
+        // --- Persistent & Ephemeral Session Management ---
+        function saveSession(email, rawKeyHex, authHash, rememberMe = true) {
             try {
-                if (typeof localStorage !== 'undefined') {
-                    localStorage.setItem("rebalance_session", JSON.stringify({
-                        email: email,
-                        rawKeyHex: rawKeyHex,
-                        authHash: authHash,
-                        savedAt: new Date().toISOString()
-                    }));
+                const payload = JSON.stringify({
+                    email: email,
+                    rawKeyHex: rawKeyHex,
+                    authHash: authHash,
+                    rememberMe: Boolean(rememberMe),
+                    savedAt: new Date().toISOString()
+                });
+                if (rememberMe) {
+                    if (typeof localStorage !== 'undefined') {
+                        localStorage.setItem("rebalance_session", payload);
+                    }
+                    if (typeof sessionStorage !== 'undefined') {
+                        sessionStorage.removeItem("rebalance_session");
+                    }
+                } else {
+                    if (typeof sessionStorage !== 'undefined') {
+                        sessionStorage.setItem("rebalance_session", payload);
+                    }
+                    if (typeof localStorage !== 'undefined') {
+                        localStorage.removeItem("rebalance_session");
+                    }
                 }
             } catch (e) {
                 console.error("Failed to save session:", e);
@@ -4487,6 +4536,9 @@
 
         function clearSession() {
             try {
+                if (typeof sessionStorage !== 'undefined') {
+                    sessionStorage.removeItem("rebalance_session");
+                }
                 if (typeof localStorage !== 'undefined') {
                     localStorage.removeItem("rebalance_session");
                 }
@@ -4497,14 +4549,26 @@
 
         function getSession() {
             try {
+                // 1. Check sessionStorage first (ephemeral session)
+                if (typeof sessionStorage !== 'undefined') {
+                    const sessionData = sessionStorage.getItem("rebalance_session");
+                    if (sessionData) return JSON.parse(sessionData);
+                }
+                // 2. Fall back to localStorage (persistent session)
                 if (typeof localStorage !== 'undefined') {
-                    const data = localStorage.getItem("rebalance_session");
-                    return data ? JSON.parse(data) : null;
+                    const localData = localStorage.getItem("rebalance_session");
+                    if (localData) return JSON.parse(localData);
                 }
             } catch (e) {
                 console.error("Failed to read session:", e);
             }
             return null;
+        }
+
+        function onToggleStatusRememberMe(isRemembered) {
+            if (!currentAccount || !currentAccount.email || !currentAccount.keys) return;
+            saveSession(currentAccount.email, currentAccount.keys.rawKeyHex, currentAccount.keys.authHash, isRemembered);
+            updateAccountUI();
         }
 
         async function restoreSession() {
@@ -4726,7 +4790,9 @@ INSTRUCTIONS:
                     keys: newKeys
                 };
 
-                saveSession(email, newKeys.rawKeyHex, newKeys.authHash);
+                const existingSession = getSession();
+                const rememberMe = existingSession ? existingSession.rememberMe !== false : true;
+                saveSession(email, newKeys.rawKeyHex, newKeys.authHash, rememberMe);
 
                 loadPortfolioFromState(restoredPortfolio);
                 updateAccountUI();
@@ -4997,7 +5063,9 @@ INSTRUCTIONS:
                     keys: newKeys
                 };
 
-                saveSession(email, newKeys.rawKeyHex, newKeys.authHash);
+                const existingSession = getSession();
+                const rememberMe = existingSession ? existingSession.rememberMe !== false : true;
+                saveSession(email, newKeys.rawKeyHex, newKeys.authHash, rememberMe);
 
                 // Hide recovery box & recovery section
                 const recBox = document.getElementById("recoveryKeyDisplayBox");
@@ -9135,6 +9203,7 @@ INSTRUCTIONS:
             window.clearSession = clearSession;
             window.getSession = getSession;
             window.restoreSession = restoreSession;
+            window.onToggleStatusRememberMe = onToggleStatusRememberMe;
             window.updateAccountUI = updateAccountUI;
             window.exportEncryptedBackupData = exportEncryptedBackupData;
             window.importEncryptedBackupData = importEncryptedBackupData;
