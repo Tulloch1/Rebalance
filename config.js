@@ -21,8 +21,8 @@
         // --- Brand & Customer Support ---
         brand: {
             appName: "Rebalance",
-            supportEmail: "support@rebalance.com",
-            feedbackEmail: "support@rebalance.com",
+            supportEmail: "rebalancecalculator@gmail.com",
+            feedbackEmail: "rebalancecalculator@gmail.com",
             companyName: "Rebalance",
             websiteUrl: "https://rebalance.com",
             disclaimerTitle: "Disclaimers",
@@ -63,3 +63,4 @@
         }
     };
 }));
+

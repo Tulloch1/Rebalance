@@ -2802,7 +2802,7 @@
             <div>
                 <span>Have feedback? Please send any thoughts or bugs you find to </span>
                 <span class="email-copy-btn" onclick="copyFeedbackEmail(event)" title="Click to copy email">
-                    <span id="feedbackEmail">support@rebalance.com</span>
+                    <span id="feedbackEmail">rebalancecalculator@gmail.com</span>
                     <span class="email-copy-icon">
                         <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
@@ -3444,8 +3444,8 @@
             return {
                 brand: {
                     appName: "Rebalance",
-                    supportEmail: "support@rebalance.com",
-                    feedbackEmail: "support@rebalance.com"
+                    supportEmail: "rebalancecalculator@gmail.com",
+                    feedbackEmail: "rebalancecalculator@gmail.com"
                 },
                 api: {
                     productionUrl: "https://rebalance-api.portfolio-calculator.workers.dev",
@@ -8240,7 +8240,7 @@ INSTRUCTIONS:
         function copyFeedbackEmail(e) {
             if (e) e.preventDefault();
             const config = getAppConfig();
-            const email = (config.brand && config.brand.feedbackEmail) || "support@rebalance.com";
+            const email = (config.brand && config.brand.feedbackEmail) || "rebalancecalculator@gmail.com";
             navigator.clipboard.writeText(email).then(() => {
                 const toast = document.getElementById("emailToast");
                 if (toast) {
