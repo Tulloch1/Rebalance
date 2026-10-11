@@ -28,6 +28,7 @@
             --text-secondary: #8E95A2;
             --text-muted: #575E6A;
             
+            --primary: #24DBA1;
             --accent: #24DBA1;
             --accent-hover: #1fca94;
             --accent-glow: rgba(36, 219, 161, 0.15);
@@ -61,6 +62,7 @@
             --text-secondary: #5A6270;
             --text-muted: #8E95A2;
             
+            --primary: #14B881;
             --accent: #14B881;
             --accent-hover: #0FA070;
             --accent-glow: rgba(20, 184, 129, 0.18);
@@ -1797,6 +1799,19 @@
             box-shadow: 0 0 0 3px var(--accent-glow);
         }
 
+        .account-checkbox {
+            accent-color: var(--accent);
+            cursor: pointer;
+            width: 15px;
+            height: 15px;
+            border-radius: 3px;
+            vertical-align: middle;
+        }
+
+        input[type="checkbox"] {
+            accent-color: var(--accent);
+        }
+
         .account-notice {
             background: var(--accent-badge-bg);
             border: 1px solid var(--accent-badge-border);
@@ -3020,7 +3035,7 @@
                             </button>
                         </div>
                         <div style="display: flex; align-items: center; gap: 8px; margin-top: -4px; margin-bottom: 12px;">
-                            <input type="checkbox" id="signInRememberMe" checked style="accent-color: var(--primary); cursor: pointer; width: 14px; height: 14px;">
+                            <input type="checkbox" id="signInRememberMe" class="account-checkbox" checked style="accent-color: var(--accent); cursor: pointer; width: 15px; height: 15px;">
                             <label for="signInRememberMe" style="font-size: 12px; color: var(--text-secondary); cursor: pointer; user-select: none;">Keep me signed in on this device</label>
                         </div>
                         <div id="signInFeedback" class="auth-feedback" style="display: none; padding: 10px 14px; border-radius: var(--radius-card); font-size: 12px; margin-bottom: 12px; line-height: 1.45;"></div>
@@ -3142,7 +3157,7 @@
                             <input type="password" class="account-input" id="signUpConfirmPassword" placeholder="••••••••••••" autocomplete="new-password" minlength="8" required>
                         </div>
                         <div style="display: flex; align-items: center; gap: 8px; margin-top: 2px; margin-bottom: 12px;">
-                            <input type="checkbox" id="signUpRememberMe" checked style="accent-color: var(--primary); cursor: pointer; width: 14px; height: 14px;">
+                            <input type="checkbox" id="signUpRememberMe" class="account-checkbox" checked style="accent-color: var(--accent); cursor: pointer; width: 15px; height: 15px;">
                             <label for="signUpRememberMe" style="font-size: 12px; color: var(--text-secondary); cursor: pointer; user-select: none;">Keep me signed in on this device</label>
                         </div>
                         <div id="signUpFeedback" class="auth-feedback" style="display: none; padding: 10px 14px; border-radius: var(--radius-card); font-size: 12px; margin-bottom: 12px; line-height: 1.45;"></div>
