@@ -5,9 +5,17 @@ const vm = require('vm');
 const htmlPath = path.resolve(__dirname, '..', 'index.html');
 const htmlContent = fs.readFileSync(htmlPath, 'utf8');
 
-const scriptMatch = htmlContent.match(/<script>([\s\S]*?)<\/script>/);
+const configPath = path.resolve(__dirname, '..', 'config.js');
+let appConfig = null;
+if (fs.existsSync(configPath)) {
+    try {
+        appConfig = require(configPath);
+    } catch (e) {}
+}
+
+const scriptMatch = htmlContent.match(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/i);
 if (!scriptMatch) {
-    throw new Error("Could not find <script> tag in index.html");
+    throw new Error("Could not find inline <script> tag in index.html");
 }
 const scriptCode = scriptMatch[1];
 
@@ -112,8 +120,10 @@ function createTestEnv() {
             },
             createElement: () => getOrCreateElement('temp_' + Math.random())
         },
+        REBALANCE_CONFIG: appConfig,
         window: {
             crypto: globalThis.crypto,
+            REBALANCE_CONFIG: appConfig,
             addEventListener() {},
             getSelection: () => ({ removeAllRanges() {}, addRange() {} })
         },

@@ -2802,7 +2802,7 @@
             <div>
                 <span>Have feedback? Please send any thoughts or bugs you find to </span>
                 <span class="email-copy-btn" onclick="copyFeedbackEmail(event)" title="Click to copy email">
-                    <span id="feedbackEmail">williambatulloch@gmail.com</span>
+                    <span id="feedbackEmail">support@rebalance.com</span>
                     <span class="email-copy-icon">
                         <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
@@ -3432,7 +3432,32 @@
         </div>
     </div>
 
+    <script src="config.js"></script>
     <script>
+        function getAppConfig() {
+            if (typeof window !== 'undefined' && window.REBALANCE_CONFIG) {
+                return window.REBALANCE_CONFIG;
+            }
+            if (typeof REBALANCE_CONFIG !== 'undefined') {
+                return REBALANCE_CONFIG;
+            }
+            return {
+                brand: {
+                    appName: "Rebalance",
+                    supportEmail: "support@rebalance.com",
+                    feedbackEmail: "support@rebalance.com"
+                },
+                api: {
+                    productionUrl: "https://rebalance-api.portfolio-calculator.workers.dev",
+                    legacyEndpoints: []
+                },
+                crypto: {
+                    defaultGuestSalt: "guest_backup@rebalance.local",
+                    defaultBackupSalt: "backup@rebalance.local"
+                }
+            };
+        }
+
         let holdingsData = [];
 
         // =========================================================================
@@ -3794,11 +3819,20 @@
             }
         }
 
+        function initFeedbackConfig() {
+            const config = getAppConfig();
+            const el = document.getElementById("feedbackEmail");
+            if (el && config.brand && config.brand.feedbackEmail) {
+                el.textContent = config.brand.feedbackEmail;
+            }
+        }
+
         window.addEventListener('DOMContentLoaded', () => {
             initTheme();
             updateCurrencySymbols();
             loadFormData();
             restoreSession();
+            initFeedbackConfig();
         });
 
         // Prevent mouse wheel from incrementing/decrementing number inputs when scrolling the page
@@ -4052,14 +4086,17 @@
         // --- RebalanceSync Service Adapter ---
         // Provides a single abstraction point for Account & Vault persistence.
         // Defaults to deployed Cloudflare Worker edge backend (D1). Setting apiBaseUrl to empty/offline switches to local storage.
-        const DEFAULT_PRODUCTION_API_URL = "https://rebalance-api.portfolio-calculator.workers.dev";
+        const DEFAULT_PRODUCTION_API_URL = (getAppConfig().api && getAppConfig().api.productionUrl) || "https://rebalance-api.portfolio-calculator.workers.dev";
 
         function getInitialApiBaseUrl() {
+            const config = getAppConfig();
+            const prodUrl = (config.api && config.api.productionUrl) || DEFAULT_PRODUCTION_API_URL;
+            const legacyUrls = (config.api && config.api.legacyEndpoints) || [];
             try {
                 if (typeof localStorage !== 'undefined') {
                     const stored = localStorage.getItem("rebalance_api_url");
                     if (stored === "offline") return "";
-                    if (stored && stored !== "https://portfolio-rebalancer.wbtulloch.workers.dev") {
+                    if (stored && !legacyUrls.includes(stored)) {
                         return stored;
                     }
                 }
@@ -4068,7 +4105,7 @@
             if (typeof process !== 'undefined' && process.versions && process.versions.node) {
                 return "";
             }
-            return DEFAULT_PRODUCTION_API_URL;
+            return prodUrl;
         }
 
         const RebalanceSync = {
@@ -8202,7 +8239,8 @@ INSTRUCTIONS:
 
         function copyFeedbackEmail(e) {
             if (e) e.preventDefault();
-            const email = "williambatulloch@gmail.com";
+            const config = getAppConfig();
+            const email = (config.brand && config.brand.feedbackEmail) || "support@rebalance.com";
             navigator.clipboard.writeText(email).then(() => {
                 const toast = document.getElementById("emailToast");
                 if (toast) {
