@@ -199,7 +199,8 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transform: translateZ(0);
+            transform: translateY(0) rotate(0deg) translateZ(0);
+            transform-origin: center center;
             backface-visibility: hidden;
             -webkit-backface-visibility: hidden;
             transition: all 0.25s ease;
@@ -209,7 +210,7 @@
             color: var(--accent);
             border-color: var(--accent-badge-border);
             background: var(--accent-badge-bg);
-            transform: rotate(45deg) translateZ(0);
+            transform: translateY(-2px) rotate(45deg) translateZ(0);
         }
 
         .settings-btn svg {
@@ -259,13 +260,17 @@
             justify-content: center;
             cursor: pointer;
             position: relative;
-            transition: color 0.25s ease, background 0.25s ease, border-color 0.25s ease;
+            transform: translateY(0) translateZ(0);
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            transition: all 0.25s ease;
         }
 
         .account-btn:hover {
             color: var(--accent);
             border-color: var(--accent-badge-border);
             background: var(--accent-badge-bg);
+            transform: translateY(-2px) translateZ(0);
         }
 
         .account-btn svg {
@@ -313,7 +318,7 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transform: rotate(0deg) translateZ(0);
+            transform: translateY(0) rotate(0deg) translateZ(0);
             transform-origin: center center;
             backface-visibility: hidden;
             -webkit-backface-visibility: hidden;
@@ -324,7 +329,7 @@
             color: var(--accent);
             border-color: var(--accent-badge-border);
             background: var(--accent-badge-bg);
-            transform: rotate(15deg) translateZ(0);
+            transform: translateY(-2px) rotate(15deg) translateZ(0);
         }
 
         .info-btn svg {
