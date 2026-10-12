@@ -148,6 +148,42 @@ Personal identifiers, contact information, operational branding, and backend end
   * Cloudflare Worker sync endpoints.
 * **Test Isolation:** Decoupled config is natively inject-able and mockable in headless test runners.
 
+### G. Monolithic Single-File Design & Future Modularization Blueprint
+The frontend is currently authored as a self-contained, single-file application (`index.html`, ~9,600 lines, ~430 KB).
+
+#### 1. Why Single-File Architecture is Preserved (Current State)
+* **Runtime & Network Performance:** At ~430 KB uncompressed (~85 KB gzipped), the application is significantly leaner than typical web bundles (1–5 MB). Embedding HTML, CSS, and JS into a single file eliminates network waterfalls, achieving near-instant First Contentful Paint (FCP).
+* **Zero-Dependency & Offline Execution:** Opening `index.html` locally via `file:///` works offline immediately without a web server. A standard multi-file split loading separate `<script src="app.js">` files triggers browser CORS security blocks (`origin 'null'`) when launched directly from disk.
+* **Sub-System Navigation Banners:** To eliminate developer navigation friction without breaking portability, `index.html` is structured into **6 formal sub-system navigation banners**:
+  1. `SUB-SYSTEM 1: CSS DESIGN SYSTEM & THEME ENGINE`
+  2. `SUB-SYSTEM 2: HTML DOM STRUCTURE & APPLICATION SHELL`
+  3. `SUB-SYSTEM 3: ZERO-KNOWLEDGE CRYPTO & CLOUD SYNC ENGINE`
+  4. `SUB-SYSTEM 4: UI STATE, SETTINGS & DOM EVENT CONTROLLERS`
+  5. `SUB-SYSTEM 5: CLIENT-SIDE DOCUMENT PARSERS & EXTENSIBLE BROKER ADAPTERS`
+  6. `SUB-SYSTEM 6: MATHEMATICAL CORE REBALANCING ENGINE`
+* **AI Assistant & Tooling Ergonomics:** Terminal searches (`Select-String` / `grep`) scan the file in milliseconds, and surgical edits via line range slicing remain fast and reliable. Context tokens are conserved because only target 30–100 line slices are loaded. Slight friction only arises during wide-scope refactors touching distant sections or when verifying global identifier scopes.
+
+#### 2. Criteria & Triggers for Modularizing (`index.html`)
+Splitting the single file should not occur arbitrarily mid-feature, but rather at one of three strategic milestones:
+1. **Acquisition & Technical Due Diligence:** Presenting modular, single-responsibility files (< 300 lines each) to prospective buyers or corporate engineering auditors.
+2. **Multi-Developer Collaboration:** Transitioning from solo development to multiple engineers committing concurrently (preventing git merge conflicts).
+3. **Developer Friction Exceeding Productivity:** When scrolling and cross-section coordination friction outweighs zero-build convenience.
+
+#### 3. Target Modular Architecture: "Source-to-Single-File" Pipeline (Option 2)
+When the split occurs, the project will **not** adopt standard multi-file runtime loading that breaks offline `file://` execution. Instead, it will implement a **Source-to-Single-File build pipeline**:
+* **Source Organization (`src/`):**
+  ```
+  src/
+  ├── styles/       # CSS tokens, theme variables, and layout rules
+  ├── crypto/       # PBKDF2 key derivation and AES-256-GCM vault encryption
+  ├── engine/       # DynaReb cash allocation and Hamilton-Hare rounding
+  ├── parsers/      # Client-side CSV, OpenXML (.xlsx), and PDF text parsers
+  ├── adapters/     # Broker registry and ledger strategies (Vanguard, CommSec, etc.)
+  └── ui/           # DOM event controllers, modal managers, and table renderers
+  ```
+* **Build / Inlining Step:** A zero-config Node.js bundler script or `vite-plugin-singlefile` compiles and inlines all modular source files into the standalone distribution `index.html`.
+* **Strategic Value:** Developers and auditors inspect clean, modular source files in git, while end-users and buyers retain a self-contained, lightning-fast, zero-dependency offline web application.
+
 ---
 
 ## 4. Cryptographic & Security Architecture
