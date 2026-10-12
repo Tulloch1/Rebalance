@@ -259,17 +259,13 @@
             justify-content: center;
             cursor: pointer;
             position: relative;
-            transform: translateY(0) translateZ(0);
-            backface-visibility: hidden;
-            -webkit-backface-visibility: hidden;
-            transition: all 0.25s ease;
+            transition: color 0.25s ease, background 0.25s ease, border-color 0.25s ease;
         }
 
         .account-btn:hover {
             color: var(--accent);
             border-color: var(--accent-badge-border);
             background: var(--accent-badge-bg);
-            transform: translateY(-2px) translateZ(0);
         }
 
         .account-btn svg {
@@ -277,6 +273,14 @@
             height: 18px;
             display: block;
             flex-shrink: 0;
+            transform: translateY(0) translateZ(0);
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            transition: transform 0.25s ease;
+        }
+
+        .account-btn:hover svg {
+            transform: translateY(-2px) translateZ(0);
         }
 
         .account-btn.logged-in {
