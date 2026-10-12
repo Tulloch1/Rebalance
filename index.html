@@ -259,8 +259,7 @@
             justify-content: center;
             cursor: pointer;
             position: relative;
-            transform: scale(1) translateZ(0);
-            transform-origin: center center;
+            transform: translateY(0) translateZ(0);
             backface-visibility: hidden;
             -webkit-backface-visibility: hidden;
             transition: all 0.25s ease;
@@ -270,7 +269,7 @@
             color: var(--accent);
             border-color: var(--accent-badge-border);
             background: var(--accent-badge-bg);
-            transform: scale(1.06) translateZ(0);
+            transform: translateY(-2px) translateZ(0);
         }
 
         .account-btn svg {
@@ -310,7 +309,7 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transform: scale(1) translateZ(0);
+            transform: rotate(0deg) translateZ(0);
             transform-origin: center center;
             backface-visibility: hidden;
             -webkit-backface-visibility: hidden;
@@ -321,7 +320,7 @@
             color: var(--accent);
             border-color: var(--accent-badge-border);
             background: var(--accent-badge-bg);
-            transform: scale(1.06) translateZ(0);
+            transform: rotate(15deg) translateZ(0);
         }
 
         .info-btn svg {
