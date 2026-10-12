@@ -593,12 +593,17 @@
             display: grid;
             grid-template-columns: 32px 1.4fr 1.3fr 1.2fr 36px;
             gap: 10px;
-            padding: 8px 4px;
+            padding: 8px 11px;
             font-size: 11px;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.05em;
             color: var(--text-muted);
+            align-items: center;
+        }
+
+        .table-headers > div:not(:first-child):not(.sort-header-cell) {
+            padding-left: 2px;
         }
 
         .holdings-list {
@@ -622,7 +627,7 @@
         /* 6-Column Share Price & Quantity Grid */
         .table-headers.mode-shares,
         .holding-row.mode-shares {
-            grid-template-columns: 32px 1.05fr 1fr 0.9fr 1.25fr 36px;
+            grid-template-columns: 32px 1.2fr 1.15fr 0.95fr 1.15fr 36px;
             gap: 8px;
         }
 
@@ -2012,6 +2017,7 @@
             .table-headers {
                 grid-template-columns: 24px 1.2fr 1fr 1fr 30px;
                 gap: 6px;
+                padding: 6px 9px;
             }
             .holding-row {
                 grid-template-columns: 24px 1.2fr 1fr 1fr 30px;
@@ -2020,9 +2026,9 @@
             }
             .table-headers.mode-shares,
             .holding-row.mode-shares {
-                grid-template-columns: 20px 0.95fr 0.95fr 0.85fr 1.25fr 28px;
+                grid-template-columns: 20px 1.05fr 1fr 0.85fr 1.15fr 28px;
                 gap: 4px;
-                padding: 6px 6px;
+                padding: 6px 7px;
             }
             .mode-shares .clean-input {
                 padding: 6px 6px;
