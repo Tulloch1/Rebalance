@@ -3308,8 +3308,8 @@ console.log("\n--- PART 4: Information Guide Modal & Chrome Tab Navigation ---")
         // =========================================================================
         console.log("\n--- PART 12: Holdings Sort By Feature ---");
 
-        // 1. Initial sort state defaults to '--select--' with disabled direction arrow
-        runTest("Holdings sort control initializes with '--select--' and disabled direction button", () => {
+        // 1. Initial sort state defaults to '--sort by--' with disabled direction arrow
+        runTest("Holdings sort control initializes with '--sort by--' and disabled direction button", () => {
             env.onSortFieldChange("none");
             env.renderTableHeaders();
             assert.strictEqual(env.getCurrentSortField(), "none");
@@ -3448,8 +3448,8 @@ console.log("\n--- PART 4: Information Guide Modal & Chrome Tab Navigation ---")
             env.onSettingInputModeToggle(false);
         });
 
-        // 7. Switching sort back to '--select--' restores the original user insertion order
-        runTest("Switching sort back to '--select--' restores the original user insertion order", () => {
+        // 7. Switching sort back to '--sort by--' restores the original user insertion order
+        runTest("Switching sort back to '--sort by--' restores the original user insertion order", () => {
             env.setHoldings([
                 { t: "Alpha", v: "300", _originalIndex: 0 },
                 { t: "Beta", v: "100", _originalIndex: 1 },

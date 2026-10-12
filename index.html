@@ -622,7 +622,7 @@
         /* 6-Column Share Price & Quantity Grid */
         .table-headers.mode-shares,
         .holding-row.mode-shares {
-            grid-template-columns: 32px 1.2fr 1.1fr 1fr 1fr 36px;
+            grid-template-columns: 32px 1.05fr 1fr 0.9fr 1.25fr 36px;
             gap: 8px;
         }
 
@@ -652,8 +652,8 @@
             background: var(--surface-card);
             border: 1px solid var(--border-subtle);
             border-radius: var(--radius-pill);
-            padding: 1px 4px 1px 7px;
-            height: 24px;
+            padding: 1px 4px 1px 6px;
+            height: 23px;
             gap: 2px;
             white-space: nowrap;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
@@ -672,11 +672,11 @@
             border: none;
             outline: none;
             color: var(--text-secondary);
-            font-size: 11px;
+            font-size: 10.5px;
             font-weight: 600;
             font-family: var(--font-sans);
             cursor: pointer;
-            padding: 0 2px;
+            padding: 0 1px;
             text-transform: none;
             letter-spacing: normal;
         }
@@ -698,8 +698,8 @@
             background: transparent;
             border: none;
             padding: 0;
-            width: 18px;
-            height: 18px;
+            width: 16px;
+            height: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -2020,7 +2020,7 @@
             }
             .table-headers.mode-shares,
             .holding-row.mode-shares {
-                grid-template-columns: 20px 1.1fr 1fr 0.9fr 0.9fr 28px;
+                grid-template-columns: 20px 0.95fr 0.95fr 0.85fr 1.25fr 28px;
                 gap: 4px;
                 padding: 6px 6px;
             }
@@ -5549,6 +5549,14 @@ INSTRUCTIONS:
             });
         }
 
+        function getCurrentSortField() {
+            return currentSortField;
+        }
+
+        function getCurrentSortDirection() {
+            return currentSortDirection;
+        }
+
         function onSortFieldChange(field) {
             const prevField = currentSortField;
             currentSortField = field;
@@ -5556,9 +5564,7 @@ INSTRUCTIONS:
                 ensureHoldingsOriginalIndices();
                 holdingsData.sort((a, b) => (a._originalIndex ?? 0) - (b._originalIndex ?? 0));
             } else {
-                if (field === "alpha" && prevField !== "alpha") {
-                    currentSortDirection = "asc";
-                } else if (prevField === "none") {
+                if (field !== prevField) {
                     currentSortDirection = (field === "alpha" ? "asc" : "desc");
                 }
                 applyHoldingsSort();
@@ -5622,6 +5628,18 @@ INSTRUCTIONS:
                     <div>Target</div>
                     ${renderSortControlHtml(false)}
                 `;
+            }
+
+            const sortSel = document.getElementById("sortFieldSelect");
+            if (sortSel) sortSel.value = currentSortField;
+            const sortBtn = document.getElementById("sortDirBtn");
+            if (sortBtn) {
+                sortBtn.disabled = (currentSortField === "none");
+                if (currentSortField === "none") {
+                    sortBtn.classList.add("disabled");
+                } else {
+                    sortBtn.classList.remove("disabled");
+                }
             }
         }
 
@@ -5930,10 +5948,12 @@ INSTRUCTIONS:
             if (typeof confirm === 'function' && !confirm("Reset portfolio to example assets? This will overwrite your current holdings.")) {
                 return;
             }
+            currentSortField = "none";
+            currentSortDirection = "desc";
             holdingsData = [
-                { t: "VOO", p: "500", q: "10", v: "5000", w: "50" },
-                { t: "VXUS", p: "60", q: "50", v: "3000", w: "30" },
-                { t: "BND", p: "80", q: "25", v: "2000", w: "20" }
+                { t: "VOO", p: "500", q: "10", v: "5000", w: "50", _originalIndex: 0 },
+                { t: "VXUS", p: "60", q: "50", v: "3000", w: "30", _originalIndex: 1 },
+                { t: "BND", p: "80", q: "25", v: "2000", w: "20", _originalIndex: 2 }
             ];
             if (document.getElementById("deposit")) {
                 document.getElementById("deposit").value = "1000";
@@ -8370,6 +8390,8 @@ INSTRUCTIONS:
                 minBuy: (minBuyEl && minBuyEl.value !== undefined && minBuyEl.value !== "") ? minBuyEl.value : "0",
                 completeRebalance: completeEl ? completeEl.checked : false,
                 inputMode: isSharesInputMode() ? "shares" : "value",
+                sortField: currentSortField,
+                sortDirection: currentSortDirection,
                 holdings: holdingsData
             };
             localStorage.setItem("rebalancer_state", JSON.stringify(payload));
@@ -8397,6 +8419,12 @@ INSTRUCTIONS:
                             localStorage.setItem("rebalancer_input_mode", data.inputMode === "shares" ? "shares" : "value");
                         } catch (e) {}
                     }
+                    if (data.sortField) {
+                        currentSortField = data.sortField;
+                    }
+                    if (data.sortDirection) {
+                        currentSortDirection = data.sortDirection;
+                    }
                     if (document.getElementById("deposit")) {
                         document.getElementById("deposit").value = data.deposit || "";
                     }
@@ -8408,6 +8436,7 @@ INSTRUCTIONS:
                     }
                     if (Array.isArray(data.holdings) && data.holdings.length > 0) {
                         holdingsData = data.holdings;
+                        ensureHoldingsOriginalIndices();
                     } else {
                         initDefaultHoldings();
                     }
@@ -8424,11 +8453,13 @@ INSTRUCTIONS:
 
         function initDefaultHoldings() {
             holdingsData = [
-                { t: "", v: "", p: "", q: "", w: "" }
+                { t: "", v: "", p: "", q: "", w: "", _originalIndex: 0 }
             ];
         }
 
         function resetPage() {
+            currentSortField = "none";
+            currentSortDirection = "desc";
             document.getElementById("deposit").value = "";
             document.getElementById("minBuy").value = "0";
             if (document.getElementById("completeRebalance")) {
@@ -9542,6 +9573,12 @@ INSTRUCTIONS:
             window.onSettingInputModeToggle = onSettingInputModeToggle;
             window.renderTableHeaders = renderTableHeaders;
             window.renderRows = renderRows;
+            window.onSortFieldChange = onSortFieldChange;
+            window.onToggleSortDirection = onToggleSortDirection;
+            window.applyHoldingsSort = applyHoldingsSort;
+            window.ensureHoldingsOriginalIndices = ensureHoldingsOriginalIndices;
+            window.getCurrentSortField = getCurrentSortField;
+            window.getCurrentSortDirection = getCurrentSortDirection;
             window.updateHolding = updateHolding;
             window.addHolding = addHolding;
             window.removeHolding = removeHolding;
