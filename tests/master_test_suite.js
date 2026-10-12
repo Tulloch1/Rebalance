@@ -3577,6 +3577,14 @@ console.log("\n--- PART 4: Information Guide Modal & Chrome Tab Navigation ---")
                 env.initBrandConfig();
             }
         });
+
+        // 5. index.html does not contain hardcoded version text inside #brandVersionTag
+        runTest("index.html does not hardcode version string inside brandVersionTag element", () => {
+            const fs = require('fs');
+            const path = require('path');
+            const html = fs.readFileSync(path.resolve(__dirname, '..', 'index.html'), 'utf8');
+            assert.ok(html.includes('<span class="brand-tag" id="brandVersionTag"></span>'), "brandVersionTag element must not contain hardcoded version string in HTML markup");
+        });
     }
 
     console.log(`\n=================================================`);
