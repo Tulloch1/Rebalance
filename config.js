@@ -21,10 +21,11 @@
         // --- Brand & Customer Support ---
         brand: {
             appName: "Rebalance",
+            version: "v1.2.2",
             supportEmail: "rebalancecalculator@gmail.com",
             feedbackEmail: "rebalancecalculator@gmail.com",
             companyName: "Rebalance",
-            websiteUrl: "https://rebalance.com",
+            websiteUrl: "https://rebalance-calculator.pages.dev/",
             disclaimerTitle: "Disclaimers",
             disclaimerText: "Rebalance is a portfolio calculation tool for informational purposes only and does not provide financial advice."
         },

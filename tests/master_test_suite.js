@@ -3536,6 +3536,47 @@ console.log("\n--- PART 4: Information Guide Modal & Chrome Tab Navigation ---")
             // Reset back to none for cleanliness
             env.onSortFieldChange("none");
         });
+
+        // =========================================================================
+        // PART 13: Brand Configuration & Version Extraction Subsystem
+        // =========================================================================
+        console.log("\n--- PART 13: Brand Configuration & Version Extraction Subsystem ---");
+
+        // 1. config.js defines brand.version matching v1.2.2
+        runTest("config.js defines brand.version matching v1.2.2", () => {
+            const config = require("../config.js");
+            assert.ok(config.brand, "config.brand must exist");
+            assert.strictEqual(config.brand.version, "v1.2.2");
+        });
+
+        // 2. getAppConfig() resolves brand.version correctly
+        runTest("getAppConfig() resolves brand.version correctly", () => {
+            const cfg = env.getAppConfig();
+            assert.ok(cfg.brand, "cfg.brand must exist");
+            assert.strictEqual(cfg.brand.version, "v1.2.2");
+        });
+
+        // 3. initBrandConfig() hydrates brandVersionTag with version from config
+        runTest("initBrandConfig() hydrates brandVersionTag with version from config", () => {
+            const versionEl = env.getEl("brandVersionTag");
+            versionEl.textContent = "";
+            env.initBrandConfig();
+            assert.strictEqual(versionEl.textContent, "v1.2.2");
+        });
+
+        // 4. initBrandConfig() respects dynamic custom version override in config
+        runTest("initBrandConfig() respects dynamic custom version override in config", () => {
+            const versionEl = env.getEl("brandVersionTag");
+            const originalVersion = env.sandbox.REBALANCE_CONFIG.brand.version;
+            try {
+                env.sandbox.REBALANCE_CONFIG.brand.version = "v2.0.0-beta";
+                env.initBrandConfig();
+                assert.strictEqual(versionEl.textContent, "v2.0.0-beta");
+            } finally {
+                env.sandbox.REBALANCE_CONFIG.brand.version = originalVersion;
+                env.initBrandConfig();
+            }
+        });
     }
 
     console.log(`\n=================================================`);

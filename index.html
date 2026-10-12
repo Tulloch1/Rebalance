@@ -2730,7 +2730,7 @@
                         <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
                     </svg>
                 </button>
-                <span class="brand-tag">v1.2.2</span>
+                <span class="brand-tag" id="brandVersionTag">v1.2.2</span>
             </div>
         </header>
 
@@ -3561,6 +3561,7 @@
             return {
                 brand: {
                     appName: "Rebalance",
+                    version: "v1.2.2",
                     supportEmail: "rebalancecalculator@gmail.com",
                     feedbackEmail: "rebalancecalculator@gmail.com"
                 },
@@ -3936,12 +3937,20 @@
             }
         }
 
-        function initFeedbackConfig() {
+        function initBrandConfig() {
             const config = getAppConfig();
-            const el = document.getElementById("feedbackEmail");
-            if (el && config.brand && config.brand.feedbackEmail) {
-                el.textContent = config.brand.feedbackEmail;
+            const emailEl = document.getElementById("feedbackEmail");
+            if (emailEl && config.brand && config.brand.feedbackEmail) {
+                emailEl.textContent = config.brand.feedbackEmail;
             }
+            const versionEl = document.getElementById("brandVersionTag") || document.getElementById("brandVersion") || document.querySelector(".header-controls .brand-tag");
+            if (versionEl && config.brand && config.brand.version) {
+                versionEl.textContent = config.brand.version;
+            }
+        }
+
+        function initFeedbackConfig() {
+            initBrandConfig();
         }
 
         window.addEventListener('DOMContentLoaded', () => {
@@ -3949,7 +3958,7 @@
             updateCurrencySymbols();
             loadFormData();
             restoreSession();
-            initFeedbackConfig();
+            initBrandConfig();
         });
 
         // Prevent mouse wheel from incrementing/decrementing number inputs when scrolling the page
