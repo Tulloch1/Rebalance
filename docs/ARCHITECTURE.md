@@ -42,11 +42,16 @@ graph TD
 ```
 Rebalancing/
 ├── index.html                  # Root distribution file (kept in 100% parity with GitHub)
+├── config.js                   # Decoupled app config (branding, support email, versioning, endpoints)
 ├── docs/
 │   ├── ARCHITECTURE.md         # This technical specification
-│   └── PRO_TIER_SPEC.md        # Monetization, pricing, and MoR specifications
+│   ├── CONTEXT.md              # Project executive context & quick-start briefing
+│   ├── PRO_TIER_SPEC.md        # Monetization, pricing, and MoR specifications
+│   ├── implementation_plan.md  # Multi-phase engineering roadmap & design specs
+│   └── sort_feature_plan.md    # Specification for Holdings Sort By subsystem
 └── GitHub/Rebalance/
     ├── index.html              # Primary source file for the Single-Page Application (SPA)
+    ├── config.js               # Standalone config module (REBALANCE_CONFIG)
     ├── backend/
     │   ├── src/
     │   │   └── index.js        # Cloudflare Worker API edge handler
@@ -54,8 +59,8 @@ Rebalancing/
     │   ├── wrangler.toml       # Cloudflare deployment configuration
     │   └── package.json        # Miniflare / Wrangler testing dependencies
     └── tests/
-        ├── master_test_suite.js    # 111 deterministic unit & integration tests
-        ├── backend_test_suite.js   # 23 Cloudflare Worker edge & SQL tests
+        ├── master_test_suite.js    # 194 deterministic unit & integration tests (Parts 1–12)
+        ├── backend_test_suite.js   # 27 Cloudflare Worker edge & SQL tests
         ├── fuzz_invariant_suite.js # Mathematical fuzzing & invariant verification
         ├── test_helper.js          # Mock DOM & Web Crypto browser environment
         └── run_all.js              # Master test runner
@@ -121,6 +126,27 @@ Located in the Rebalance Breakdown output:
 * **Initial Weight Bar (`alloc-bar-start`):** Represents pre-rebalance portfolio weighting.
 * **New Weight Bar (`alloc-bar-new`):** Represents post-rebalance weighting in bright mint green (`--accent`).
 * **Target Marker (`alloc-target-marker`):** A white vertical indicator positioned at `targetPct%`.
+
+### E. Dynamic Holdings Sorting Subsystem
+Located directly above the holding row remove buttons (`✕`) anchored to the right of the Target column:
+* **UI Structure:** A segmented pill (`.sort-pill-container`) containing:
+  * A native styled dropdown (`#sortFieldSelect`) defaulting to `--sort by--`.
+  * An integrated direction toggle button (`#sortDirBtn`) with directional arrow SVGs ($\blacktriangle$ ascending / $\blacktriangledown$ descending).
+* **Mode-Aware Variable Selection:**
+  * **Value Mode:** `--sort by--` (default insertion order), `Alphabetical`, `Target Weight`, and `Value`.
+  * **Shares Mode:** Dynamically introduces `Share Price` and `Quantity`. Toggling back to Value mode safely resets sort if ordered by an inactive variable (`price` or `qty`).
+* **Original Order Restoration:** Every holding tracks its user creation order through `_originalIndex: number`. Selecting `--sort by--` instantly restores manual input sequence and disables the direction arrow.
+* **Column Alignment & Sizing:** Table headers use `padding: 8px 11px;` to match `.holding-row` card borders and inner padding (10px + 1px border), with a 6-column grid (`32px 1.2fr 1.15fr 0.95fr 1.15fr 36px`) guaranteeing 30px+ clearance before the sort pill.
+
+### F. Decoupled Configuration & Identifier Engine (`config.js`)
+Personal identifiers, contact information, operational branding, and backend endpoints are decoupled from `index.html` into a standalone `config.js` file:
+* **Global Accessor (`REBALANCE_CONFIG`):** Exposed on `window` and loaded prior to the main SPA script.
+* **Fallback Resilience:** `index.html` contains non-destructive null-coalescing defaults if `config.js` is absent.
+* **Centralized Fields:**
+  * Support & Feedback contact (`rebalancecalculator@gmail.com`).
+  * App branding, version tag (`v1.2.2`), and metadata.
+  * Cloudflare Worker sync endpoints.
+* **Test Isolation:** Decoupled config is natively inject-able and mockable in headless test runners.
 
 ---
 
@@ -201,14 +227,14 @@ Testing is strictly deterministic and executes in Node.js using custom mock envi
 
 | Test Suite | File | Tests | Focus Area |
 | :--- | :--- | :---: | :--- |
-| **Master Deterministic Suite** | `tests/master_test_suite.js` | **182** | Core math, DOM rendering, whole-dollar rounding, storage persistence, Clean Slate flows, Shares Mode, CSV/Excel/PDF parsing, and Broker Adapters. |
-| **Backend Edge Suite** | `tests/backend_test_suite.js` | **23** | Cloudflare Worker endpoints, D1 SQL queries, OTP rate limiting, billing challenges, and anti-enumeration. |
+| **Master Deterministic Suite** | `tests/master_test_suite.js` | **194** | Core math, DOM rendering, whole-dollar rounding, storage persistence, Clean Slate flows, Shares Mode, CSV/Excel/PDF parsing, Broker Adapters, and Holdings Sort By subsystem. |
+| **Backend Edge Suite** | `tests/backend_test_suite.js` | **27** | Cloudflare Worker endpoints, D1 SQL queries, OTP rate limiting, billing challenges, security headers, and anti-enumeration. |
 | **Fuzz Invariant Suite** | `tests/fuzz_invariant_suite.js` | **Fuzz** | Property-based randomized fuzzing verifying cash-conservation and non-negativity invariants across millions of permutations. |
 
 ### Running the Tests:
 ```powershell
-node tests/master_test_suite.js    # Runs all 182 frontend & DOM unit tests
-node tests/backend_test_suite.js   # Runs all 23 Cloudflare Worker edge tests
+node tests/master_test_suite.js    # Runs all 194 frontend & DOM unit tests
+node tests/backend_test_suite.js   # Runs all 27 Cloudflare Worker edge tests
 node tests/run_all.js              # Executes complete end-to-end verification
 ```
 
@@ -222,6 +248,6 @@ node tests/run_all.js              # Executes complete end-to-end verification
    * All active development occurs on branch `dev` or `main`.
    * **NEVER push to remote git.** Local commits are made locally; the user controls when to push to GitHub.
 3. **Testing Gate:**
-   No feature or refactor is considered complete until all 205 automated tests pass with 100% success.
+   No feature or refactor is considered complete until all 221 automated tests pass with 100% success.
 4. **Client-Side Privacy:**
    Document parsing (CSV, Excel, PDF) is executed entirely client-side using Web Streams and vanilla JS with zero external server dependencies.

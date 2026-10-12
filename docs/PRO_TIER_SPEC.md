@@ -140,3 +140,14 @@ CREATE TABLE accounts (
 * No custom billing management code or credit card update forms are needed in the app.
 * Lemon Squeezy provides a hosted **Customer Portal**.
 * A simple *"Manage Subscription"* link in Settings -> Account redirects the user to their authenticated Lemon Squeezy billing portal.
+
+---
+
+## 5. Support & Feedback Infrastructure
+
+* **Decoupled Support Routing:** All customer support, dispute inquiries, and feedback communications route through the decoupled configuration module defined in [`config.js`](file:///c:/Users/willi/Desktop/Rebalancing/GitHub/Rebalance/config.js) via `REBALANCE_CONFIG.supportEmail`:
+  ```javascript
+  supportEmail: 'rebalancecalculator@gmail.com'
+  ```
+* **Privacy & Decoupling:** Eliminates personal identifier exposure across public, documentation, and client-facing interfaces while providing users with a dedicated contact channel for billing and application feedback.
+
