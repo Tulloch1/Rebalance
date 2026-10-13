@@ -552,7 +552,7 @@
             border: 1px solid var(--border-subtle);
             border-radius: var(--radius-card);
             padding: 8px 10px;
-            transition: all 0.2s ease;
+            transition: background 0.08s ease-out, border-color 0.08s ease-out;
         }
 
         /* 6-Column Share Price & Quantity Grid */
@@ -565,6 +565,7 @@
         .holding-row:hover {
             border-color: var(--border-hover);
             background: rgba(255, 255, 255, 0.015);
+            transition: background 0.05s ease-out, border-color 0.05s ease-out;
         }
 
         .holding-row:focus-within {
