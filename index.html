@@ -825,6 +825,14 @@
             box-shadow: 0 0 0 2px var(--accent-glow);
         }
 
+        .clean-input:-webkit-autofill,
+        .clean-input:-webkit-autofill:hover,
+        .clean-input:-webkit-autofill:focus {
+            -webkit-text-fill-color: var(--text-primary);
+            -webkit-box-shadow: 0 0 0px 1000px var(--surface-card) inset;
+            transition: background-color 5000s ease-in-out 0s;
+        }
+
         .input-ticker {
             text-transform: uppercase;
             font-weight: 600;
@@ -2887,7 +2895,7 @@
                 </div>
                 <div class="deposit-input-wrapper">
                     <span class="deposit-currency">$</span>
-                    <input type="number" step="any" class="deposit-input" id="deposit" placeholder="0.00" oninput="onDepositInput(); saveFormData()">
+                    <input type="number" step="any" class="deposit-input" id="deposit" placeholder="0.00" autocomplete="off" oninput="onDepositInput(); saveFormData()">
                 </div>
             </div>
 
@@ -2923,7 +2931,7 @@
                         <label for="minBuy">Minimum Transaction</label>
                         <div class="min-buy-input-wrapper">
                             <span class="min-buy-currency">$</span>
-                            <input type="number" step="any" min="0" class="min-buy-input" id="minBuy" placeholder="0" value="0" oninput="onMinBuyInput(); saveFormData()">
+                            <input type="number" step="any" min="0" class="min-buy-input" id="minBuy" placeholder="0" value="0" autocomplete="off" oninput="onMinBuyInput(); saveFormData()">
                         </div>
                     </div>
                 </div>
@@ -8376,17 +8384,17 @@ INSTRUCTIONS:
                     row.innerHTML = `
                         <div class="row-index">${rowNum}</div>
                         <div class="input-group">
-                            <input type="text" class="clean-input input-ticker" id="ticker_${rowNum}" placeholder="e.g. AAPL" value="${holding.t || ''}" oninput="updateHolding(${index}, 't', this.value)">
+                            <input type="text" class="clean-input input-ticker" id="ticker_${rowNum}" placeholder="e.g. AAPL" value="${holding.t || ''}" autocomplete="off" spellcheck="false" autocorrect="off" oninput="updateHolding(${index}, 't', this.value)">
                         </div>
                         <div class="input-group">
                             <span class="input-prefix">${getCurrencySymbol()}</span>
-                            <input type="number" step="any" min="0" class="clean-input input-price" id="price_${rowNum}" placeholder="0.00" value="${holding.p !== undefined && holding.p !== null ? holding.p : ''}" oninput="updateHolding(${index}, 'p', this.value)">
+                            <input type="number" step="any" min="0" class="clean-input input-price" id="price_${rowNum}" placeholder="0.00" value="${holding.p !== undefined && holding.p !== null ? holding.p : ''}" autocomplete="off" oninput="updateHolding(${index}, 'p', this.value)">
                         </div>
                         <div class="input-group">
-                            <input type="number" step="any" min="0" class="clean-input input-qty" id="qty_${rowNum}" placeholder="0" value="${holding.q !== undefined && holding.q !== null ? holding.q : ''}" oninput="updateHolding(${index}, 'q', this.value)">
+                            <input type="number" step="any" min="0" class="clean-input input-qty" id="qty_${rowNum}" placeholder="0" value="${holding.q !== undefined && holding.q !== null ? holding.q : ''}" autocomplete="off" oninput="updateHolding(${index}, 'q', this.value)">
                         </div>
                         <div class="input-group">
-                            <input type="number" step="any" min="0" max="100" class="clean-input input-weight" id="weight_${rowNum}" placeholder="0" value="${holding.w !== undefined && holding.w !== null ? holding.w : ''}" oninput="updateHolding(${index}, 'w', this.value)">
+                            <input type="number" step="any" min="0" max="100" class="clean-input input-weight" id="weight_${rowNum}" placeholder="0" value="${holding.w !== undefined && holding.w !== null ? holding.w : ''}" autocomplete="off" oninput="updateHolding(${index}, 'w', this.value)">
                             <span class="input-suffix">%</span>
                         </div>
                         <button class="btn-remove" title="Remove row" onclick="removeHolding(${index})">
@@ -8400,14 +8408,14 @@ INSTRUCTIONS:
                     row.innerHTML = `
                         <div class="row-index">${rowNum}</div>
                         <div class="input-group">
-                            <input type="text" class="clean-input input-ticker" id="ticker_${rowNum}" placeholder="e.g. AAPL" value="${holding.t || ''}" oninput="updateHolding(${index}, 't', this.value)">
+                            <input type="text" class="clean-input input-ticker" id="ticker_${rowNum}" placeholder="e.g. AAPL" value="${holding.t || ''}" autocomplete="off" spellcheck="false" autocorrect="off" oninput="updateHolding(${index}, 't', this.value)">
                         </div>
                         <div class="input-group">
                             <span class="input-prefix">${getCurrencySymbol()}</span>
-                            <input type="number" step="any" min="0" class="clean-input input-value" id="value_${rowNum}" placeholder="0.00" value="${holding.v !== undefined && holding.v !== null ? holding.v : ''}" oninput="updateHolding(${index}, 'v', this.value)">
+                            <input type="number" step="any" min="0" class="clean-input input-value" id="value_${rowNum}" placeholder="0.00" value="${holding.v !== undefined && holding.v !== null ? holding.v : ''}" autocomplete="off" oninput="updateHolding(${index}, 'v', this.value)">
                         </div>
                         <div class="input-group">
-                            <input type="number" step="any" min="0" max="100" class="clean-input input-weight" id="weight_${rowNum}" placeholder="0" value="${holding.w !== undefined && holding.w !== null ? holding.w : ''}" oninput="updateHolding(${index}, 'w', this.value)">
+                            <input type="number" step="any" min="0" max="100" class="clean-input input-weight" id="weight_${rowNum}" placeholder="0" value="${holding.w !== undefined && holding.w !== null ? holding.w : ''}" autocomplete="off" oninput="updateHolding(${index}, 'w', this.value)">
                             <span class="input-suffix">%</span>
                         </div>
                         <button class="btn-remove" title="Remove row" onclick="removeHolding(${index})">
