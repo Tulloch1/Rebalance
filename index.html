@@ -139,7 +139,9 @@
             padding: 4px 8px;
         }
 
-        .brand {
+        .brand,
+        .asset-identity,
+        .allocation-tag-wrap {
             display: flex;
             align-items: center;
             gap: 12px;
@@ -157,7 +159,8 @@
             color: var(--accent);
         }
 
-        .brand-icon svg {
+        .brand-icon svg,
+        .csv-drop-icon svg {
             width: 20px;
             height: 20px;
         }
@@ -187,8 +190,10 @@
             border-radius: var(--radius-pill);
         }
 
-        /* Settings Button */
-        .settings-btn {
+        /* Header Utility Buttons (Settings, Account, Info) */
+        .settings-btn,
+        .account-btn,
+        .info-btn {
             width: 34px;
             height: 34px;
             border-radius: var(--radius-pill);
@@ -199,99 +204,58 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            transition: all 0.25s ease;
+        }
+
+        .settings-btn,
+        .info-btn {
             transform: translateY(0) rotate(0deg) translateZ(0);
             transform-origin: center center;
-            backface-visibility: hidden;
-            -webkit-backface-visibility: hidden;
-            transition: all 0.25s ease;
         }
 
-        .settings-btn:hover {
-            color: var(--accent);
-            border-color: var(--accent-badge-border);
-            background: var(--accent-badge-bg);
-            transform: translateY(-2px) rotate(45deg) translateZ(0);
-        }
-
-        .settings-btn svg {
-            width: 18px;
-            height: 18px;
-            display: block;
-            flex-shrink: 0;
-        }
-
-        /* Legacy Theme Toggle Button (backwards-compatibility) */
-        .theme-toggle-btn {
-            width: 34px;
-            height: 34px;
-            border-radius: var(--radius-pill);
-            background: var(--surface-card);
-            border: 1px solid var(--border-subtle);
-            color: var(--text-secondary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .theme-toggle-btn:hover {
-            color: var(--accent);
-            border-color: var(--accent-badge-border);
-            background: var(--accent-badge-bg);
-            transform: rotate(15deg);
-        }
-
-        .theme-toggle-btn svg {
-            width: 16px;
-            height: 16px;
-        }
-
-        /* Account & Sync Button */
         .account-btn {
-            width: 34px;
-            height: 34px;
-            border-radius: var(--radius-pill);
-            background: var(--surface-card);
-            border: 1px solid var(--border-subtle);
-            color: var(--text-secondary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
             position: relative;
             transform: translateY(0) translateZ(0);
-            backface-visibility: hidden;
-            -webkit-backface-visibility: hidden;
-            transition: all 0.25s ease;
         }
 
-        .account-btn:hover {
-            color: var(--accent);
-            border-color: var(--accent-badge-border);
-            background: var(--accent-badge-bg);
-            transform: translateY(-2px) translateZ(0);
-        }
-
-        .account-btn svg {
+        .settings-btn svg,
+        .account-btn svg,
+        .info-btn svg {
             width: 18px;
             height: 18px;
             display: block;
             flex-shrink: 0;
-            transform: translateY(0) translateZ(0);
-            backface-visibility: hidden;
-            -webkit-backface-visibility: hidden;
-            transition: transform 0.25s ease;
         }
 
-        .account-btn:hover svg {
-            transform: translateY(-2px) translateZ(0);
-        }
-
+        .settings-btn:hover,
+        .account-btn:hover,
+        .info-btn:hover,
         .account-btn.logged-in {
             color: var(--accent);
             border-color: var(--accent-badge-border);
             background: var(--accent-badge-bg);
+        }
+
+        .settings-btn:hover {
+            transform: translateY(-2px) rotate(45deg) translateZ(0);
+        }
+
+        .info-btn:hover {
+            transform: translateY(-2px) rotate(15deg) translateZ(0);
+        }
+
+        .account-btn:hover,
+        .account-btn:hover svg {
+            transform: translateY(-2px) translateZ(0);
+        }
+
+        .account-btn svg {
+            transform: translateY(0) translateZ(0);
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            transition: transform 0.25s ease;
         }
 
         .account-btn.logged-in::after {
@@ -304,39 +268,6 @@
             border-radius: var(--radius-pill);
             background: var(--accent);
             box-shadow: 0 0 6px var(--accent);
-        }
-
-        /* Info Guide Button */
-        .info-btn {
-            width: 34px;
-            height: 34px;
-            border-radius: var(--radius-pill);
-            background: var(--surface-card);
-            border: 1px solid var(--border-subtle);
-            color: var(--text-secondary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transform: translateY(0) rotate(0deg) translateZ(0);
-            transform-origin: center center;
-            backface-visibility: hidden;
-            -webkit-backface-visibility: hidden;
-            transition: all 0.25s ease;
-        }
-
-        .info-btn:hover {
-            color: var(--accent);
-            border-color: var(--accent-badge-border);
-            background: var(--accent-badge-bg);
-            transform: translateY(-2px) rotate(15deg) translateZ(0);
-        }
-
-        .info-btn svg {
-            width: 18px;
-            height: 18px;
-            display: block;
-            flex-shrink: 0;
         }
 
         /* Card Container */
@@ -362,12 +293,16 @@
             transition: all 0.2s ease;
         }
 
-        .deposit-well:focus-within {
+        .deposit-well:focus-within,
+        .min-buy-well:focus-within,
+        .setting-select:focus {
             border-color: var(--accent);
             box-shadow: 0 0 0 3px var(--accent-glow);
         }
 
-        .deposit-label-wrap {
+        .deposit-label-wrap,
+        .mode-toggle-info,
+        .asset-details {
             display: flex;
             flex-direction: column;
             gap: 2px;
@@ -384,7 +319,9 @@
             color: var(--text-muted);
         }
 
-        .deposit-input-wrapper {
+        .deposit-input-wrapper,
+        .min-buy-input-wrapper,
+        .input-group {
             position: relative;
             display: flex;
             align-items: center;
@@ -415,7 +352,8 @@
             transition: all 0.15s ease;
         }
 
-        .deposit-input:focus {
+        .deposit-input:focus,
+        .min-buy-input:focus {
             background: var(--surface-elevated);
             border-color: var(--accent);
         }
@@ -432,12 +370,6 @@
             margin-top: -12px;
             margin-bottom: 24px;
             transition: all 0.2s ease;
-        }
-
-        .mode-toggle-info {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
         }
 
         .mode-toggle-title {
@@ -528,7 +460,8 @@
         }
 
         /* Minimum Purchase Input Box (Right-anchored) */
-        .min-buy-container {
+        .min-buy-container,
+        .calc-btn-container {
             display: flex;
             flex-direction: column;
             align-items: flex-start;
@@ -552,22 +485,6 @@
             filter: grayscale(0.5);
         }
 
-        /* [REDUNDANT/UNUSED]: .min-buy-sub kept for backwards compatibility; status messaging now handled by .calc-error-sub */
-        .min-buy-sub {
-            font-size: 9.5px;
-            font-weight: 500;
-            color: #FF7B7B;
-            letter-spacing: 0.02em;
-            line-height: 1.2;
-            white-space: nowrap;
-            padding-left: 2px;
-        }
-
-        .min-buy-well:focus-within {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px var(--accent-glow);
-        }
-
         .min-buy-well label {
             font-size: 11px;
             font-weight: 700;
@@ -576,12 +493,6 @@
             color: var(--text-secondary);
             cursor: pointer;
             white-space: nowrap;
-        }
-
-        .min-buy-input-wrapper {
-            position: relative;
-            display: flex;
-            align-items: center;
         }
 
         .min-buy-currency {
@@ -607,11 +518,6 @@
             text-align: right;
             outline: none;
             transition: all 0.15s ease;
-        }
-
-        .min-buy-input:focus {
-            background: var(--surface-elevated);
-            border-color: var(--accent);
         }
 
         .table-headers {
@@ -691,7 +597,8 @@
             z-index: 2;
         }
 
-        .sort-pill-container:hover {
+        .sort-pill-container:hover,
+        .setting-row:hover {
             border-color: var(--border-hover);
         }
 
@@ -778,12 +685,6 @@
             text-align: center;
         }
 
-        .input-group {
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
-
         .input-prefix, .input-suffix {
             position: absolute;
             color: var(--text-muted);
@@ -864,7 +765,8 @@
             transition: all 0.15s ease;
         }
 
-        .btn-remove svg {
+        .btn-remove svg,
+        .modal-close-btn svg {
             width: 16px;
             height: 16px;
             display: block;
@@ -877,7 +779,8 @@
             border-color: var(--danger-border);
         }
 
-        .btn-remove:active {
+        .btn-remove:active,
+        .csv-file-remove-btn:active {
             transform: scale(0.90) translateZ(0);
         }
 
@@ -941,13 +844,6 @@
             justify-content: space-between;
             gap: 12px;
             margin-top: 8px;
-        }
-
-        .calc-btn-container {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 4px;
         }
 
         .calc-error-sub {
@@ -1036,7 +932,15 @@
             box-shadow: 0 6px 20px var(--accent-glow);
         }
 
-        .btn-calc:active {
+        .btn-calc:active,
+        .btn-account-primary:active,
+        .btn-account-secondary:active,
+        .btn-account-danger:active,
+        .btn-setting-action:active,
+        .btn-setting-ping:active,
+        .btn-danger-outline:active,
+        .btn-danger-filled:active,
+        .csv-upload-btn:active {
             transform: translateY(0) translateZ(0);
         }
 
@@ -1047,18 +951,22 @@
             cursor: not-allowed;
         }
 
-        /* Error Banner */
+        /* Error Banners */
+        .error-banner,
+        .csv-error-banner {
+            background: var(--danger-bg);
+            border: 1px solid var(--danger-border);
+            color: var(--danger);
+            border-radius: var(--radius-card);
+            font-weight: 500;
+        }
+
         .error-banner {
             display: none;
             flex-direction: column;
             gap: 6px;
-            background: var(--danger-bg);
-            border: 1px solid var(--danger-border);
-            color: var(--danger);
             padding: 12px 16px;
-            border-radius: var(--radius-card);
             font-size: 13px;
-            font-weight: 500;
             margin-top: 16px;
             line-height: 1.4;
         }
@@ -1146,16 +1054,12 @@
             background: linear-gradient(90deg, rgba(255, 92, 92, 0.08) 0%, var(--surface-input) 100%);
         }
 
-        .allocation-item-top {
+        .allocation-item-top,
+        .csv-modal-header,
+        .csv-select-header-row {
             display: flex;
             align-items: center;
             justify-content: space-between;
-        }
-
-        .asset-identity {
-            display: flex;
-            align-items: center;
-            gap: 12px;
         }
 
         .ticker-badge {
@@ -1169,22 +1073,10 @@
             border-radius: 8px;
         }
 
-        .asset-details {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-
         .asset-val-preview {
             font-size: 12px;
             color: var(--text-secondary);
             font-family: var(--font-mono);
-        }
-
-        .allocation-tag-wrap {
-            display: flex;
-            align-items: center;
-            gap: 12px;
         }
 
         .cut-badge {
@@ -1301,29 +1193,27 @@
             background: var(--accent-badge-bg);
         }
 
-        /* Warning banner for low buy threshold */
-        .threshold-warning {
+        /* Notice & Warning Banners */
+        .threshold-warning,
+        .norm-notice {
             display: none;
-            background: var(--warning-bg);
-            border: 1px solid var(--warning-border);
             border-radius: var(--radius-card);
             padding: 12px 16px;
             margin-bottom: 16px;
             font-size: 13px;
-            color: var(--warning);
             line-height: 1.4;
         }
 
+        .threshold-warning {
+            background: var(--warning-bg);
+            border: 1px solid var(--warning-border);
+            color: var(--warning);
+        }
+
         .norm-notice {
-            display: none;
             background: var(--accent-badge-bg);
             border: 1px solid var(--accent-badge-border);
-            border-radius: var(--radius-card);
-            padding: 12px 16px;
-            margin-bottom: 16px;
-            font-size: 13px;
             color: var(--text-primary);
-            line-height: 1.4;
         }
 
         /* Collapsible ASCII Terminal Area */
@@ -1427,7 +1317,8 @@
             word-break: break-all;
         }
 
-        .email-copy-btn:hover {
+        .email-copy-btn:hover,
+        .footer-disclaimer-link:hover {
             color: var(--accent-hover);
             text-decoration-color: var(--accent);
         }
@@ -1504,11 +1395,6 @@
             transition: all 0.2s ease;
         }
 
-        .footer-disclaimer-link:hover {
-            color: var(--accent-hover);
-            text-decoration-color: var(--accent);
-        }
-
         /* Information Modal & Backdrop */
         .modal-overlay {
             position: fixed;
@@ -1536,24 +1422,24 @@
             visibility: visible;
         }
 
-        .info-modal-card {
+        .info-modal-card,
+        .csv-modal-card {
             background: var(--surface-card);
             border: 1px solid var(--border-subtle);
             border-radius: var(--radius-outer);
-            max-width: 650px;
-            width: 100%;
-            max-height: 82vh;
+            width: 95%;
+            max-height: 88vh;
             display: flex;
             flex-direction: column;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6), 0 0 0 1px var(--border-subtle);
             overflow: hidden;
-            padding: 0 !important;
             transform: scale(0.94) translateY(12px) translateZ(0);
             backface-visibility: hidden;
             transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        .modal-overlay.active .info-modal-card {
+        .modal-overlay.active .info-modal-card,
+        .modal-overlay.active .csv-modal-card {
             transform: scale(1) translateY(0) translateZ(0);
         }
 
@@ -1605,7 +1491,9 @@
             flex-shrink: 0;
         }
 
-        .chrome-tab:hover:not(.active) {
+        .chrome-tab:hover:not(.active),
+        .modal-sidebar-tab:hover:not(.active),
+        .account-tab:hover:not(.active) {
             background: var(--track-bg);
             color: var(--text-primary);
         }
@@ -1644,13 +1532,6 @@
 
         .modal-close-btn:active {
             transform: scale(0.92) translateZ(0);
-        }
-
-        .modal-close-btn svg {
-            width: 16px;
-            height: 16px;
-            display: block;
-            flex-shrink: 0;
         }
 
         /* Modal Content Body */
@@ -1729,25 +1610,11 @@
             outline: none;
         }
 
-        .account-tab:hover:not(.active) {
-            background: var(--track-bg);
-            color: var(--text-primary);
-        }
-
-        .account-tab.active {
-            background: var(--bg-base);
-            color: var(--accent);
-            border-color: var(--accent);
-            font-weight: 700;
-            box-shadow: 0 0 0 2px var(--accent-glow);
-        }
-
         #accountModalOverlay .info-modal-body {
             padding: 20px 24px 24px 24px;
         }
 
-        .modal-sidebar,
-        .info-sidebar {
+        .modal-sidebar {
             width: 220px;
             flex-shrink: 0;
             background: var(--surface-input);
@@ -1758,8 +1625,7 @@
             user-select: none;
         }
 
-        .modal-sidebar-header,
-        .info-sidebar-header {
+        .modal-sidebar-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -1768,8 +1634,7 @@
             border-bottom: 1px solid var(--border-subtle);
         }
 
-        .modal-sidebar-title,
-        .info-sidebar-title {
+        .modal-sidebar-title {
             font-family: var(--font-sans);
             font-size: 11.5px;
             font-weight: 700;
@@ -1778,16 +1643,14 @@
             color: var(--text-muted);
         }
 
-        .modal-sidebar-tabs,
-        .info-sidebar-tabs {
+        .modal-sidebar-tabs {
             display: flex;
             flex-direction: column;
             gap: 6px;
             margin-top: 8px;
         }
 
-        .modal-sidebar-tab,
-        .info-sidebar-tab {
+        .modal-sidebar-tab {
             background: transparent;
             border: 1px solid transparent;
             border-radius: 9px;
@@ -1807,14 +1670,8 @@
             outline: none;
         }
 
-        .modal-sidebar-tab:hover:not(.active),
-        .info-sidebar-tab:hover:not(.active) {
-            background: var(--track-bg);
-            color: var(--text-primary);
-        }
-
         .modal-sidebar-tab.active,
-        .info-sidebar-tab.active {
+        .account-tab.active {
             background: var(--bg-base);
             color: var(--accent);
             border-color: var(--accent);
@@ -1822,8 +1679,7 @@
             box-shadow: 0 0 0 2px var(--accent-glow);
         }
 
-        .modal-content-container,
-        .info-content-container {
+        .modal-content-container {
             flex: 1;
             display: flex;
             flex-direction: column;
@@ -1832,8 +1688,7 @@
             background: var(--surface-card);
         }
 
-        .modal-content-header,
-        .info-content-header {
+        .modal-content-header {
             display: flex;
             justify-content: flex-end;
             align-items: center;
@@ -1856,21 +1711,18 @@
                 max-height: 88vh;
             }
 
-            .modal-sidebar,
-            .info-sidebar {
+            .modal-sidebar {
                 width: 100%;
                 border-right: none;
                 border-bottom: 1px solid var(--border-subtle);
                 padding: 10px 10px 6px 10px;
             }
 
-            .modal-sidebar-header,
-            .info-sidebar-header {
+            .modal-sidebar-header {
                 display: none;
             }
 
-            .modal-sidebar-tabs,
-            .info-sidebar-tabs {
+            .modal-sidebar-tabs {
                 flex-direction: row;
                 overflow-x: auto;
                 gap: 6px;
@@ -1880,21 +1732,18 @@
                 padding-bottom: 4px;
             }
 
-            .modal-sidebar-tabs::-webkit-scrollbar,
-            .info-sidebar-tabs::-webkit-scrollbar {
+            .modal-sidebar-tabs::-webkit-scrollbar {
                 display: none;
             }
 
-            .modal-sidebar-tab,
-            .info-sidebar-tab {
+            .modal-sidebar-tab {
                 width: auto;
                 padding: 7px 12px;
                 font-size: 12px;
                 border-radius: 8px;
             }
 
-            .modal-content-header,
-            .info-content-header {
+            .modal-content-header {
                 position: absolute;
                 top: 8px;
                 right: 8px;
@@ -1982,7 +1831,6 @@
         }
 
         .account-checkbox {
-            accent-color: var(--accent);
             cursor: pointer;
             width: 15px;
             height: 15px;
@@ -2054,14 +1902,8 @@
             box-shadow: 0 4px 14px var(--accent-glow);
         }
 
-        .btn-account-primary:active {
-            transform: translateY(0) translateZ(0);
-        }
-
-        .btn-account-secondary {
-            background: var(--surface-input);
-            color: var(--text-primary);
-            border: 1px solid var(--border-subtle);
+        .btn-account-secondary,
+        .btn-account-danger {
             border-radius: var(--radius-btn);
             padding: 10px 14px;
             font-size: 12.5px;
@@ -2074,6 +1916,12 @@
             align-items: center;
             justify-content: center;
             gap: 6px;
+        }
+
+        .btn-account-secondary {
+            background: var(--surface-input);
+            color: var(--text-primary);
+            border: 1px solid var(--border-subtle);
             text-align: center;
             user-select: none;
         }
@@ -2085,36 +1933,16 @@
             transform: translateY(-1px) translateZ(0);
         }
 
-        .btn-account-secondary:active {
-            transform: translateY(0) translateZ(0);
-        }
-
         .btn-account-danger {
             background: var(--danger-bg);
             color: var(--danger);
             border: 1px solid var(--danger-border);
-            border-radius: var(--radius-btn);
-            padding: 10px 14px;
-            font-size: 12.5px;
-            font-weight: 600;
-            cursor: pointer;
-            transform: translateY(0) translateZ(0);
-            backface-visibility: hidden;
-            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
         }
 
         .btn-account-danger:hover {
             background: var(--danger);
             color: #FFFFFF;
             transform: translateY(-1px) translateZ(0);
-        }
-
-        .btn-account-danger:active {
-            transform: translateY(0) translateZ(0);
         }
 
         @media (max-width: 500px) {
@@ -2185,10 +2013,6 @@
             transition: border-color 0.2s ease;
         }
 
-        .setting-row:hover {
-            border-color: var(--border-hover);
-        }
-
         .setting-info {
             display: flex;
             flex-direction: column;
@@ -2221,16 +2045,15 @@
             transition: all 0.2s ease;
         }
 
-        .setting-select:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px var(--accent-glow);
-        }
-
-        .setting-box {
+        .setting-box,
+        .csv-guide-box {
             background: var(--surface-input);
             border: 1px solid var(--border-subtle);
             border-radius: var(--radius-card);
             padding: 14px 16px;
+        }
+
+        .setting-box {
             margin-bottom: 12px;
         }
 
@@ -2283,10 +2106,6 @@
             transform: translateY(-1px) translateZ(0);
         }
 
-        .btn-setting-action:active {
-            transform: translateY(0) translateZ(0);
-        }
-
         .btn-setting-ping {
             background: var(--surface-card);
             border: 1px solid var(--border-subtle);
@@ -2305,10 +2124,6 @@
             color: var(--accent);
             border-color: var(--accent-badge-border);
             transform: translateY(-1px) translateZ(0);
-        }
-
-        .btn-setting-ping:active {
-            transform: translateY(0) translateZ(0);
         }
 
         .btn-setting-pill {
@@ -2351,7 +2166,8 @@
             box-shadow: none;
         }
 
-        .btn-setting-pill svg {
+        .btn-setting-pill svg,
+        .csv-upload-btn svg {
             width: 14px;
             height: 14px;
             display: block;
@@ -2392,10 +2208,8 @@
             flex-wrap: wrap;
         }
 
-        .btn-danger-outline {
-            background: transparent;
-            border: 1px solid var(--danger);
-            color: var(--danger);
+        .btn-danger-outline,
+        .btn-danger-filled {
             padding: 8px 14px;
             border-radius: var(--radius-btn);
             font-size: 0.82rem;
@@ -2404,6 +2218,12 @@
             transform: translateY(0) translateZ(0);
             backface-visibility: hidden;
             transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .btn-danger-outline {
+            background: transparent;
+            border: 1px solid var(--danger);
+            color: var(--danger);
         }
 
         .btn-danger-outline:hover {
@@ -2411,31 +2231,15 @@
             transform: translateY(-1px) translateZ(0);
         }
 
-        .btn-danger-outline:active {
-            transform: translateY(0) translateZ(0);
-        }
-
         .btn-danger-filled {
             background: var(--danger);
             border: 1px solid var(--danger);
             color: #FFFFFF;
-            padding: 8px 14px;
-            border-radius: var(--radius-btn);
-            font-size: 0.82rem;
-            font-weight: 600;
-            cursor: pointer;
-            transform: translateY(0) translateZ(0);
-            backface-visibility: hidden;
-            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .btn-danger-filled:hover {
             filter: brightness(1.1);
             transform: translateY(-1px) translateZ(0);
-        }
-
-        .btn-danger-filled:active {
-            transform: translateY(0) translateZ(0);
         }
 
         /* Sync Status Badges */
@@ -2498,44 +2302,12 @@
             transform: translateY(-1.5px) translateZ(0);
         }
 
-        .csv-upload-btn:active {
-            transform: translateY(0) translateZ(0);
-        }
-
-        .csv-upload-btn svg {
-            width: 14px;
-            height: 14px;
-            display: block;
-            flex-shrink: 0;
-        }
-
         /* CSV Import Modal */
         .csv-modal-card {
             max-width: 620px;
-            width: 95%;
-            max-height: 88vh;
             overflow-y: auto;
             padding: 24px !important;
-            background: var(--surface-card);
-            border: 1px solid var(--border-subtle);
-            border-radius: var(--radius-outer);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6), 0 0 0 1px var(--border-subtle);
-            transform: scale(0.94) translateY(12px) translateZ(0);
-            backface-visibility: hidden;
-            transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
-            display: flex;
-            flex-direction: column;
             gap: 16px;
-        }
-
-        .modal-overlay.active .csv-modal-card {
-            transform: scale(1) translateY(0) translateZ(0);
-        }
-
-        .csv-modal-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
         }
 
         .csv-modal-title {
@@ -2550,12 +2322,6 @@
             display: flex;
             flex-direction: column;
             gap: 6px;
-        }
-
-        .csv-select-header-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
         }
 
         .csv-label {
@@ -2647,11 +2413,6 @@
 
         .csv-drop-zone.dragover .csv-drop-icon {
             transform: translateY(-2px);
-        }
-
-        .csv-drop-icon svg {
-            width: 20px;
-            height: 20px;
         }
 
         .csv-drop-main-text {
@@ -2759,10 +2520,6 @@
             background: var(--danger-bg);
         }
 
-        .csv-file-remove-btn:active {
-            transform: scale(0.90) translateZ(0);
-        }
-
         .csv-holding-badge {
             display: inline-flex;
             align-items: center;
@@ -2778,13 +2535,6 @@
         }
 
         /* Guide Card */
-        .csv-guide-box {
-            background: var(--surface-input);
-            border: 1px solid var(--border-subtle);
-            border-radius: var(--radius-card);
-            padding: 14px 16px;
-        }
-
         .csv-guide-header {
             font-size: 0.78rem;
             font-weight: 700;
@@ -2813,15 +2563,10 @@
             font-family: var(--font-mono);
         }
 
-        /* Error Banner */
+        /* CSV Error Banner */
         .csv-error-banner {
-            background: var(--danger-bg);
-            border: 1px solid var(--danger-border);
-            color: var(--danger);
             font-size: 0.82rem;
-            font-weight: 500;
             padding: 8px 12px;
-            border-radius: var(--radius-card);
             display: flex;
             align-items: center;
             gap: 8px;
@@ -2925,8 +2670,6 @@
                 </div>
                 <!-- Right-anchored Minimum Transaction Input -->
                 <div class="min-buy-container">
-                    <!-- [REDUNDANT/UNUSED]: Kept for backwards compatibility; Minimum Transaction is always available -->
-                    <span class="min-buy-sub" id="minBuyNotice" style="display: none;"></span>
                     <div class="min-buy-well" id="minBuyWell">
                         <label for="minBuy">Minimum Transaction</label>
                         <div class="min-buy-input-wrapper">
@@ -3092,32 +2835,32 @@
     <div class="modal-overlay" id="infoModalOverlay" onclick="handleModalBackdropClick(event)">
         <div class="info-modal-card card" role="dialog" aria-modal="true" aria-labelledby="modalTabTitle">
             <!-- Left Sidebar with Vertical Tabs -->
-            <div class="info-sidebar">
-                <div class="info-sidebar-header">
-                    <span class="info-sidebar-title">Guide</span>
+            <div class="modal-sidebar">
+                <div class="modal-sidebar-header">
+                    <span class="modal-sidebar-title">Guide</span>
                 </div>
-                <div class="info-sidebar-tabs" role="tablist">
-                    <button class="info-sidebar-tab active" id="tab-btn-overview" role="tab" aria-selected="true" onclick="switchInfoTab('overview')">
+                <div class="modal-sidebar-tabs" role="tablist">
+                    <button class="modal-sidebar-tab active" id="tab-btn-overview" role="tab" aria-selected="true" onclick="switchInfoTab('overview')">
                         <span class="tab-title">Overview</span>
                     </button>
-                    <button class="info-sidebar-tab" id="tab-btn-dynamic" role="tab" aria-selected="false" onclick="switchInfoTab('dynamic')">
+                    <button class="modal-sidebar-tab" id="tab-btn-dynamic" role="tab" aria-selected="false" onclick="switchInfoTab('dynamic')">
                         <span class="tab-title">DCA Rebalance</span>
                     </button>
-                    <button class="info-sidebar-tab" id="tab-btn-complete" role="tab" aria-selected="false" onclick="switchInfoTab('complete')">
+                    <button class="modal-sidebar-tab" id="tab-btn-complete" role="tab" aria-selected="false" onclick="switchInfoTab('complete')">
                         <span class="tab-title">Complete Rebalance</span>
                     </button>
-                    <button class="info-sidebar-tab" id="tab-btn-thresholds" role="tab" aria-selected="false" onclick="switchInfoTab('thresholds')">
+                    <button class="modal-sidebar-tab" id="tab-btn-thresholds" role="tab" aria-selected="false" onclick="switchInfoTab('thresholds')">
                         <span class="tab-title">Minimum Transactions</span>
                     </button>
-                    <button class="info-sidebar-tab" id="tab-btn-disclaimers" role="tab" aria-selected="false" onclick="switchInfoTab('disclaimers')">
+                    <button class="modal-sidebar-tab" id="tab-btn-disclaimers" role="tab" aria-selected="false" onclick="switchInfoTab('disclaimers')">
                         <span class="tab-title">Disclaimers</span>
                     </button>
                 </div>
             </div>
 
             <!-- Right Content Container -->
-            <div class="info-content-container">
-                <div class="info-content-header">
+            <div class="modal-content-container">
+                <div class="modal-content-header">
                     <button class="modal-close-btn" id="modalCloseBtn" title="Close (Esc)" onclick="closeInfoModal()" aria-label="Close information modal">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
                             <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -4121,45 +3864,90 @@
             }
         });
 
+        // =========================================================================
+        // Unified Modal Lifecycle & Tab Management Subsystem
+        // =========================================================================
+        const ModalManager = {
+            MODAL_IDS: ["infoModalOverlay", "accountModalOverlay", "settingsModalOverlay", "csvModalOverlay"],
+
+            open(overlayId, onOpen) {
+                const overlay = document.getElementById(overlayId);
+                if (overlay) {
+                    overlay.classList.add("active");
+                    document.body.style.overflow = "hidden";
+                    if (typeof onOpen === 'function') onOpen(overlay);
+                }
+            },
+
+            close(overlayId, onClose) {
+                const overlay = document.getElementById(overlayId);
+                if (overlay) {
+                    overlay.classList.remove("active");
+                    document.body.style.overflow = "";
+                    if (typeof onClose === 'function') onClose(overlay);
+                }
+            },
+
+            closeAll() {
+                if (this.isOpen("infoModalOverlay")) closeInfoModal();
+                if (this.isOpen("accountModalOverlay")) closeAccountModal();
+                if (this.isOpen("settingsModalOverlay")) closeSettingsModal();
+                if (this.isOpen("csvModalOverlay")) closeCsvModal();
+            },
+
+            isOpen(overlayId) {
+                const el = document.getElementById(overlayId);
+                return !!(el && el.classList && el.classList.contains("active"));
+            },
+
+            isAnyOpen() {
+                return this.MODAL_IDS.some(id => this.isOpen(id));
+            },
+
+            handleBackdrop(event, overlayId, closeFn) {
+                if (event && event.target && event.target.id === overlayId) {
+                    closeFn();
+                }
+            },
+
+            switchTab({ tabs, activeTabId, btnPrefix, panePrefix, onSwitch }) {
+                tabs.forEach(t => {
+                    const btn = document.getElementById(`${btnPrefix}${t}`);
+                    const pane = document.getElementById(`${panePrefix}${t}`);
+                    const isActive = (t === activeTabId);
+                    if (btn) {
+                        btn.classList.toggle("active", isActive);
+                        btn.setAttribute("aria-selected", isActive ? "true" : "false");
+                    }
+                    if (pane) {
+                        pane.classList.toggle("active", isActive);
+                    }
+                });
+                if (typeof onSwitch === 'function') onSwitch(activeTabId);
+            }
+        };
+
         // --- Information Guide Modal ---
         function openInfoModal(tabId) {
-            const overlay = document.getElementById("infoModalOverlay");
-            if (overlay) {
-                overlay.classList.add("active");
-                document.body.style.overflow = "hidden";
-                if (tabId) {
-                    switchInfoTab(tabId);
-                }
-            }
+            ModalManager.open("infoModalOverlay", () => {
+                if (tabId) switchInfoTab(tabId);
+            });
         }
 
         function closeInfoModal() {
-            const overlay = document.getElementById("infoModalOverlay");
-            if (overlay) {
-                overlay.classList.remove("active");
-                document.body.style.overflow = "";
-            }
+            ModalManager.close("infoModalOverlay");
         }
 
         function handleModalBackdropClick(event) {
-            if (event.target && event.target.id === "infoModalOverlay") {
-                closeInfoModal();
-            }
+            ModalManager.handleBackdrop(event, "infoModalOverlay", closeInfoModal);
         }
 
         function switchInfoTab(tabId) {
-            const tabs = ['overview', 'dynamic', 'complete', 'thresholds', 'disclaimers'];
-            tabs.forEach(t => {
-                const btn = document.getElementById(`tab-btn-${t}`);
-                const pane = document.getElementById(`tab-pane-${t}`);
-                if (btn) {
-                    const isActive = (t === tabId);
-                    btn.classList.toggle("active", isActive);
-                    btn.setAttribute("aria-selected", isActive ? "true" : "false");
-                }
-                if (pane) {
-                    pane.classList.toggle("active", t === tabId);
-                }
+            ModalManager.switchTab({
+                tabs: ['overview', 'dynamic', 'complete', 'thresholds', 'disclaimers'],
+                activeTabId: tabId,
+                btnPrefix: 'tab-btn-',
+                panePrefix: 'tab-pane-'
             });
         }
 
@@ -4167,54 +3955,37 @@
         let currentAccount = null;
 
         function openAccountModal() {
-            const overlay = document.getElementById("accountModalOverlay");
-            if (overlay) {
-                overlay.classList.add("active");
-                document.body.style.overflow = "hidden";
-                updateAccountUI();
-            }
+            ModalManager.open("accountModalOverlay", updateAccountUI);
         }
 
         function closeAccountModal() {
-            const overlay = document.getElementById("accountModalOverlay");
-            if (overlay) {
-                overlay.classList.remove("active");
-                document.body.style.overflow = "";
-            }
-            const signInForm = document.getElementById("signInForm");
-            if (signInForm && typeof signInForm.reset === 'function') signInForm.reset();
-            const signUpForm = document.getElementById("signUpForm");
-            if (signUpForm && typeof signUpForm.reset === 'function') signUpForm.reset();
-            const recSection = document.getElementById("recoverySection");
-            if (recSection) recSection.style.display = "none";
-            const recKeyInput = document.getElementById("recoveryKeyInput");
-            if (recKeyInput) recKeyInput.value = "";
-            const recNewPass = document.getElementById("recoveryNewPassword");
-            if (recNewPass) recNewPass.value = "";
-            resetCleanSlateForm();
-            hideFeedback("signInFeedback");
-            hideFeedback("signUpFeedback");
+            ModalManager.close("accountModalOverlay", () => {
+                const signInForm = document.getElementById("signInForm");
+                if (signInForm && typeof signInForm.reset === 'function') signInForm.reset();
+                const signUpForm = document.getElementById("signUpForm");
+                if (signUpForm && typeof signUpForm.reset === 'function') signUpForm.reset();
+                const recSection = document.getElementById("recoverySection");
+                if (recSection) recSection.style.display = "none";
+                const recKeyInput = document.getElementById("recoveryKeyInput");
+                if (recKeyInput) recKeyInput.value = "";
+                const recNewPass = document.getElementById("recoveryNewPassword");
+                if (recNewPass) recNewPass.value = "";
+                resetCleanSlateForm();
+                hideFeedback("signInFeedback");
+                hideFeedback("signUpFeedback");
+            });
         }
 
         function handleAccountBackdropClick(event) {
-            if (event.target && event.target.id === "accountModalOverlay") {
-                closeAccountModal();
-            }
+            ModalManager.handleBackdrop(event, "accountModalOverlay", closeAccountModal);
         }
 
         function switchAccountTab(tabId) {
-            const tabs = ['status', 'signin', 'signup'];
-            tabs.forEach(t => {
-                const btn = document.getElementById(`tab-btn-acc-${t}`);
-                const pane = document.getElementById(`tab-pane-acc-${t}`);
-                if (btn) {
-                    const isActive = (t === tabId);
-                    btn.classList.toggle("active", isActive);
-                    btn.setAttribute("aria-selected", isActive ? "true" : "false");
-                }
-                if (pane) {
-                    pane.classList.toggle("active", t === tabId);
-                }
+            ModalManager.switchTab({
+                tabs: ['status', 'signin', 'signup'],
+                activeTabId: tabId,
+                btnPrefix: 'tab-btn-acc-',
+                panePrefix: 'tab-pane-acc-'
             });
             hideFeedback("signInFeedback");
             hideFeedback("signUpFeedback");
@@ -4623,7 +4394,7 @@
             }
         };
 
-        function getCurrentPortfolioState() {
+        function serializePortfolioState() {
             const depositEl = document.getElementById("deposit");
             const minBuyEl = document.getElementById("minBuy");
             const completeEl = document.getElementById("completeRebalance");
@@ -4632,16 +4403,24 @@
                 minBuy: (minBuyEl && minBuyEl.value !== undefined && minBuyEl.value !== "") ? minBuyEl.value : "0",
                 completeRebalance: completeEl ? completeEl.checked : false,
                 inputMode: isSharesInputMode() ? "shares" : "value",
+                sortField: typeof currentSortField !== 'undefined' ? currentSortField : "none",
+                sortDirection: typeof currentSortDirection !== 'undefined' ? currentSortDirection : "desc",
                 holdings: Array.isArray(holdingsData) ? holdingsData : []
             };
         }
 
-        function loadPortfolioFromState(data) {
+        function deserializePortfolioState(data) {
             if (!data) return;
             if (data.inputMode) {
                 try {
                     localStorage.setItem("rebalancer_input_mode", data.inputMode === "shares" ? "shares" : "value");
                 } catch (e) {}
+            }
+            if (data.sortField && typeof currentSortField !== 'undefined') {
+                currentSortField = data.sortField;
+            }
+            if (data.sortDirection && typeof currentSortDirection !== 'undefined') {
+                currentSortDirection = data.sortDirection;
             }
             const depositEl = document.getElementById("deposit");
             const minBuyEl = document.getElementById("minBuy");
@@ -4650,13 +4429,26 @@
             if (depositEl) depositEl.value = data.deposit || "";
             if (minBuyEl) minBuyEl.value = (data.minBuy !== undefined && data.minBuy !== "") ? data.minBuy : "0";
             if (completeEl) completeEl.checked = Boolean(data.completeRebalance);
+
             if (Array.isArray(data.holdings) && data.holdings.length > 0) {
                 holdingsData = data.holdings;
+                if (typeof ensureHoldingsOriginalIndices === 'function') {
+                    ensureHoldingsOriginalIndices();
+                }
             } else {
                 initDefaultHoldings();
             }
             onToggleCompleteRebalance();
             renderRows();
+        }
+
+        function getCurrentPortfolioState() {
+            return serializePortfolioState();
+        }
+
+        function loadPortfolioFromState(data) {
+            if (!data) return;
+            deserializePortfolioState(data);
             saveFormData();
         }
 
@@ -5928,11 +5720,7 @@ INSTRUCTIONS:
         }
 
         function openSettingsModal() {
-            const overlay = document.getElementById("settingsModalOverlay");
-            if (overlay) {
-                overlay.classList.add("active");
-                document.body.style.overflow = "hidden";
-
+            ModalManager.open("settingsModalOverlay", () => {
                 const themeToggle = document.getElementById("settingThemeToggle");
                 if (themeToggle) {
                     const currentTheme = (document.documentElement && typeof document.documentElement.getAttribute === 'function' ? document.documentElement.getAttribute("data-theme") : null) || "dark";
@@ -5972,39 +5760,25 @@ INSTRUCTIONS:
 
                 hideFeedback("settingSyncFeedback");
                 pingSyncServer();
-            }
+            });
         }
 
         function closeSettingsModal() {
-            const overlay = document.getElementById("settingsModalOverlay");
-            if (overlay) {
-                overlay.classList.remove("active");
-                document.body.style.overflow = "";
-            }
-            hideFeedback("settingSyncFeedback");
+            ModalManager.close("settingsModalOverlay", () => hideFeedback("settingSyncFeedback"));
         }
 
         function handleSettingsBackdropClick(event) {
-            if (event.target && event.target.id === "settingsModalOverlay") {
-                closeSettingsModal();
-            }
+            ModalManager.handleBackdrop(event, "settingsModalOverlay", closeSettingsModal);
         }
 
         function switchSettingsTab(tabId) {
-            const tabs = ['pref', 'sync'];
-            tabs.forEach(t => {
-                const btn = document.getElementById(`tab-btn-set-${t}`);
-                const pane = document.getElementById(`tab-pane-set-${t}`);
-                if (btn) {
-                    const isActive = (t === tabId);
-                    btn.classList.toggle("active", isActive);
-                    btn.setAttribute("aria-selected", isActive ? "true" : "false");
-                }
-                if (pane) {
-                    pane.classList.toggle("active", t === tabId);
-                }
+            ModalManager.switchTab({
+                tabs: ['pref', 'sync'],
+                activeTabId: tabId,
+                btnPrefix: 'tab-btn-set-',
+                panePrefix: 'tab-pane-set-',
+                onSwitch: () => hideFeedback("settingSyncFeedback")
             });
-            hideFeedback("settingSyncFeedback");
         }
 
         function onSyncUrlInput() {
@@ -6428,10 +6202,19 @@ INSTRUCTIONS:
             `
         }));
 
-        class NabtradeCsvAdapter {
-            constructor() {
-                this.id = "nabtrade";
-                this.name = "Nabtrade";
+        class SnapshotBrokerAdapter {
+            constructor({ id, name, expectedShares, expectedValue, reqSharesColText, reqValueColText, headers, ignoredTickers, ignoredPrefixes, preferValColumnInShares, guideHtml }) {
+                this.id = id;
+                this.name = name;
+                this.expectedShares = expectedShares;
+                this.expectedValue = expectedValue;
+                this.reqSharesColText = reqSharesColText;
+                this.reqValueColText = reqValueColText;
+                this.headers = headers;
+                this.ignoredTickers = new Set(ignoredTickers || []);
+                this.ignoredPrefixes = ignoredPrefixes || ['TOTAL', 'CASH'];
+                this.preferValColumnInShares = Boolean(preferValColumnInShares);
+                this._guideHtml = guideHtml;
             }
 
             get mode() {
@@ -6439,17 +6222,7 @@ INSTRUCTIONS:
             }
 
             get guideHtml() {
-                return `
-                    <p><strong>Nabtrade Portfolio CSV Export</strong></p>
-                    <p style="margin-top: 4px;">In Nabtrade, navigate to <em>Trading &gt; Portfolio</em> and click <strong>Export CSV</strong>.</p>
-                    <ul style="margin: 8px 0 0 18px; padding: 0; font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5;">
-                        <li><strong>Code:</strong> Mapped to <code>Holding</code> (e.g. <code>VAS</code>, <code>BHP</code>).</li>
-                        <li><strong>Share Price &amp; Quantity Mode (Enabled):</strong> Automatically maps <code>Quantity</code> and <code>Mkt.Price</code> (Share Price).</li>
-                        <li><strong>Value per Holding Mode (Disabled):</strong> Automatically maps <code>Market value</code> (Value).</li>
-                        <li><strong>Target Allocation:</strong> Weights are left blank so you can enter target percentages after importing.</li>
-                    </ul>
-                    <p style="margin-top: 8px; font-size: 0.8rem; color: var(--accent);">Note: Cash accounts and portfolio summary rows are automatically filtered out.</p>
-                `;
+                return this._guideHtml;
             }
 
             parse(csvText) {
@@ -6464,10 +6237,10 @@ INSTRUCTIONS:
                 let headerRowIdx = -1;
                 let colMap = {};
 
-                const codeAliases = ['code', 'asx code', 'security code', 'holding', 'ticker'];
-                const qtyAliases = ['quantity', 'qty', 'units', 'shares', 'number of shares'];
-                const priceAliases = ['mkt.price', 'mkt price', 'market price', 'price', 'last price', 'unit price'];
-                const valAliases = ['market value', 'mkt value', 'marketvalue', 'value', 'current value', 'total value'];
+                const codeAliases = this.headers.code || [];
+                const qtyAliases = this.headers.qty || [];
+                const priceAliases = this.headers.price || [];
+                const valAliases = this.headers.val || [];
 
                 for (let r = 0; r < Math.min(rows.length, 5); r++) {
                     const row = rows[r];
@@ -6498,31 +6271,26 @@ INSTRUCTIONS:
                 }
 
                 if (headerRowIdx === -1) {
-                    const expected = isShares ? "Code, Quantity, Mkt.Price" : "Code, Market value";
+                    const expected = isShares ? this.expectedShares : this.expectedValue;
                     return {
                         success: false,
-                        error: `Could not identify required columns in Nabtrade CSV. Expected headers: ${expected}. Check the guide below.`
+                        error: `Could not identify required columns in ${this.name} CSV. Expected headers: ${expected}. Check the guide below.`
                     };
                 }
 
                 if (isShares && (colMap.qty === undefined || colMap.price === undefined)) {
                     return {
                         success: false,
-                        error: "Could not identify required 'Quantity' and 'Mkt.Price' columns for Share Price & Quantity mode. Check the guide below."
+                        error: `Could not identify required ${this.reqSharesColText} columns for Share Price & Quantity mode. Check the guide below.`
                     };
                 }
 
                 if (!isShares && colMap.val === undefined && (colMap.qty === undefined || colMap.price === undefined)) {
                     return {
                         success: false,
-                        error: "Could not identify required 'Market value' column for Value mode. Check the guide below."
+                        error: `Could not identify required ${this.reqValueColText} column for Value mode. Check the guide below.`
                     };
                 }
-
-                const ignoredTickers = new Set([
-                    'TOTAL', 'TOTALS', 'TOTAL PORTFOLIO', 'PORTFOLIO TOTAL',
-                    'CASH', 'AUD CASH', 'CASH ACCOUNT', 'USD CASH', 'AUD', 'USD'
-                ]);
 
                 const holdings = [];
                 for (let i = headerRowIdx + 1; i < rows.length; i++) {
@@ -6534,192 +6302,32 @@ INSTRUCTIONS:
                     if (!ticker) continue;
 
                     const upperTicker = ticker.toUpperCase();
-                    if (ignoredTickers.has(upperTicker)) continue;
-                    if (upperTicker.startsWith('TOTAL') || upperTicker.startsWith('CASH')) continue;
-
-                    if (isShares) {
-                        const rawShares = colMap.qty !== undefined ? sanitizeCsvNumber(row[colMap.qty]) : '';
-                        const rawPrice = colMap.price !== undefined ? sanitizeCsvNumber(row[colMap.price]) : '';
-                        
-                        let rawValue = '';
-                        const p = parseFloat(rawPrice);
-                        const q = parseFloat(rawShares);
-                        if (!isNaN(p) && !isNaN(q)) {
-                            rawValue = String(Math.round(p * q * 100) / 100);
-                        }
-
-                        // Holding, quantity and share price kept. Weight empty for user input.
-                        holdings.push({
-                            t: upperTicker,
-                            p: rawPrice,
-                            q: rawShares,
-                            v: rawValue,
-                            w: ''
-                        });
-                    } else {
-                        const rawValue = colMap.val !== undefined ? sanitizeCsvNumber(row[colMap.val]) : '';
-                        const rawShares = colMap.qty !== undefined ? sanitizeCsvNumber(row[colMap.qty]) : '';
-                        const rawPrice = colMap.price !== undefined ? sanitizeCsvNumber(row[colMap.price]) : '';
-
-                        let effectiveValue = rawValue;
-                        if (!effectiveValue && rawPrice !== '' && rawShares !== '') {
-                            const p = parseFloat(rawPrice);
-                            const q = parseFloat(rawShares);
-                            if (!isNaN(p) && !isNaN(q)) {
-                                effectiveValue = String(Math.round(p * q * 100) / 100);
-                            }
-                        }
-
-                        // Holding and value kept, retaining share price and quantity if present in the file
-                        holdings.push({
-                            t: upperTicker,
-                            p: rawPrice,
-                            q: rawShares,
-                            v: effectiveValue,
-                            w: ''
-                        });
-                    }
-                }
-
-                if (holdings.length === 0) {
-                    return {
-                        success: false,
-                        error: "Matching Nabtrade column headers were found, but no valid holding rows were detected."
-                    };
-                }
-
-                return {
-                    success: true,
-                    holdings,
-                    mode: effectiveMode,
-                    count: holdings.length
-                };
-            }
-        }
-
-        class VanguardCsvAdapter {
-            constructor() {
-                this.id = "vanguard";
-                this.name = "Vanguard";
-            }
-
-            get mode() {
-                return isSharesInputMode() ? "shares" : "value";
-            }
-
-            get guideHtml() {
-                return `
-                    <p><strong>Vanguard Portfolio CSV Export</strong></p>
-                    <p style="margin-top: 4px;">In Vanguard, navigate to your Holdings or Portfolio screen and export your CSV.</p>
-                    <ul style="margin: 8px 0 0 18px; padding: 0; font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5;">
-                        <li><strong>Product ID:</strong> Mapped to <code>Holding</code> (e.g. <code>VAS</code>, <code>VGS</code>).</li>
-                        <li><strong>Share Price &amp; Quantity Mode (Enabled):</strong> Automatically maps <code>Quantity</code> and <code>Price</code> (Share Price).</li>
-                        <li><strong>Value per Holding Mode (Disabled):</strong> Automatically maps <code>Value</code>, while retaining Quantity and Price if present.</li>
-                        <li><strong>Target Allocation:</strong> Weights are left blank so you can enter target percentages after importing.</li>
-                    </ul>
-                    <p style="margin-top: 8px; font-size: 0.8rem; color: var(--accent);">Note: Cash accounts and portfolio total rows are automatically filtered out.</p>
-                `;
-            }
-
-            parse(csvText) {
-                const rows = parseCsvText(csvText);
-                if (!rows || rows.length < 2) {
-                    return { success: false, error: "The selected CSV file appears to be empty or contains only a header." };
-                }
-
-                const isShares = isSharesInputMode();
-                const effectiveMode = isShares ? "shares" : "value";
-
-                let headerRowIdx = -1;
-                let colMap = {};
-
-                const codeAliases = ['product id', 'product_id', 'holding', 'code', 'security code', 'ticker', 'symbol'];
-                const qtyAliases = ['quantity', 'qty', 'units', 'shares', 'number of shares'];
-                const priceAliases = ['price', 'unit price', 'share price', 'mkt.price', 'mkt price', 'market price', 'last price'];
-                const valAliases = ['value', 'market value', 'mkt value', 'current value', 'total value', 'estimated value'];
-
-                for (let r = 0; r < Math.min(rows.length, 5); r++) {
-                    const row = rows[r];
-                    const normalized = row.map(h => String(h || '').trim().toLowerCase());
-                    const currentMap = {};
-
-                    for (let i = 0; i < normalized.length; i++) {
-                        const h = normalized[i];
-                        if (currentMap.code === undefined && codeAliases.includes(h)) currentMap.code = i;
-                        if (currentMap.qty === undefined && qtyAliases.includes(h)) currentMap.qty = i;
-                        if (currentMap.price === undefined && priceAliases.includes(h)) currentMap.price = i;
-                        if (currentMap.val === undefined && valAliases.includes(h)) currentMap.val = i;
-                    }
-
-                    if (isShares) {
-                        if (currentMap.code !== undefined && (currentMap.qty !== undefined || currentMap.price !== undefined)) {
-                            headerRowIdx = r;
-                            colMap = currentMap;
-                            break;
-                        }
-                    } else {
-                        if (currentMap.code !== undefined && (currentMap.val !== undefined || (currentMap.qty !== undefined && currentMap.price !== undefined))) {
-                            headerRowIdx = r;
-                            colMap = currentMap;
-                            break;
-                        }
-                    }
-                }
-
-                if (headerRowIdx === -1) {
-                    const expected = isShares ? "Product ID, Quantity, Price" : "Product ID, Value";
-                    return {
-                        success: false,
-                        error: `Could not identify required columns in Vanguard CSV. Expected headers: ${expected}. Check the guide below.`
-                    };
-                }
-
-                if (isShares && (colMap.qty === undefined || colMap.price === undefined)) {
-                    return {
-                        success: false,
-                        error: "Could not identify required 'Quantity' and 'Price' columns for Share Price & Quantity mode. Check the guide below."
-                    };
-                }
-
-                if (!isShares && colMap.val === undefined && (colMap.qty === undefined || colMap.price === undefined)) {
-                    return {
-                        success: false,
-                        error: "Could not identify required 'Value' column for Value mode. Check the guide below."
-                    };
-                }
-
-                const ignoredTickers = new Set([
-                    'TOTAL', 'TOTALS', 'TOTAL PORTFOLIO', 'PORTFOLIO TOTAL',
-                    'CASH', 'AUD CASH', 'CASH ACCOUNT', 'USD CASH', 'AUD', 'USD',
-                    'VANGUARD CASH ACCOUNT', 'VANGUARD CASH'
-                ]);
-
-                const holdings = [];
-                for (let i = headerRowIdx + 1; i < rows.length; i++) {
-                    const row = rows[i];
-                    if (!row || row.length === 0) continue;
-
-                    const rawCode = colMap.code !== undefined ? row[colMap.code] : '';
-                    const ticker = (rawCode || '').trim();
-                    if (!ticker) continue;
-
-                    const upperTicker = ticker.toUpperCase();
-                    if (ignoredTickers.has(upperTicker)) continue;
-                    if (upperTicker.startsWith('TOTAL') || upperTicker.startsWith('CASH') || upperTicker.startsWith('VANGUARD CASH')) continue;
+                    if (this.ignoredTickers.has(upperTicker)) continue;
+                    if (this.ignoredPrefixes.some(p => upperTicker.startsWith(p))) continue;
 
                     const rawShares = colMap.qty !== undefined ? sanitizeCsvNumber(row[colMap.qty]) : '';
                     const rawPrice = colMap.price !== undefined ? sanitizeCsvNumber(row[colMap.price]) : '';
-                    let rawValue = colMap.val !== undefined ? sanitizeCsvNumber(row[colMap.val]) : '';
+                    let rawValue = '';
 
-                    if (!rawValue && rawPrice !== '' && rawShares !== '') {
-                        const p = parseFloat(rawPrice);
-                        const q = parseFloat(rawShares);
-                        if (!isNaN(p) && !isNaN(q)) {
+                    const p = parseFloat(rawPrice);
+                    const q = parseFloat(rawShares);
+
+                    if (isShares) {
+                        if (this.preferValColumnInShares && colMap.val !== undefined && row[colMap.val] !== undefined && String(row[colMap.val]).trim() !== '') {
+                            rawValue = sanitizeCsvNumber(row[colMap.val]);
+                        }
+                        if (!rawValue && !isNaN(p) && !isNaN(q)) {
+                            rawValue = String(Math.round(p * q * 100) / 100);
+                        }
+                    } else {
+                        if (colMap.val !== undefined && row[colMap.val] !== undefined && String(row[colMap.val]).trim() !== '') {
+                            rawValue = sanitizeCsvNumber(row[colMap.val]);
+                        }
+                        if (!rawValue && !isNaN(p) && !isNaN(q)) {
                             rawValue = String(Math.round(p * q * 100) / 100);
                         }
                     }
 
-                    // Preserve holding, price, quantity, and value in both modes
                     holdings.push({
                         t: upperTicker,
                         p: rawPrice,
@@ -6732,7 +6340,7 @@ INSTRUCTIONS:
                 if (holdings.length === 0) {
                     return {
                         success: false,
-                        error: "Matching Vanguard column headers were found, but no valid holding rows were detected."
+                        error: `Matching ${this.name} column headers were found, but no valid holding rows were detected.`
                     };
                 }
 
@@ -6742,6 +6350,78 @@ INSTRUCTIONS:
                     mode: effectiveMode,
                     count: holdings.length
                 };
+            }
+        }
+
+        class NabtradeCsvAdapter extends SnapshotBrokerAdapter {
+            constructor() {
+                super({
+                    id: "nabtrade",
+                    name: "Nabtrade",
+                    expectedShares: "Code, Quantity, Mkt.Price",
+                    expectedValue: "Code, Market value",
+                    reqSharesColText: "'Quantity' and 'Mkt.Price'",
+                    reqValueColText: "'Market value'",
+                    headers: {
+                        code: ['code', 'asx code', 'security code', 'holding', 'ticker'],
+                        qty: ['quantity', 'qty', 'units', 'shares', 'number of shares'],
+                        price: ['mkt.price', 'mkt price', 'market price', 'price', 'last price', 'unit price'],
+                        val: ['market value', 'mkt value', 'marketvalue', 'value', 'current value', 'total value']
+                    },
+                    ignoredTickers: [
+                        'TOTAL', 'TOTALS', 'TOTAL PORTFOLIO', 'PORTFOLIO TOTAL',
+                        'CASH', 'AUD CASH', 'CASH ACCOUNT', 'USD CASH', 'AUD', 'USD'
+                    ],
+                    ignoredPrefixes: ['TOTAL', 'CASH'],
+                    guideHtml: `
+                        <p><strong>Nabtrade Portfolio CSV Export</strong></p>
+                        <p style="margin-top: 4px;">In Nabtrade, navigate to <em>Trading &gt; Portfolio</em> and click <strong>Export CSV</strong>.</p>
+                        <ul style="margin: 8px 0 0 18px; padding: 0; font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5;">
+                            <li><strong>Code:</strong> Mapped to <code>Holding</code> (e.g. <code>VAS</code>, <code>BHP</code>).</li>
+                            <li><strong>Share Price &amp; Quantity Mode (Enabled):</strong> Automatically maps <code>Quantity</code> and <code>Mkt.Price</code> (Share Price).</li>
+                            <li><strong>Value per Holding Mode (Disabled):</strong> Automatically maps <code>Market value</code> (Value).</li>
+                            <li><strong>Target Allocation:</strong> Weights are left blank so you can enter target percentages after importing.</li>
+                        </ul>
+                        <p style="margin-top: 8px; font-size: 0.8rem; color: var(--accent);">Note: Cash accounts and portfolio summary rows are automatically filtered out.</p>
+                    `
+                });
+            }
+        }
+
+        class VanguardCsvAdapter extends SnapshotBrokerAdapter {
+            constructor() {
+                super({
+                    id: "vanguard",
+                    name: "Vanguard",
+                    expectedShares: "Product ID, Quantity, Price",
+                    expectedValue: "Product ID, Value",
+                    reqSharesColText: "'Quantity' and 'Price'",
+                    reqValueColText: "'Value'",
+                    headers: {
+                        code: ['product id', 'product_id', 'holding', 'code', 'security code', 'ticker', 'symbol'],
+                        qty: ['quantity', 'qty', 'units', 'shares', 'number of shares'],
+                        price: ['price', 'unit price', 'share price', 'mkt.price', 'mkt price', 'market price', 'last price'],
+                        val: ['value', 'market value', 'mkt value', 'current value', 'total value', 'estimated value']
+                    },
+                    ignoredTickers: [
+                        'TOTAL', 'TOTALS', 'TOTAL PORTFOLIO', 'PORTFOLIO TOTAL',
+                        'CASH', 'AUD CASH', 'CASH ACCOUNT', 'USD CASH', 'AUD', 'USD',
+                        'VANGUARD CASH ACCOUNT', 'VANGUARD CASH'
+                    ],
+                    ignoredPrefixes: ['TOTAL', 'CASH', 'VANGUARD CASH'],
+                    preferValColumnInShares: true,
+                    guideHtml: `
+                        <p><strong>Vanguard Portfolio CSV Export</strong></p>
+                        <p style="margin-top: 4px;">In Vanguard, navigate to your Holdings or Portfolio screen and export your CSV.</p>
+                        <ul style="margin: 8px 0 0 18px; padding: 0; font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5;">
+                            <li><strong>Product ID:</strong> Mapped to <code>Holding</code> (e.g. <code>VAS</code>, <code>VGS</code>).</li>
+                            <li><strong>Share Price &amp; Quantity Mode (Enabled):</strong> Automatically maps <code>Quantity</code> and <code>Price</code> (Share Price).</li>
+                            <li><strong>Value per Holding Mode (Disabled):</strong> Automatically maps <code>Value</code>, while retaining Quantity and Price if present.</li>
+                            <li><strong>Target Allocation:</strong> Weights are left blank so you can enter target percentages after importing.</li>
+                        </ul>
+                        <p style="margin-top: 8px; font-size: 0.8rem; color: var(--accent);">Note: Cash accounts and portfolio total rows are automatically filtered out.</p>
+                    `
+                });
             }
         }
 
@@ -7163,32 +6843,24 @@ INSTRUCTIONS:
         }
 
         function openCsvModal() {
-            const overlay = document.getElementById("csvModalOverlay");
-            if (overlay) {
-                overlay.classList.add("active");
-                document.body.style.overflow = "hidden";
+            ModalManager.open("csvModalOverlay", () => {
                 populateCsvFormatDropdown();
                 const select = document.getElementById("csvFormatSelect");
                 if (select) {
                     updateCsvGuide(select.value);
                 }
-            }
+            });
         }
 
         function closeCsvModal() {
-            const overlay = document.getElementById("csvModalOverlay");
-            if (overlay) {
-                overlay.classList.remove("active");
-                document.body.style.overflow = "";
-            }
-            resetCsvDropState();
-            hideCsvError();
+            ModalManager.close("csvModalOverlay", () => {
+                resetCsvDropState();
+                hideCsvError();
+            });
         }
 
         function handleCsvBackdropClick(event) {
-            if (event && event.target && event.target.id === "csvModalOverlay") {
-                closeCsvModal();
-            }
+            ModalManager.handleBackdrop(event, "csvModalOverlay", closeCsvModal);
         }
 
         function onCsvFormatChange(formatId) {
@@ -8342,22 +8014,7 @@ INSTRUCTIONS:
         // Close active modals on Escape key
         document.addEventListener("keydown", function(e) {
             if (e.key === "Escape" || e.keyCode === 27) {
-                const infoOverlay = document.getElementById("infoModalOverlay");
-                if (infoOverlay && infoOverlay.classList.contains("active")) {
-                    closeInfoModal();
-                }
-                const accOverlay = document.getElementById("accountModalOverlay");
-                if (accOverlay && accOverlay.classList.contains("active")) {
-                    closeAccountModal();
-                }
-                const setOverlay = document.getElementById("settingsModalOverlay");
-                if (setOverlay && setOverlay.classList.contains("active")) {
-                    closeSettingsModal();
-                }
-                const csvOverlay = document.getElementById("csvModalOverlay");
-                if (csvOverlay && csvOverlay.classList.contains("active")) {
-                    closeCsvModal();
-                }
+                ModalManager.closeAll();
             }
         });
 
@@ -8365,14 +8022,7 @@ INSTRUCTIONS:
         // Keyboard Grid Navigation Subsystem (Spreadsheet-Style 2D Traversal)
         // =========================================================================
         function isAnyModalOpen() {
-            const modalIds = ["infoModalOverlay", "accountModalOverlay", "settingsModalOverlay", "csvModalOverlay"];
-            for (let i = 0; i < modalIds.length; i++) {
-                const el = document.getElementById(modalIds[i]);
-                if (el && el.classList && el.classList.contains("active")) {
-                    return true;
-                }
-            }
-            return false;
+            return ModalManager.isAnyOpen();
         }
 
         function focusAndSelect(el) {
@@ -8683,23 +8333,14 @@ INSTRUCTIONS:
             const isWithdrawal = !isNaN(depositVal) && depositVal < 0;
 
             const minBuyWell = document.getElementById("minBuyWell");
-            const minBuyNotice = document.getElementById("minBuyNotice");
             const minBuyInput = document.getElementById("minBuy") ? document.getElementById("minBuy").value.trim() : "";
             const minBuyVal = parseFloat(minBuyInput);
             const depositEl = document.getElementById("deposit");
             const btnCalc = document.getElementById("btnCalc");
             const calcNotice = document.getElementById("calcNotice");
 
-            // [REDUNDANT/UNUSED with Minimum Transaction]: Minimum Transaction is now active during withdrawals.
-            // minBuyWell is no longer disabled on withdrawals, and minBuyNotice ("Unavailable while only making a withdrawal") is no longer displayed.
-            if (minBuyNotice) minBuyNotice.style.display = "none";
             if (minBuyWell) minBuyWell.classList.remove("disabled");
-
-            if (isComplete) {
-                if (depositEl) depositEl.placeholder = "0.00";
-            } else {
-                if (depositEl) depositEl.placeholder = "0.00";
-            }
+            if (depositEl) depositEl.placeholder = "0.00";
 
             // Calculate Allocation button validation:
             const absDeposit = !isNaN(depositVal) ? Math.abs(depositVal) : NaN;
@@ -8741,18 +8382,7 @@ INSTRUCTIONS:
         }
 
         function saveFormData() {
-            const depositEl = document.getElementById("deposit");
-            const minBuyEl = document.getElementById("minBuy");
-            const completeEl = document.getElementById("completeRebalance");
-            const payload = {
-                deposit: depositEl ? depositEl.value : "",
-                minBuy: (minBuyEl && minBuyEl.value !== undefined && minBuyEl.value !== "") ? minBuyEl.value : "0",
-                completeRebalance: completeEl ? completeEl.checked : false,
-                inputMode: isSharesInputMode() ? "shares" : "value",
-                sortField: currentSortField,
-                sortDirection: currentSortDirection,
-                holdings: holdingsData
-            };
+            const payload = serializePortfolioState();
             localStorage.setItem("rebalancer_state", JSON.stringify(payload));
 
             // Auto-sync encrypted vault if user is logged in
@@ -8772,41 +8402,17 @@ INSTRUCTIONS:
             const saved = localStorage.getItem("rebalancer_state");
             if (saved) {
                 try {
-                    const data = JSON.parse(saved);
-                    if (data.inputMode) {
-                        try {
-                            localStorage.setItem("rebalancer_input_mode", data.inputMode === "shares" ? "shares" : "value");
-                        } catch (e) {}
-                    }
-                    if (data.sortField) {
-                        currentSortField = data.sortField;
-                    }
-                    if (data.sortDirection) {
-                        currentSortDirection = data.sortDirection;
-                    }
-                    if (document.getElementById("deposit")) {
-                        document.getElementById("deposit").value = data.deposit || "";
-                    }
-                    if (document.getElementById("minBuy")) {
-                        document.getElementById("minBuy").value = (data.minBuy !== undefined && data.minBuy !== "") ? data.minBuy : "0";
-                    }
-                    if (document.getElementById("completeRebalance")) {
-                        document.getElementById("completeRebalance").checked = Boolean(data.completeRebalance);
-                    }
-                    if (Array.isArray(data.holdings) && data.holdings.length > 0) {
-                        holdingsData = data.holdings;
-                        ensureHoldingsOriginalIndices();
-                    } else {
-                        initDefaultHoldings();
-                    }
+                    deserializePortfolioState(JSON.parse(saved));
                 } catch (e) {
                     initDefaultHoldings();
+                    onToggleCompleteRebalance();
+                    renderRows();
                 }
             } else {
                 initDefaultHoldings();
+                onToggleCompleteRebalance();
+                renderRows();
             }
-            onToggleCompleteRebalance();
-            renderRows();
             updateAccountUI();
         }
 
@@ -8903,6 +8509,9 @@ INSTRUCTIONS:
         // - Share Price & Quantity Mode (Integer Shares, Residual Cash Redistribution)
         // - Dynamic Minimum Buy Thresholds & Real-Time Calculation Orchestration
         // =========================================================================
+
+        const padLeft = (s, len) => String(s).padStart(len, " ");
+        const padRight = (s, len) => String(s).padEnd(len, " ");
 
         // --- Core Algorithm (Ported directly from dynaReb.c with dynamic minBuy) ---
         function calculateRebalance() {
@@ -9449,17 +9058,6 @@ INSTRUCTIONS:
                 overweight = max_h;
             }
 
-            function padLeft(str, len) {
-                str = String(str);
-                while (str.length < len) str = " " + str;
-                return str;
-            }
-            function padRight(str, len) {
-                str = String(str);
-                while (str.length < len) str = str + " ";
-                return str;
-            }
-
             let out = "";
             out += "___________________________________\n";
             out += "       Complete Rebalance\n";
@@ -9547,17 +9145,6 @@ INSTRUCTIONS:
             for (let a of assets) {
                 curr_folio_value += a.value;
                 a.cut = 0;
-            }
-
-            function padLeft(str, len) {
-                str = String(str);
-                while (str.length < len) str = " " + str;
-                return str;
-            }
-            function padRight(str, len) {
-                str = String(str);
-                while (str.length < len) str = str + " ";
-                return str;
             }
 
             if (added < 0) {
