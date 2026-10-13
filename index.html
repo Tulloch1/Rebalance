@@ -565,7 +565,7 @@
 
         .min-buy-well:focus-within {
             border-color: var(--accent);
-            box-shadow: 0 0 0 2px var(--accent-glow);
+            box-shadow: 0 0 0 3px var(--accent-glow);
         }
 
         .min-buy-well label {
@@ -742,12 +742,18 @@
             border-radius: 4px;
             cursor: pointer;
             color: var(--text-primary);
+            transform: scale(1) translateZ(0);
+            backface-visibility: hidden;
             transition: all 0.15s ease;
         }
 
         .sort-dir-btn:not(.disabled):hover {
             color: var(--accent);
             background: var(--accent-badge-bg);
+        }
+
+        .sort-dir-btn:not(.disabled):active {
+            transform: scale(0.88) translateZ(0);
         }
 
         .sort-dir-btn.disabled {
@@ -838,18 +844,26 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
+            transform: scale(1) translateZ(0);
+            backface-visibility: hidden;
             transition: all 0.15s ease;
         }
 
         .btn-remove svg {
             width: 16px;
             height: 16px;
+            display: block;
+            flex-shrink: 0;
         }
 
         .btn-remove:hover {
             color: var(--danger);
             background: var(--danger-bg);
             border-color: var(--danger-border);
+        }
+
+        .btn-remove:active {
+            transform: scale(0.90) translateZ(0);
         }
 
         /* Target Weight Meter */
@@ -947,6 +961,8 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
+            transform: translateY(0) translateZ(0);
+            backface-visibility: hidden;
             transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
             border: 1px solid transparent;
             user-select: none;
@@ -955,6 +971,8 @@
         button.btn svg {
             width: 15px;
             height: 15px;
+            display: block;
+            flex-shrink: 0;
         }
 
         .btn-add {
@@ -966,6 +984,13 @@
         .btn-add:hover {
             background: rgba(255, 255, 255, 0.08);
             border-color: var(--border-hover);
+            transform: translateY(-1px) translateZ(0);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+        }
+
+        .btn-add:active {
+            transform: translateY(0) translateZ(0);
+            box-shadow: none;
         }
 
         .btn-reset {
@@ -979,6 +1004,11 @@
             background: rgba(255, 255, 255, 0.04);
         }
 
+        .btn-reset:active {
+            transform: scale(0.96) translateZ(0);
+            opacity: 0.8;
+        }
+
         .btn-calc {
             background: var(--accent);
             color: var(--accent-on-text);
@@ -987,12 +1017,12 @@
 
         .btn-calc:hover {
             background: var(--accent-hover);
-            transform: translateY(-1px);
+            transform: translateY(-1px) translateZ(0);
             box-shadow: 0 6px 20px var(--accent-glow);
         }
 
         .btn-calc:active {
-            transform: translateY(0);
+            transform: translateY(0) translateZ(0);
         }
 
         .btn-calc.disabled, .btn-calc:disabled {
@@ -1199,7 +1229,7 @@
             position: absolute;
             left: 0;
             top: 0;
-            transition: width 0.4s ease;
+            transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .alloc-target-marker {
@@ -1339,11 +1369,17 @@
             font-size: 11px;
             font-weight: 500;
             cursor: pointer;
+            transform: scale(1) translateZ(0);
+            backface-visibility: hidden;
             transition: all 0.15s ease;
         }
 
         .btn-copy-raw:hover {
             background: rgba(255, 255, 255, 0.18);
+        }
+
+        .btn-copy-raw:active {
+            transform: scale(0.95) translateZ(0);
         }
 
         /* Feedback Footer */
@@ -1385,11 +1421,13 @@
             display: inline-flex;
             align-items: center;
             opacity: 0.85;
-            transition: transform 0.15s ease;
+            transform: scale(1) translateZ(0);
+            backface-visibility: hidden;
+            transition: transform 0.15s ease, opacity 0.15s ease;
         }
 
         .email-copy-btn:hover .email-copy-icon {
-            transform: scale(1.1);
+            transform: scale(1.1) translateZ(0);
             opacity: 1;
         }
 
@@ -1448,7 +1486,7 @@
             text-decoration: underline;
             text-underline-offset: 2px;
             text-decoration-color: rgba(36, 219, 161, 0.4);
-            transition: all 0.18s ease;
+            transition: all 0.2s ease;
         }
 
         .footer-disclaimer-link:hover {
@@ -1495,12 +1533,13 @@
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6), 0 0 0 1px var(--border-subtle);
             overflow: hidden;
             padding: 0 !important;
-            transform: scale(0.94) translateY(12px);
+            transform: scale(0.94) translateY(12px) translateZ(0);
+            backface-visibility: hidden;
             transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .modal-overlay.active .info-modal-card {
-            transform: scale(1) translateY(0);
+            transform: scale(1) translateY(0) translateZ(0);
         }
 
         /* Chrome-style Tab Bar */
@@ -1576,21 +1615,27 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            margin-bottom: 4px;
-            margin-left: 8px;
             flex-shrink: 0;
+            transform: scale(1) translateZ(0);
+            backface-visibility: hidden;
             transition: all 0.15s ease;
         }
 
         .modal-close-btn:hover {
             background: var(--danger-bg);
             border-color: var(--danger-border);
-            transform: scale(1.08);
+            transform: scale(1.08) translateZ(0);
+        }
+
+        .modal-close-btn:active {
+            transform: scale(0.92) translateZ(0);
         }
 
         .modal-close-btn svg {
             width: 16px;
             height: 16px;
+            display: block;
+            flex-shrink: 0;
         }
 
         /* Modal Content Body */
@@ -1664,7 +1709,7 @@
             border: 1px solid transparent;
             border-radius: 9px;
             cursor: pointer;
-            transition: all 0.16s ease;
+            transition: all 0.15s ease;
             white-space: nowrap;
             outline: none;
         }
@@ -1737,7 +1782,7 @@
             font-weight: 600;
             color: var(--text-secondary);
             cursor: pointer;
-            transition: all 0.16s ease;
+            transition: all 0.15s ease;
             white-space: nowrap;
             display: flex;
             align-items: center;
@@ -1979,7 +2024,9 @@
             font-size: 14px;
             font-weight: 700;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transform: translateY(0) translateZ(0);
+            backface-visibility: hidden;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -1988,8 +2035,12 @@
 
         .btn-account-primary:hover {
             background: var(--accent-hover);
-            transform: translateY(-1px);
+            transform: translateY(-1px) translateZ(0);
             box-shadow: 0 4px 14px var(--accent-glow);
+        }
+
+        .btn-account-primary:active {
+            transform: translateY(0) translateZ(0);
         }
 
         .btn-account-secondary {
@@ -2001,7 +2052,9 @@
             font-size: 12.5px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.15s ease;
+            transform: translateY(0) translateZ(0);
+            backface-visibility: hidden;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -2014,6 +2067,11 @@
             border-color: var(--border-hover);
             background: var(--surface-elevated);
             color: var(--accent);
+            transform: translateY(-1px) translateZ(0);
+        }
+
+        .btn-account-secondary:active {
+            transform: translateY(0) translateZ(0);
         }
 
         .btn-account-danger {
@@ -2025,7 +2083,9 @@
             font-size: 12.5px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.15s ease;
+            transform: translateY(0) translateZ(0);
+            backface-visibility: hidden;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -2035,6 +2095,11 @@
         .btn-account-danger:hover {
             background: var(--danger);
             color: #FFFFFF;
+            transform: translateY(-1px) translateZ(0);
+        }
+
+        .btn-account-danger:active {
+            transform: translateY(0) translateZ(0);
         }
 
         @media (max-width: 500px) {
@@ -2190,7 +2255,9 @@
             font-size: 0.82rem;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transform: translateY(0) translateZ(0);
+            backface-visibility: hidden;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
             white-space: nowrap;
         }
 
@@ -2198,6 +2265,11 @@
             border-color: var(--accent);
             color: var(--accent);
             background: var(--accent-badge-bg);
+            transform: translateY(-1px) translateZ(0);
+        }
+
+        .btn-setting-action:active {
+            transform: translateY(0) translateZ(0);
         }
 
         .btn-setting-ping {
@@ -2209,12 +2281,19 @@
             font-size: 0.76rem;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transform: translateY(0) translateZ(0);
+            backface-visibility: hidden;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .btn-setting-ping:hover {
             color: var(--accent);
             border-color: var(--accent-badge-border);
+            transform: translateY(-1px) translateZ(0);
+        }
+
+        .btn-setting-ping:active {
+            transform: translateY(0) translateZ(0);
         }
 
         .btn-setting-pill {
@@ -2230,6 +2309,8 @@
             align-items: center;
             justify-content: center;
             gap: 7px;
+            transform: translateY(0) translateZ(0);
+            backface-visibility: hidden;
             transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
             box-shadow: 0 2px 8px var(--accent-glow);
             white-space: nowrap;
@@ -2239,12 +2320,12 @@
         .btn-setting-pill:hover {
             background: var(--accent-hover);
             border-color: var(--accent-hover);
-            transform: translateY(-1px);
+            transform: translateY(-1px) translateZ(0);
             box-shadow: 0 4px 14px var(--accent-glow);
         }
 
         .btn-setting-pill:active {
-            transform: translateY(0);
+            transform: translateY(0) translateZ(0);
             box-shadow: 0 2px 6px var(--accent-glow);
         }
 
@@ -2258,6 +2339,8 @@
         .btn-setting-pill svg {
             width: 14px;
             height: 14px;
+            display: block;
+            flex-shrink: 0;
         }
 
         /* Danger Zone Card (Coral Red) */
@@ -2303,12 +2386,18 @@
             font-size: 0.82rem;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transform: translateY(0) translateZ(0);
+            backface-visibility: hidden;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .btn-danger-outline:hover {
             background: rgba(248, 113, 113, 0.15);
-            transform: translateY(-1px);
+            transform: translateY(-1px) translateZ(0);
+        }
+
+        .btn-danger-outline:active {
+            transform: translateY(0) translateZ(0);
         }
 
         .btn-danger-filled {
@@ -2320,12 +2409,18 @@
             font-size: 0.82rem;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transform: translateY(0) translateZ(0);
+            backface-visibility: hidden;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .btn-danger-filled:hover {
             filter: brightness(1.1);
-            transform: translateY(-1px);
+            transform: translateY(-1px) translateZ(0);
+        }
+
+        .btn-danger-filled:active {
+            transform: translateY(0) translateZ(0);
         }
 
         /* Sync Status Badges */
@@ -2375,6 +2470,8 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
+            transform: translateY(0) translateZ(0);
+            backface-visibility: hidden;
             transition: all 0.2s ease;
             padding: 0;
         }
@@ -2383,12 +2480,18 @@
             color: var(--accent);
             border-color: var(--accent-badge-border);
             background: var(--accent-badge-bg);
-            transform: scale(1.06);
+            transform: translateY(-1.5px) translateZ(0);
+        }
+
+        .csv-upload-btn:active {
+            transform: translateY(0) translateZ(0);
         }
 
         .csv-upload-btn svg {
             width: 14px;
             height: 14px;
+            display: block;
+            flex-shrink: 0;
         }
 
         /* CSV Import Modal */
@@ -2402,7 +2505,8 @@
             border: 1px solid var(--border-subtle);
             border-radius: var(--radius-outer);
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6), 0 0 0 1px var(--border-subtle);
-            transform: scale(0.94) translateY(12px);
+            transform: scale(0.94) translateY(12px) translateZ(0);
+            backface-visibility: hidden;
             transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
             display: flex;
             flex-direction: column;
@@ -2410,7 +2514,7 @@
         }
 
         .modal-overlay.active .csv-modal-card {
-            transform: scale(1) translateY(0);
+            transform: scale(1) translateY(0) translateZ(0);
         }
 
         .csv-modal-header {
@@ -2630,12 +2734,18 @@
             padding: 2px 6px;
             border-radius: var(--radius-pill);
             line-height: 1;
+            transform: scale(1) translateZ(0);
+            backface-visibility: hidden;
             transition: all 0.15s ease;
         }
 
         .csv-file-remove-btn:hover {
             color: var(--danger);
             background: var(--danger-bg);
+        }
+
+        .csv-file-remove-btn:active {
+            transform: scale(0.90) translateZ(0);
         }
 
         .csv-holding-badge {
