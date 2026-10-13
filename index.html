@@ -8361,6 +8361,181 @@ INSTRUCTIONS:
             }
         });
 
+        // =========================================================================
+        // Keyboard Grid Navigation Subsystem (Spreadsheet-Style 2D Traversal)
+        // =========================================================================
+        function isAnyModalOpen() {
+            const modalIds = ["infoModalOverlay", "accountModalOverlay", "settingsModalOverlay", "csvModalOverlay"];
+            for (let i = 0; i < modalIds.length; i++) {
+                const el = document.getElementById(modalIds[i]);
+                if (el && el.classList && el.classList.contains("active")) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        function focusAndSelect(el) {
+            if (!el || el.disabled) return;
+            el.focus();
+            if (typeof el.select === "function") {
+                try {
+                    el.select();
+                } catch (err) {}
+            }
+        }
+
+        function canMoveLeft(input) {
+            try {
+                if (input && typeof input.selectionStart === "number") {
+                    if (input.selectionStart !== input.selectionEnd) return true;
+                    return input.selectionStart === 0;
+                }
+            } catch (err) {}
+            return true;
+        }
+
+        function canMoveRight(input) {
+            try {
+                if (input && typeof input.selectionEnd === "number") {
+                    if (input.selectionStart !== input.selectionEnd) return true;
+                    const len = (input.value !== undefined && input.value !== null) ? String(input.value).length : 0;
+                    return input.selectionEnd === len;
+                }
+            } catch (err) {}
+            return true;
+        }
+
+        function handleGridKeyNavigation(e) {
+            if (isAnyModalOpen()) return;
+
+            const target = e.target || document.activeElement;
+            if (!target || !target.id) return;
+
+            const isDeposit = target.id === "deposit";
+            const isMinBuy = target.id === "minBuy";
+            const rowMatch = target.id.match(/^(ticker|price|qty|value|weight)_(\d+)$/);
+
+            if (!isDeposit && !isMinBuy && !rowMatch) return;
+
+            const key = e.key || "";
+            const isDown = key === "ArrowDown" || e.keyCode === 40;
+            const isUp = key === "ArrowUp" || e.keyCode === 38;
+            const isLeft = key === "ArrowLeft" || e.keyCode === 37;
+            const isRight = key === "ArrowRight" || e.keyCode === 39;
+            const isEnter = key === "Enter" || e.keyCode === 13;
+
+            if (!isDown && !isUp && !isLeft && !isRight && !isEnter) return;
+            if (e.altKey || e.ctrlKey || e.metaKey) return;
+            if (e.isComposing) return;
+            if ((isDown || isUp || isLeft || isRight) && e.shiftKey) return;
+
+            const isShares = isSharesInputMode();
+            const totalRows = (Array.isArray(holdingsData) && holdingsData.length > 0) ? holdingsData.length : 1;
+
+            function getRowCols(r) {
+                if (isShares) {
+                    return ["ticker_" + r, "price_" + r, "qty_" + r, "weight_" + r];
+                } else {
+                    return ["ticker_" + r, "value_" + r, "weight_" + r];
+                }
+            }
+
+            // Down navigation: ArrowDown OR (Enter without Shift)
+            if (isDown || (isEnter && !e.shiftKey)) {
+                e.preventDefault();
+                if (isDeposit) {
+                    focusAndSelect(document.getElementById("ticker_1"));
+                } else if (isMinBuy) {
+                    const row1Cols = getRowCols(1);
+                    focusAndSelect(document.getElementById(row1Cols[row1Cols.length - 1]));
+                } else if (rowMatch) {
+                    const r = parseInt(rowMatch[2], 10);
+                    const colType = rowMatch[1];
+                    if (r < totalRows) {
+                        const nextId = colType + "_" + (r + 1);
+                        focusAndSelect(document.getElementById(nextId));
+                    }
+                }
+                return;
+            }
+
+            // Up navigation: ArrowUp OR (Enter with Shift)
+            if (isUp || (isEnter && e.shiftKey)) {
+                e.preventDefault();
+                if (isDeposit) {
+                    // Stay at top boundary
+                } else if (isMinBuy) {
+                    focusAndSelect(document.getElementById("deposit"));
+                } else if (rowMatch) {
+                    const r = parseInt(rowMatch[2], 10);
+                    const colType = rowMatch[1];
+                    if (r > 1) {
+                        const prevId = colType + "_" + (r - 1);
+                        focusAndSelect(document.getElementById(prevId));
+                    } else if (r === 1) {
+                        if (colType === "weight") {
+                            focusAndSelect(document.getElementById("minBuy"));
+                        } else {
+                            focusAndSelect(document.getElementById("deposit"));
+                        }
+                    }
+                }
+                return;
+            }
+
+            // Right navigation: ArrowRight
+            if (isRight) {
+                if (!canMoveRight(target)) return;
+                e.preventDefault();
+                if (isDeposit) {
+                    focusAndSelect(document.getElementById("minBuy"));
+                } else if (isMinBuy) {
+                    focusAndSelect(document.getElementById("ticker_1"));
+                } else if (rowMatch) {
+                    const r = parseInt(rowMatch[2], 10);
+                    const cols = getRowCols(r);
+                    const curIndex = cols.indexOf(target.id);
+                    if (curIndex !== -1 && curIndex < cols.length - 1) {
+                        focusAndSelect(document.getElementById(cols[curIndex + 1]));
+                    } else if (curIndex === cols.length - 1) {
+                        if (r < totalRows) {
+                            focusAndSelect(document.getElementById("ticker_" + (r + 1)));
+                        }
+                    }
+                }
+                return;
+            }
+
+            // Left navigation: ArrowLeft
+            if (isLeft) {
+                if (!canMoveLeft(target)) return;
+                e.preventDefault();
+                if (isDeposit) {
+                    // Stay at boundary
+                } else if (isMinBuy) {
+                    focusAndSelect(document.getElementById("deposit"));
+                } else if (rowMatch) {
+                    const r = parseInt(rowMatch[2], 10);
+                    const cols = getRowCols(r);
+                    const curIndex = cols.indexOf(target.id);
+                    if (curIndex > 0) {
+                        focusAndSelect(document.getElementById(cols[curIndex - 1]));
+                    } else if (curIndex === 0) {
+                        if (r > 1) {
+                            const prevCols = getRowCols(r - 1);
+                            focusAndSelect(document.getElementById(prevCols[prevCols.length - 1]));
+                        } else if (r === 1) {
+                            focusAndSelect(document.getElementById("deposit"));
+                        }
+                    }
+                }
+                return;
+            }
+        }
+
+        document.addEventListener("keydown", handleGridKeyNavigation);
+
         function renderRows() {
             renderTableHeaders();
             const container = document.getElementById("portfolioContainer");

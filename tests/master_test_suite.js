@@ -3301,6 +3301,7 @@ console.log("\n--- PART 4: Information Guide Modal & Chrome Tab Navigation ---")
 
             env.resetCsvDropState();
             env.onCsvFormatChange("generic_shares");
+            env.closeCsvModal();
         });
 
         // =========================================================================
@@ -3601,6 +3602,193 @@ console.log("\n--- PART 4: Information Guide Modal & Chrome Tab Navigation ---")
             const path = require('path');
             const html = fs.readFileSync(path.resolve(__dirname, '..', 'index.html'), 'utf8');
             assert.ok(html.includes('<span class="brand-tag" id="brandVersionTag"></span>'), "brandVersionTag element must not contain hardcoded version string in HTML markup");
+        });
+
+        // =========================================================================
+        // PART 14: Spreadsheet-Style 2D Keyboard Grid Navigation Subsystem
+        // =========================================================================
+        console.log("\n--- PART 14: Spreadsheet-Style 2D Keyboard Grid Navigation Subsystem ---");
+
+        function dispatchKey(targetId, key, options = {}) {
+            if (!options.allowModal) {
+                ["infoModalOverlay", "accountModalOverlay", "settingsModalOverlay", "csvModalOverlay"].forEach(id => {
+                    const el = env.getEl(id);
+                    if (el && el.classList) el.classList.remove("active");
+                });
+            }
+            const targetEl = env.getEl(targetId);
+            env.sandbox.document.activeElement = targetEl;
+            let defaultPrevented = false;
+            const event = {
+                type: 'keydown',
+                key: key,
+                target: targetEl,
+                shiftKey: Boolean(options.shiftKey),
+                ctrlKey: Boolean(options.ctrlKey),
+                altKey: Boolean(options.altKey),
+                metaKey: Boolean(options.metaKey),
+                preventDefault() { defaultPrevented = true; }
+            };
+            env.dispatchDocumentEvent(event);
+            return {
+                defaultPrevented,
+                activeId: env.sandbox.document.activeElement ? env.sandbox.document.activeElement.id : null,
+                selected: Boolean(env.sandbox.document.activeElement && env.sandbox.document.activeElement._selected)
+            };
+        }
+
+        // 1. ArrowDown and Enter on deposit navigates to ticker_1 with auto-selection
+        runTest("ArrowDown and Enter on deposit navigates to ticker_1 with auto-selection", () => {
+            env.onSettingInputModeToggle(true);
+            env.setHoldings([
+                { t: "VAS", p: "90", q: "10", w: "40" },
+                { t: "VGS", p: "110", q: "5", w: "60" }
+            ]);
+            env.renderRows();
+
+            const res1 = dispatchKey("deposit", "ArrowDown");
+            assert.strictEqual(res1.defaultPrevented, true, "ArrowDown on deposit must prevent default number decrement");
+            assert.strictEqual(res1.activeId, "ticker_1", "Focus must advance to ticker_1");
+            assert.strictEqual(res1.selected, true, "Field contents must be auto-selected");
+
+            const res2 = dispatchKey("deposit", "Enter");
+            assert.strictEqual(res2.defaultPrevented, true, "Enter on deposit must prevent default submit");
+            assert.strictEqual(res2.activeId, "ticker_1", "Focus must advance to ticker_1");
+        });
+
+        // 2. ArrowRight on deposit navigates to minBuy with auto-selection
+        runTest("ArrowRight on deposit navigates to minBuy with auto-selection", () => {
+            const res = dispatchKey("deposit", "ArrowRight");
+            assert.strictEqual(res.defaultPrevented, true);
+            assert.strictEqual(res.activeId, "minBuy");
+            assert.strictEqual(res.selected, true);
+        });
+
+        // 3. ArrowDown on minBuy navigates to row 1 target weight
+        runTest("ArrowDown on minBuy navigates to row 1 target weight", () => {
+            const res = dispatchKey("minBuy", "ArrowDown");
+            assert.strictEqual(res.defaultPrevented, true);
+            assert.strictEqual(res.activeId, "weight_1");
+        });
+
+        // 4. ArrowLeft on minBuy navigates back to deposit
+        runTest("ArrowLeft on minBuy navigates back to deposit", () => {
+            const res = dispatchKey("minBuy", "ArrowLeft");
+            assert.strictEqual(res.defaultPrevented, true);
+            assert.strictEqual(res.activeId, "deposit");
+        });
+
+        // 5. ArrowDown and Enter navigate vertically down same column without modifying numbers
+        runTest("ArrowDown and Enter navigate vertically down same column without modifying numbers", () => {
+            const price1 = env.getEl("price_1");
+            const originalPrice = price1.value;
+
+            const res1 = dispatchKey("price_1", "ArrowDown");
+            assert.strictEqual(res1.defaultPrevented, true, "Must prevent native number decrement");
+            assert.strictEqual(res1.activeId, "price_2");
+            assert.strictEqual(price1.value, originalPrice, "Price value must not change");
+
+            const res2 = dispatchKey("qty_1", "Enter");
+            assert.strictEqual(res2.defaultPrevented, true);
+            assert.strictEqual(res2.activeId, "qty_2");
+        });
+
+        // 6. ArrowUp and Shift+Enter navigate vertically up same column
+        runTest("ArrowUp and Shift+Enter navigate vertically up same column", () => {
+            const res1 = dispatchKey("price_2", "ArrowUp");
+            assert.strictEqual(res1.defaultPrevented, true);
+            assert.strictEqual(res1.activeId, "price_1");
+
+            const res2 = dispatchKey("weight_2", "Enter", { shiftKey: true });
+            assert.strictEqual(res2.defaultPrevented, true);
+            assert.strictEqual(res2.activeId, "weight_1");
+        });
+
+        // 7. ArrowUp from row 1 connects to deposit (ticker/price/qty) and minBuy (weight)
+        runTest("ArrowUp from row 1 connects to deposit (ticker/price/qty) and minBuy (weight)", () => {
+            const res1 = dispatchKey("ticker_1", "ArrowUp");
+            assert.strictEqual(res1.defaultPrevented, true);
+            assert.strictEqual(res1.activeId, "deposit");
+
+            const res2 = dispatchKey("price_1", "ArrowUp");
+            assert.strictEqual(res2.defaultPrevented, true);
+            assert.strictEqual(res2.activeId, "deposit");
+
+            const res3 = dispatchKey("weight_1", "ArrowUp");
+            assert.strictEqual(res3.defaultPrevented, true);
+            assert.strictEqual(res3.activeId, "minBuy");
+        });
+
+        // 8. ArrowRight navigates across columns and wraps from weight_1 to ticker_2
+        runTest("ArrowRight navigates across columns and wraps from weight_1 to ticker_2", () => {
+            const res1 = dispatchKey("ticker_1", "ArrowRight");
+            assert.strictEqual(res1.defaultPrevented, true);
+            assert.strictEqual(res1.activeId, "price_1");
+
+            const res2 = dispatchKey("price_1", "ArrowRight");
+            assert.strictEqual(res2.defaultPrevented, true);
+            assert.strictEqual(res2.activeId, "qty_1");
+
+            const res3 = dispatchKey("qty_1", "ArrowRight");
+            assert.strictEqual(res3.defaultPrevented, true);
+            assert.strictEqual(res3.activeId, "weight_1");
+
+            const res4 = dispatchKey("weight_1", "ArrowRight");
+            assert.strictEqual(res4.defaultPrevented, true);
+            assert.strictEqual(res4.activeId, "ticker_2");
+        });
+
+        // 9. ArrowLeft navigates across columns and wraps from ticker_2 to weight_1, and ticker_1 to deposit
+        runTest("ArrowLeft navigates across columns and wraps from ticker_2 to weight_1, and ticker_1 to deposit", () => {
+            const res1 = dispatchKey("ticker_2", "ArrowLeft");
+            assert.strictEqual(res1.defaultPrevented, true);
+            assert.strictEqual(res1.activeId, "weight_1");
+
+            const res2 = dispatchKey("weight_1", "ArrowLeft");
+            assert.strictEqual(res2.defaultPrevented, true);
+            assert.strictEqual(res2.activeId, "qty_1");
+
+            const res3 = dispatchKey("ticker_1", "ArrowLeft");
+            assert.strictEqual(res3.defaultPrevented, true);
+            assert.strictEqual(res3.activeId, "deposit");
+        });
+
+        // 10. Arrow keys respect caret position inside text inputs
+        runTest("Arrow keys respect caret position inside text inputs", () => {
+            const ticker1 = env.getEl("ticker_1");
+            ticker1.value = "AAPL";
+            ticker1.selectionStart = 2; // Caret between A and P
+            ticker1.selectionEnd = 2;
+
+            const resRight = dispatchKey("ticker_1", "ArrowRight");
+            assert.strictEqual(resRight.defaultPrevented, false, "Must not intercept when caret is in middle of text");
+            assert.strictEqual(resRight.activeId, "ticker_1", "Must remain on ticker_1");
+
+            const resLeft = dispatchKey("ticker_1", "ArrowLeft");
+            assert.strictEqual(resLeft.defaultPrevented, false, "Must not intercept when caret is in middle of text");
+            assert.strictEqual(resLeft.activeId, "ticker_1", "Must remain on ticker_1");
+        });
+
+        // 11. Keyboard grid navigation is bypassed when any modal overlay is active
+        runTest("Keyboard grid navigation is bypassed when any modal overlay is active", () => {
+            const infoOverlay = env.getEl("infoModalOverlay");
+            infoOverlay.classList.add("active");
+            try {
+                const res = dispatchKey("deposit", "ArrowDown", { allowModal: true });
+                assert.strictEqual(res.defaultPrevented, false, "Must not intercept keys while modal is active");
+                assert.strictEqual(res.activeId, "deposit", "Focus must not move while modal is active");
+            } finally {
+                infoOverlay.classList.remove("active");
+            }
+        });
+
+        // 12. Modifier combinations preserve browser defaults and text selection
+        runTest("Modifier combinations preserve browser defaults and text selection", () => {
+            const resCtrl = dispatchKey("ticker_1", "ArrowRight", { ctrlKey: true });
+            assert.strictEqual(resCtrl.defaultPrevented, false, "Ctrl+Arrow must not be intercepted");
+
+            const resShift = dispatchKey("ticker_1", "ArrowRight", { shiftKey: true });
+            assert.strictEqual(resShift.defaultPrevented, false, "Shift+Arrow must not be intercepted to permit text selection");
         });
     }
 

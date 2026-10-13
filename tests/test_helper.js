@@ -63,8 +63,19 @@ function createTestEnv() {
                 },
                 scrollIntoView() {},
                 reset() {},
-                focus() {},
-                blur() {}
+                focus() {
+                    if (sandbox && sandbox.document) {
+                        sandbox.document.activeElement = this;
+                    }
+                },
+                blur() {
+                    if (sandbox && sandbox.document && sandbox.document.activeElement === this) {
+                        sandbox.document.activeElement = null;
+                    }
+                },
+                select() {
+                    this._selected = true;
+                }
             };
         }
         return elements[id];
@@ -100,6 +111,7 @@ function createTestEnv() {
         crypto: globalThis.crypto,
         document: {
             body: { style: {} },
+            activeElement: null,
             getElementById: (id) => getOrCreateElement(id),
             documentElement: { setAttribute() {} },
             addEventListener() {},
@@ -332,7 +344,8 @@ function createTestEnv() {
             };
         },
         getStagedCsvHoldings: () => vm.runInContext('stagedCsvHoldings', sandbox),
-        getStagedCsvMode: () => vm.runInContext('stagedCsvMode', sandbox)
+        getStagedCsvMode: () => vm.runInContext('stagedCsvMode', sandbox),
+        handleGridKeyNavigation: (e) => sandbox.handleGridKeyNavigation(e)
     };
 }
 
