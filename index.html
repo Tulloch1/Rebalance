@@ -695,6 +695,11 @@
             border-color: var(--border-hover);
         }
 
+        .sort-pill-container.active,
+        .sort-pill-container.active:hover {
+            border-color: var(--accent);
+        }
+
         .sort-select {
             appearance: none;
             -webkit-appearance: none;
@@ -714,9 +719,11 @@
             text-align-last: center;
             -webkit-text-align-last: center;
             -moz-text-align-last: center;
+            transition: color 0.15s ease;
         }
 
-        .sort-select:focus {
+        .sort-pill-container.active .sort-select,
+        .sort-select.active {
             color: var(--accent);
         }
 
@@ -748,7 +755,7 @@
         }
 
         .sort-dir-btn:not(.disabled):hover {
-            color: var(--accent);
+            color: var(--text-primary);
             background: var(--accent-badge-bg);
         }
 
@@ -2928,7 +2935,7 @@
                 <div>Current Value</div>
                 <div>Target</div>
                 <div class="sort-header-cell">
-                    <div class="sort-pill-container" title="Sort holdings">
+                    <div class="sort-pill-container" id="sortPillContainer" title="Sort holdings">
                         <select id="sortFieldSelect" class="sort-select" onchange="onSortFieldChange(this.value)" aria-label="Sort holdings by">
                             <option value="none">--sort by--</option>
                             <option value="alpha">Alphabetical</option>
@@ -5647,8 +5654,8 @@ INSTRUCTIONS:
 
             return `
                 <div class="sort-header-cell">
-                    <div class="sort-pill-container" title="Sort holdings">
-                        <select id="sortFieldSelect" class="sort-select" onchange="onSortFieldChange(this.value)" aria-label="Sort holdings by">
+                    <div class="sort-pill-container${isNone ? "" : " active"}" id="sortPillContainer" title="Sort holdings">
+                        <select id="sortFieldSelect" class="sort-select${isNone ? "" : " active"}" onchange="onSortFieldChange(this.value)" aria-label="Sort holdings by">
                             <option value="none"${currentSortField === "none" ? " selected" : ""}>--sort by--</option>
                             <option value="alpha"${currentSortField === "alpha" ? " selected" : ""}>Alphabetical</option>
                             <option value="target"${currentSortField === "target" ? " selected" : ""}>Target Weight</option>
@@ -5789,8 +5796,23 @@ INSTRUCTIONS:
                 `;
             }
 
+            const sortPill = document.getElementById("sortPillContainer");
+            if (sortPill) {
+                if (currentSortField === "none") {
+                    sortPill.classList.remove("active");
+                } else {
+                    sortPill.classList.add("active");
+                }
+            }
             const sortSel = document.getElementById("sortFieldSelect");
-            if (sortSel) sortSel.value = currentSortField;
+            if (sortSel) {
+                sortSel.value = currentSortField;
+                if (currentSortField === "none") {
+                    sortSel.classList.remove("active");
+                } else {
+                    sortSel.classList.add("active");
+                }
+            }
             const sortBtn = document.getElementById("sortDirBtn");
             if (sortBtn) {
                 sortBtn.disabled = (currentSortField === "none");

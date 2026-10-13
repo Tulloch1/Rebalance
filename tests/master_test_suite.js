@@ -3537,6 +3537,23 @@ console.log("\n--- PART 4: Information Guide Modal & Chrome Tab Navigation ---")
             env.onSortFieldChange("none");
         });
 
+        // 11. Selecting a sort order toggles active class on sortPillContainer and sortFieldSelect
+        runTest("Selecting a sort order toggles active mint green state on sortPillContainer and sortFieldSelect", () => {
+            env.onSortFieldChange("none");
+            assert.strictEqual(env.getEl("sortPillContainer").classList.contains("active"), false);
+            assert.strictEqual(env.getEl("sortFieldSelect").classList.contains("active"), false);
+
+            env.onSortFieldChange("alpha");
+            assert.strictEqual(env.getEl("sortPillContainer").classList.contains("active"), true);
+            assert.strictEqual(env.getEl("sortFieldSelect").classList.contains("active"), true);
+            assert.strictEqual(env.getEl("sortDirBtn").classList.contains("disabled"), false);
+
+            env.onSortFieldChange("none");
+            assert.strictEqual(env.getEl("sortPillContainer").classList.contains("active"), false);
+            assert.strictEqual(env.getEl("sortFieldSelect").classList.contains("active"), false);
+            assert.strictEqual(env.getEl("sortDirBtn").classList.contains("disabled"), true);
+        });
+
         // =========================================================================
         // PART 13: Brand Configuration & Version Extraction Subsystem
         // =========================================================================
