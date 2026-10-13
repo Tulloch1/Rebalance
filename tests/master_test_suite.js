@@ -3637,8 +3637,8 @@ console.log("\n--- PART 4: Information Guide Modal & Chrome Tab Navigation ---")
             };
         }
 
-        // 1. ArrowDown and Enter on deposit navigates to ticker_1 with auto-selection
-        runTest("ArrowDown and Enter on deposit navigates to ticker_1 with auto-selection", () => {
+        // 1. ArrowDown and Enter on deposit navigates to minBuy with auto-selection
+        runTest("ArrowDown and Enter on deposit navigates to minBuy with auto-selection", () => {
             env.onSettingInputModeToggle(true);
             env.setHoldings([
                 { t: "VAS", p: "90", q: "10", w: "40" },
@@ -3648,12 +3648,12 @@ console.log("\n--- PART 4: Information Guide Modal & Chrome Tab Navigation ---")
 
             const res1 = dispatchKey("deposit", "ArrowDown");
             assert.strictEqual(res1.defaultPrevented, true, "ArrowDown on deposit must prevent default number decrement");
-            assert.strictEqual(res1.activeId, "ticker_1", "Focus must advance to ticker_1");
+            assert.strictEqual(res1.activeId, "minBuy", "Focus must advance to minBuy");
             assert.strictEqual(res1.selected, true, "Field contents must be auto-selected");
 
             const res2 = dispatchKey("deposit", "Enter");
             assert.strictEqual(res2.defaultPrevented, true, "Enter on deposit must prevent default submit");
-            assert.strictEqual(res2.activeId, "ticker_1", "Focus must advance to ticker_1");
+            assert.strictEqual(res2.activeId, "minBuy", "Focus must advance to minBuy");
         });
 
         // 2. ArrowRight on deposit navigates to minBuy with auto-selection
@@ -3664,11 +3664,15 @@ console.log("\n--- PART 4: Information Guide Modal & Chrome Tab Navigation ---")
             assert.strictEqual(res.selected, true);
         });
 
-        // 3. ArrowDown on minBuy navigates to row 1 target weight
-        runTest("ArrowDown on minBuy navigates to row 1 target weight", () => {
-            const res = dispatchKey("minBuy", "ArrowDown");
-            assert.strictEqual(res.defaultPrevented, true);
-            assert.strictEqual(res.activeId, "weight_1");
+        // 3. ArrowDown and Enter on minBuy navigates to ticker_1
+        runTest("ArrowDown and Enter on minBuy navigates to row 1 asset field (ticker_1)", () => {
+            const res1 = dispatchKey("minBuy", "ArrowDown");
+            assert.strictEqual(res1.defaultPrevented, true);
+            assert.strictEqual(res1.activeId, "ticker_1");
+
+            const res2 = dispatchKey("minBuy", "Enter");
+            assert.strictEqual(res2.defaultPrevented, true);
+            assert.strictEqual(res2.activeId, "ticker_1");
         });
 
         // 4. ArrowLeft on minBuy navigates back to deposit
@@ -3704,23 +3708,31 @@ console.log("\n--- PART 4: Information Guide Modal & Chrome Tab Navigation ---")
             assert.strictEqual(res2.activeId, "weight_1");
         });
 
-        // 7. ArrowUp from row 1 connects to deposit (ticker/price/qty) and minBuy (weight)
-        runTest("ArrowUp from row 1 connects to deposit (ticker/price/qty) and minBuy (weight)", () => {
+        // 7. ArrowUp from any field in row 1 connects to minBuy, and up from minBuy connects to deposit
+        runTest("ArrowUp from any field in row 1 connects to minBuy, and up from minBuy connects to deposit", () => {
             const res1 = dispatchKey("ticker_1", "ArrowUp");
             assert.strictEqual(res1.defaultPrevented, true);
-            assert.strictEqual(res1.activeId, "deposit");
+            assert.strictEqual(res1.activeId, "minBuy");
 
             const res2 = dispatchKey("price_1", "ArrowUp");
             assert.strictEqual(res2.defaultPrevented, true);
-            assert.strictEqual(res2.activeId, "deposit");
+            assert.strictEqual(res2.activeId, "minBuy");
 
             const res3 = dispatchKey("weight_1", "ArrowUp");
             assert.strictEqual(res3.defaultPrevented, true);
             assert.strictEqual(res3.activeId, "minBuy");
+
+            const resUpMinBuy = dispatchKey("minBuy", "ArrowUp");
+            assert.strictEqual(resUpMinBuy.defaultPrevented, true);
+            assert.strictEqual(resUpMinBuy.activeId, "deposit");
         });
 
-        // 8. ArrowRight navigates across columns and wraps from weight_1 to ticker_2
-        runTest("ArrowRight navigates across columns and wraps from weight_1 to ticker_2", () => {
+        // 8. ArrowRight navigates across columns, wraps from minBuy to ticker_1, and wraps from weight_1 to ticker_2
+        runTest("ArrowRight navigates across columns, wraps from minBuy to ticker_1, and wraps from weight_1 to ticker_2", () => {
+            const resMinBuyRight = dispatchKey("minBuy", "ArrowRight");
+            assert.strictEqual(resMinBuyRight.defaultPrevented, true);
+            assert.strictEqual(resMinBuyRight.activeId, "ticker_1");
+
             const res1 = dispatchKey("ticker_1", "ArrowRight");
             assert.strictEqual(res1.defaultPrevented, true);
             assert.strictEqual(res1.activeId, "price_1");
@@ -3738,8 +3750,8 @@ console.log("\n--- PART 4: Information Guide Modal & Chrome Tab Navigation ---")
             assert.strictEqual(res4.activeId, "ticker_2");
         });
 
-        // 9. ArrowLeft navigates across columns and wraps from ticker_2 to weight_1, and ticker_1 to deposit
-        runTest("ArrowLeft navigates across columns and wraps from ticker_2 to weight_1, and ticker_1 to deposit", () => {
+        // 9. ArrowLeft navigates across columns and wraps from ticker_2 to weight_1, ticker_1 to minBuy, and minBuy to deposit
+        runTest("ArrowLeft navigates across columns and wraps from ticker_2 to weight_1, ticker_1 to minBuy, and minBuy to deposit", () => {
             const res1 = dispatchKey("ticker_2", "ArrowLeft");
             assert.strictEqual(res1.defaultPrevented, true);
             assert.strictEqual(res1.activeId, "weight_1");
@@ -3750,7 +3762,11 @@ console.log("\n--- PART 4: Information Guide Modal & Chrome Tab Navigation ---")
 
             const res3 = dispatchKey("ticker_1", "ArrowLeft");
             assert.strictEqual(res3.defaultPrevented, true);
-            assert.strictEqual(res3.activeId, "deposit");
+            assert.strictEqual(res3.activeId, "minBuy");
+
+            const res4 = dispatchKey("minBuy", "ArrowLeft");
+            assert.strictEqual(res4.defaultPrevented, true);
+            assert.strictEqual(res4.activeId, "deposit");
         });
 
         // 10. Arrow keys respect caret position inside text inputs

@@ -8445,10 +8445,9 @@ INSTRUCTIONS:
             if (isDown || (isEnter && !e.shiftKey)) {
                 e.preventDefault();
                 if (isDeposit) {
-                    focusAndSelect(document.getElementById("ticker_1"));
+                    focusAndSelect(document.getElementById("minBuy"));
                 } else if (isMinBuy) {
-                    const row1Cols = getRowCols(1);
-                    focusAndSelect(document.getElementById(row1Cols[row1Cols.length - 1]));
+                    focusAndSelect(document.getElementById("ticker_1"));
                 } else if (rowMatch) {
                     const r = parseInt(rowMatch[2], 10);
                     const colType = rowMatch[1];
@@ -8474,11 +8473,7 @@ INSTRUCTIONS:
                         const prevId = colType + "_" + (r - 1);
                         focusAndSelect(document.getElementById(prevId));
                     } else if (r === 1) {
-                        if (colType === "weight") {
-                            focusAndSelect(document.getElementById("minBuy"));
-                        } else {
-                            focusAndSelect(document.getElementById("deposit"));
-                        }
+                        focusAndSelect(document.getElementById("minBuy"));
                     }
                 }
                 return;
@@ -8526,7 +8521,7 @@ INSTRUCTIONS:
                             const prevCols = getRowCols(r - 1);
                             focusAndSelect(document.getElementById(prevCols[prevCols.length - 1]));
                         } else if (r === 1) {
-                            focusAndSelect(document.getElementById("deposit"));
+                            focusAndSelect(document.getElementById("minBuy"));
                         }
                     }
                 }
