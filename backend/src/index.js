@@ -4,16 +4,23 @@
  */
 
 function getCorsHeaders(request) {
-    const origin = (request && request.headers && request.headers.get("Origin")) || "*";
+    const origin =
+        (request && request.headers && request.headers.get("Origin")) || "*";
     return {
         "Access-Control-Allow-Origin": origin,
         "Access-Control-Allow-Methods": "GET, POST, PUT, OPTIONS",
-        "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Requested-With",
+        "Access-Control-Allow-Headers":
+            "Content-Type, Authorization, X-Requested-With",
         "Access-Control-Max-Age": "86400"
     };
 }
 
-function jsonResponse(data, status = 200, request = null, extraHeaders = {}) {
+function jsonResponse(
+    data,
+    status = 200,
+    request = null,
+    extraHeaders = {}
+) {
     const headers = {
         "Content-Type": "application/json; charset=utf-8",
         "X-Content-Type-Options": "nosniff",
@@ -47,7 +54,9 @@ function normalizeAccountRow(row, isCallerAuthenticated = true) {
     }
 
     try {
-        if (row.recovery_envelope) recoveryEnvelope = JSON.parse(row.recovery_envelope);
+        if (row.recovery_envelope) {
+            recoveryEnvelope = JSON.parse(row.recovery_envelope);
+        }
     } catch (e) {
         recoveryEnvelope = null;
     }
@@ -105,14 +114,22 @@ async function getCustomerCardLast4(customerId, env) {
     }
     if (env.STRIPE_SECRET_KEY) {
         try {
-            const resp = await fetch(`https://api.stripe.com/v1/payment_methods?customer=${encodeURIComponent(customerId)}&type=card`, {
+            const url =
+                "https://api.stripe.com/v1/payment_methods?customer=" +
+                encodeURIComponent(customerId) + "&type=card";
+            const resp = await fetch(url, {
                 headers: {
                     "Authorization": `Bearer ${env.STRIPE_SECRET_KEY}`
                 }
             });
             if (resp.ok) {
                 const data = await resp.json();
-                if (data && data.data && data.data.length > 0 && data.data[0].card) {
+                if (
+                    data &&
+                    data.data &&
+                    data.data.length > 0 &&
+                    data.data[0].card
+                ) {
                     return data.data[0].card.last4;
                 }
             }
@@ -126,7 +143,9 @@ async function getCustomerCardLast4(customerId, env) {
 async function sendResetOtpEmail(email, code, env) {
     if (env.RESEND_API_KEY) {
         try {
-            const fromAddr = env.EMAIL_FROM || "Portfolio Rebalancer <onboarding@resend.dev>";
+            const fromAddr =
+                env.EMAIL_FROM ||
+                "Portfolio Rebalancer <onboarding@resend.dev>";
             const resp = await fetch("https://api.resend.com/emails", {
                 method: "POST",
                 headers: {
@@ -137,12 +156,20 @@ async function sendResetOtpEmail(email, code, env) {
                     from: fromAddr,
                     to: [email],
                     subject: "Your Clean Slate Reset Code",
-                    html: `<p>Your single-use verification code is: <strong style="font-size: 22px; letter-spacing: 2px;">${code}</strong></p><p>This code will expire in 15 minutes. If you did not request this, please ignore this email.</p>`
+                    html:
+                        `<p>Your single-use verification code is: ` +
+                        `<strong style="font-size: 22px; ` +
+                        `letter-spacing: 2px;">${code}</strong></p>` +
+                        `<p>This code will expire in 15 minutes. ` +
+                        `If you did not request this, please ignore ` +
+                        `this email.</p>`
                 })
             });
             if (!resp.ok) {
                 const errText = await resp.text();
-                console.error("Resend API rejected reset email:", resp.status, errText);
+                console.error(
+                    "Resend API rejected reset email:", resp.status, errText
+                );
             }
         } catch (err) {
             console.error("Failed to send email via Resend:", err);
@@ -150,14 +177,20 @@ async function sendResetOtpEmail(email, code, env) {
     }
     if (env.RECORD_SENT_EMAILS || !env.RESEND_API_KEY) {
         if (!env._sentEmails) env._sentEmails = [];
-        env._sentEmails.push({ email, code, timestamp: new Date().toISOString() });
+        env._sentEmails.push({
+            email,
+            code,
+            timestamp: new Date().toISOString()
+        });
     }
 }
 
 async function sendResetConfirmationEmail(email, env) {
     if (env.RESEND_API_KEY) {
         try {
-            const fromAddr = env.EMAIL_FROM || "Portfolio Rebalancer <onboarding@resend.dev>";
+            const fromAddr =
+                env.EMAIL_FROM ||
+                "Portfolio Rebalancer <onboarding@resend.dev>";
             const resp = await fetch("https://api.resend.com/emails", {
                 method: "POST",
                 headers: {
@@ -168,12 +201,20 @@ async function sendResetConfirmationEmail(email, env) {
                     from: fromAddr,
                     to: [email],
                     subject: "Account Credentials Reset Confirmation",
-                    html: `<p>Your account credentials have been successfully reset via verified billing authorization.</p><p>If you did not authorize this action, please contact security support immediately.</p>`
+                    html:
+                        `<p>Your account credentials have been successfully ` +
+                        `reset via verified billing authorization.</p>` +
+                        `<p>If you did not authorize this action, please ` +
+                        `contact security support immediately.</p>`
                 })
             });
             if (!resp.ok) {
                 const errText = await resp.text();
-                console.error("Resend API rejected confirmation email:", resp.status, errText);
+                console.error(
+                    "Resend API rejected confirmation email:",
+                    resp.status,
+                    errText
+                );
             }
         } catch (err) {
             console.error("Failed to send confirmation email:", err);
@@ -181,7 +222,10 @@ async function sendResetConfirmationEmail(email, env) {
     }
     if (env.RECORD_SENT_EMAILS || !env.RESEND_API_KEY) {
         if (!env._sentConfirmations) env._sentConfirmations = [];
-        env._sentConfirmations.push({ email, timestamp: new Date().toISOString() });
+        env._sentConfirmations.push({
+            email,
+            timestamp: new Date().toISOString()
+        });
     }
 }
 
@@ -202,7 +246,9 @@ export default {
             // Guard: Check body size limit (512 KB)
             const contentLength = request.headers.get("Content-Length");
             if (contentLength && parseInt(contentLength, 10) > 512 * 1024) {
-                return errorResponse("Payload too large (max 512KB).", 413, request);
+                return errorResponse(
+                    "Payload too large (max 512KB).", 413, request
+                );
             }
 
             // Route: GET /api/health
@@ -210,7 +256,8 @@ export default {
                 let d1Status = "unknown";
                 try {
                     if (env.DB) {
-                        const testRes = await env.DB.prepare("SELECT 1 AS ok").first();
+                        const testRes =
+                            await env.DB.prepare("SELECT 1 AS ok").first();
                         if (testRes && testRes.ok === 1) d1Status = "connected";
                     }
                 } catch (dbErr) {
@@ -229,25 +276,39 @@ export default {
             if (path === "/api/account" && request.method === "GET") {
                 const emailParam = url.searchParams.get("email");
                 if (!emailParam) {
-                    return errorResponse("Missing email query parameter.", 400, request);
+                    return errorResponse(
+                        "Missing email query parameter.", 400, request
+                    );
                 }
                 const email = emailParam.trim().toLowerCase();
                 if (!isValidEmail(email)) {
-                    return errorResponse("Invalid email address format.", 400, request);
+                    return errorResponse(
+                        "Invalid email address format.", 400, request
+                    );
                 }
 
-                const row = await env.DB.prepare("SELECT * FROM accounts WHERE email = ?").bind(email).first();
+                const row = await env.DB.prepare(
+                    "SELECT * FROM accounts WHERE email = ?"
+                ).bind(email).first();
                 if (!row) {
                     return errorResponse("Account not found.", 404, request);
                 }
 
                 const authHeader = request.headers.get("Authorization");
-                const authHashFromHeader = authHeader && authHeader.startsWith("Bearer ") ? authHeader.slice(7).trim() : null;
+                const authHashFromHeader = authHeader &&
+                    authHeader.startsWith("Bearer ")
+                    ? authHeader.slice(7).trim()
+                    : null;
                 const authHashFromQuery = url.searchParams.get("authHash");
-                const providedAuthHash = authHashFromHeader || authHashFromQuery;
-                const isAuthenticated = Boolean(providedAuthHash && providedAuthHash === row.auth_hash);
+                const providedAuthHash =
+                    authHashFromHeader || authHashFromQuery;
+                const isAuthenticated = Boolean(
+                    providedAuthHash && providedAuthHash === row.auth_hash
+                );
 
-                return jsonResponse(normalizeAccountRow(row, isAuthenticated), 200, request);
+                return jsonResponse(
+                    normalizeAccountRow(row, isAuthenticated), 200, request
+                );
             }
 
             // Route: POST /api/account (Registration)
@@ -256,42 +317,73 @@ export default {
                 try {
                     body = await request.json();
                 } catch (parseErr) {
-                    return errorResponse("Invalid JSON in request body.", 400, request);
+                    return errorResponse(
+                        "Invalid JSON in request body.", 400, request
+                    );
                 }
 
                 if (!body || typeof body !== 'object') {
-                    return errorResponse("Request body must be a JSON object.", 400, request);
+                    return errorResponse(
+                        "Request body must be a JSON object.", 400, request
+                    );
                 }
 
                 const email = body.email ? body.email.trim().toLowerCase() : "";
                 const authHash = body.authHash ? body.authHash.trim() : "";
 
                 if (!isValidEmail(email)) {
-                    return errorResponse("A valid email address is required.", 400, request);
+                    return errorResponse(
+                        "A valid email address is required.", 400, request
+                    );
                 }
-                if (!authHash || typeof authHash !== 'string' || authHash.length < 32) {
-                    return errorResponse("A valid authHash string is required.", 400, request);
+                if (
+                    !authHash ||
+                    typeof authHash !== 'string' ||
+                    authHash.length < 32
+                ) {
+                    return errorResponse(
+                        "A valid authHash string is required.", 400, request
+                    );
                 }
 
                 // Check if account already exists
-                const existing = await env.DB.prepare("SELECT email FROM accounts WHERE email = ?").bind(email).first();
+                const existing = await env.DB.prepare(
+                    "SELECT email FROM accounts WHERE email = ?"
+                ).bind(email).first();
                 if (existing) {
-                    return errorResponse("An account with this email already exists.", 409, request);
+                    return errorResponse(
+                        "An account with this email already exists.",
+                        409,
+                        request
+                    );
                 }
 
                 const now = new Date().toISOString();
-                const vaultCiphertext = body.vault ? JSON.stringify(body.vault) : null;
-                const recoveryEnvelope = body.recoveryEnvelope ? JSON.stringify(body.recoveryEnvelope) : null;
+                const vaultCiphertext = body.vault
+                    ? JSON.stringify(body.vault)
+                    : null;
+                const recoveryEnvelope = body.recoveryEnvelope
+                    ? JSON.stringify(body.recoveryEnvelope)
+                    : null;
                 const tier = body.tier || "free";
-                const preferences = body.preferences ? JSON.stringify(body.preferences) : JSON.stringify({ currency: "USD", theme: "auto", autoSync: true });
+                const preferences = body.preferences
+                    ? JSON.stringify(body.preferences)
+                    : JSON.stringify({
+                        currency: "USD",
+                        theme: "auto",
+                        autoSync: true
+                    });
 
                 await env.DB.prepare(`
                     INSERT INTO accounts (
                         email, auth_hash, schema_version, vault_version,
-                        vault_ciphertext, recovery_envelope, tier, stripe_customer_id,
-                        subscription_status, subscription_expires_at, preferences,
-                        created_at, updated_at, last_login_at
-                    ) VALUES (?, ?, 2, 1, ?, ?, ?, NULL, 'none', NULL, ?, ?, ?, ?)
+                        vault_ciphertext, recovery_envelope, tier,
+                        stripe_customer_id, subscription_status,
+                        subscription_expires_at, preferences, created_at,
+                        updated_at, last_login_at
+                    ) VALUES (
+                        ?, ?, 2, 1, ?, ?, ?, NULL, 'none', NULL, ?, ?, ?, ?
+                    )
                 `).bind(
                     email,
                     authHash,
@@ -304,43 +396,78 @@ export default {
                     now
                 ).run();
 
-                const created = await env.DB.prepare("SELECT * FROM accounts WHERE email = ?").bind(email).first();
-                return jsonResponse(normalizeAccountRow(created), 201, request);
+                const created = await env.DB.prepare(
+                    "SELECT * FROM accounts WHERE email = ?"
+                ).bind(email).first();
+                return jsonResponse(
+                    normalizeAccountRow(created), 201, request
+                );
             }
 
-            // Route: PUT /api/vault (Vault Auto-Sync & Key Recovery Envelope Update)
+            // Route: PUT /api/vault
+            // (Vault Auto-Sync & Key Recovery Envelope Update)
             if (path === "/api/vault" && request.method === "PUT") {
                 let body = null;
                 try {
                     body = await request.json();
                 } catch (e) {
-                    return errorResponse("Invalid JSON in request body.", 400, request);
+                    return errorResponse(
+                        "Invalid JSON in request body.", 400, request
+                    );
                 }
 
-                const email = body && body.email ? body.email.trim().toLowerCase() : "";
+                const email = body && body.email
+                    ? body.email.trim().toLowerCase()
+                    : "";
                 if (!isValidEmail(email)) {
-                    return errorResponse("A valid email is required.", 400, request);
+                    return errorResponse(
+                        "A valid email is required.", 400, request
+                    );
                 }
 
-                const account = await env.DB.prepare("SELECT * FROM accounts WHERE email = ?").bind(email).first();
+                const account = await env.DB.prepare(
+                    "SELECT * FROM accounts WHERE email = ?"
+                ).bind(email).first();
                 if (!account) {
                     return errorResponse("Account not found.", 404, request);
                 }
 
-                // Broken Access Control Fix: Require authenticating authHash via Bearer header or body.authHash
+                // Broken Access Control Fix: Require authenticating authHash
+                // via Bearer header or body.authHash
                 const authHeader = request.headers.get("Authorization");
-                const authHashFromHeader = authHeader && authHeader.startsWith("Bearer ") ? authHeader.slice(7).trim() : null;
-                const authHashFromBody = body && body.authHash ? String(body.authHash).trim() : null;
-                const providedAuthHash = authHashFromHeader || authHashFromBody;
+                const authHashFromHeader = authHeader &&
+                    authHeader.startsWith("Bearer ")
+                    ? authHeader.slice(7).trim()
+                    : null;
+                const authHashFromBody = body && body.authHash
+                    ? String(body.authHash).trim()
+                    : null;
+                const providedAuthHash =
+                    authHashFromHeader || authHashFromBody;
 
-                if (!providedAuthHash || providedAuthHash !== account.auth_hash) {
-                    return errorResponse("Unauthorized: Missing or invalid authentication token.", 401, request);
+                if (
+                    !providedAuthHash ||
+                    providedAuthHash !== account.auth_hash
+                ) {
+                    return errorResponse(
+                        "Unauthorized: Missing or invalid authentication " +
+                        "token.",
+                        401,
+                        request
+                    );
                 }
 
                 const now = new Date().toISOString();
-                const vaultCiphertext = body.vault !== undefined ? JSON.stringify(body.vault) : account.vault_ciphertext;
-                const recoveryEnvelope = body.recoveryEnvelope !== undefined ? JSON.stringify(body.recoveryEnvelope) : account.recovery_envelope;
-                const targetVersion = (body.vaultVersion !== null && body.vaultVersion !== undefined)
+                const vaultCiphertext = body.vault !== undefined
+                    ? JSON.stringify(body.vault)
+                    : account.vault_ciphertext;
+                const recoveryEnvelope = body.recoveryEnvelope !== undefined
+                    ? JSON.stringify(body.recoveryEnvelope)
+                    : account.recovery_envelope;
+                const targetVersion = (
+                    body.vaultVersion !== null &&
+                    body.vaultVersion !== undefined
+                )
                     ? Number(body.vaultVersion)
                     : (Number(account.vault_version) || 1) + 1;
 
@@ -359,34 +486,56 @@ export default {
                     email
                 ).run();
 
-                const updated = await env.DB.prepare("SELECT * FROM accounts WHERE email = ?").bind(email).first();
-                return jsonResponse(normalizeAccountRow(updated, true), 200, request);
+                const updated = await env.DB.prepare(
+                    "SELECT * FROM accounts WHERE email = ?"
+                ).bind(email).first();
+                return jsonResponse(
+                    normalizeAccountRow(updated, true), 200, request
+                );
             }
 
-            // Route: POST /api/recover (Account Recovery via Emergency Key)
+            // Route: POST /api/recover
+            // (Account Recovery via Emergency Key)
             if (path === "/api/recover" && request.method === "POST") {
                 let body = null;
                 try {
                     body = await request.json();
                 } catch (e) {
-                    return errorResponse("Invalid JSON in request body.", 400, request);
+                    return errorResponse(
+                        "Invalid JSON in request body.", 400, request
+                    );
                 }
 
-                const email = body && body.email ? body.email.trim().toLowerCase() : "";
-                const newAuthHash = body && body.authHash ? body.authHash.trim() : "";
+                const email = body && body.email
+                    ? body.email.trim().toLowerCase()
+                    : "";
+                const newAuthHash = body && body.authHash
+                    ? body.authHash.trim()
+                    : "";
                 if (!isValidEmail(email)) {
-                    return errorResponse("A valid email is required.", 400, request);
+                    return errorResponse(
+                        "A valid email is required.", 400, request
+                    );
                 }
                 if (!newAuthHash || newAuthHash.length < 32) {
-                    return errorResponse("A valid authHash is required.", 400, request);
+                    return errorResponse(
+                        "A valid authHash is required.", 400, request
+                    );
                 }
 
-                const account = await env.DB.prepare("SELECT * FROM accounts WHERE email = ?").bind(email).first();
+                const account = await env.DB.prepare(
+                    "SELECT * FROM accounts WHERE email = ?"
+                ).bind(email).first();
                 if (!account) {
                     return errorResponse("Account not found.", 404, request);
                 }
                 if (!account.recovery_envelope) {
-                    return errorResponse("No emergency recovery key configured for this account.", 400, request);
+                    return errorResponse(
+                        "No emergency recovery key configured for this " +
+                        "account.",
+                        400,
+                        request
+                    );
                 }
 
                 // Verify recovery proof if configured in the recovery envelope
@@ -398,14 +547,25 @@ export default {
                 }
 
                 if (envelopeObj && envelopeObj.recoveryProof) {
-                    const providedProof = body && body.recoveryProof ? String(body.recoveryProof).trim() : "";
-                    if (!providedProof || providedProof !== envelopeObj.recoveryProof) {
-                        return errorResponse("Unauthorized: Invalid recovery key proof.", 401, request);
+                    const providedProof = body && body.recoveryProof
+                        ? String(body.recoveryProof).trim()
+                        : "";
+                    if (
+                        !providedProof ||
+                        providedProof !== envelopeObj.recoveryProof
+                    ) {
+                        return errorResponse(
+                            "Unauthorized: Invalid recovery key proof.",
+                            401,
+                            request
+                        );
                     }
                 }
 
                 const now = new Date().toISOString();
-                const newVaultCiphertext = body.vault ? JSON.stringify(body.vault) : account.vault_ciphertext;
+                const newVaultCiphertext = body.vault
+                    ? JSON.stringify(body.vault)
+                    : account.vault_ciphertext;
                 const nextVersion = (Number(account.vault_version) || 1) + 1;
 
                 await env.DB.prepare(`
@@ -425,119 +585,201 @@ export default {
                     email
                 ).run();
 
-                const updated = await env.DB.prepare("SELECT * FROM accounts WHERE email = ?").bind(email).first();
-                return jsonResponse(normalizeAccountRow(updated, true), 200, request);
+                const updated = await env.DB.prepare(
+                    "SELECT * FROM accounts WHERE email = ?"
+                ).bind(email).first();
+                return jsonResponse(
+                    normalizeAccountRow(updated, true), 200, request
+                );
             }
 
-            // Route: POST /api/account/request-reset (Initiate Clean Slate OTP Reset)
-            if (path === "/api/account/request-reset" && request.method === "POST") {
+            // Route: POST /api/account/request-reset
+            // (Initiate Clean Slate OTP Reset)
+            if (
+                path === "/api/account/request-reset" &&
+                request.method === "POST"
+            ) {
                 let body = null;
                 try {
                     body = await request.json();
                 } catch (e) {
-                    return errorResponse("Invalid JSON in request body.", 400, request);
+                    return errorResponse(
+                        "Invalid JSON in request body.", 400, request
+                    );
                 }
 
-                const email = body && body.email ? body.email.trim().toLowerCase() : "";
+                const email = body && body.email
+                    ? body.email.trim().toLowerCase()
+                    : "";
                 if (!isValidEmail(email)) {
-                    return errorResponse("A valid email is required.", 400, request);
+                    return errorResponse(
+                        "A valid email is required.", 400, request
+                    );
                 }
 
-                const account = await env.DB.prepare("SELECT * FROM accounts WHERE email = ?").bind(email).first();
+                const account = await env.DB.prepare(
+                    "SELECT * FROM accounts WHERE email = ?"
+                ).bind(email).first();
                 if (!account) {
-                    // Prevent account enumeration by returning success without dispatching email
-                    return jsonResponse({ success: true, requiresBillingChallenge: false }, 200, request);
+                    // Prevent enumeration by returning generic success
+                    return jsonResponse({
+                        success: true,
+                        requiresBillingChallenge: false
+                    }, 200, request);
                 }
 
                 // Rate limiting: Max 3 requests per 1 hour (3600 seconds)
-                const oneHourAgo = new Date(Date.now() - 3600 * 1000).toISOString();
+                const oneHourAgo =
+                    new Date(Date.now() - 3600 * 1000).toISOString();
                 const rateCheck = await env.DB.prepare(
-                    "SELECT COUNT(*) AS req_count FROM password_reset_tokens WHERE email = ? AND created_at > ?"
+                    "SELECT COUNT(*) AS req_count FROM " +
+                    "password_reset_tokens WHERE email = ? AND created_at > ?"
                 ).bind(email, oneHourAgo).first();
 
                 if (rateCheck && Number(rateCheck.req_count) >= 3) {
                     return jsonResponse({
-                        error: "Too many reset requests. You can only request 3 reset codes per hour. Please try again later.",
+                        error:
+                            "Too many reset requests. You can only " +
+                            "request 3 reset codes per hour. Please try " +
+                            "again later.",
                         success: false
                     }, 429, request);
                 }
 
-                // Invalidate/supersede any existing active tokens for this email
+                // Invalidate/supersede any existing active tokens for this
+                // email
                 await env.DB.prepare(
-                    "UPDATE password_reset_tokens SET status = 'superseded' WHERE email = ? AND status = 'active'"
+                    "UPDATE password_reset_tokens SET status = 'superseded' " +
+                    "WHERE email = ? AND status = 'active'"
                 ).bind(email).run();
 
                 const code = generateOtpCode();
                 const tokenId = generateTokenId();
                 const now = new Date();
-                const expiresAt = new Date(now.getTime() + 15 * 60 * 1000).toISOString();
+                const expiresAt =
+                    new Date(now.getTime() + 15 * 60 * 1000).toISOString();
                 const nowIso = now.toISOString();
 
                 await env.DB.prepare(`
                     INSERT INTO password_reset_tokens (
-                        id, email, token_hash, code, failed_attempts, status, expires_at, created_at
+                        id, email, token_hash, code, failed_attempts,
+                        status, expires_at, created_at
                     ) VALUES (?, ?, ?, ?, 0, 'active', ?, ?)
                 `).bind(tokenId, email, tokenId, code, expiresAt, nowIso).run();
 
                 await sendResetOtpEmail(email, code, env);
 
-                const requiresBillingChallenge = Boolean(account.tier === 'pro' && account.stripe_customer_id);
-                return jsonResponse({ success: true, requiresBillingChallenge }, 200, request);
+                const requiresBillingChallenge = Boolean(
+                    account.tier === 'pro' && account.stripe_customer_id
+                );
+                return jsonResponse({
+                    success: true,
+                    requiresBillingChallenge
+                }, 200, request);
             }
 
-            // Route: POST /api/account/clean-slate-reset (Verify OTP + Billing Challenge & Execute Wipe)
-            if (path === "/api/account/clean-slate-reset" && request.method === "POST") {
+            // Route: POST /api/account/clean-slate-reset
+            // (Verify OTP + Billing Challenge & Execute Wipe)
+            if (
+                path === "/api/account/clean-slate-reset" &&
+                request.method === "POST"
+            ) {
                 let body = null;
                 try {
                     body = await request.json();
                 } catch (e) {
-                    return errorResponse("Invalid JSON in request body.", 400, request);
+                    return errorResponse(
+                        "Invalid JSON in request body.", 400, request
+                    );
                 }
 
-                const email = body && body.email ? body.email.trim().toLowerCase() : "";
-                const code = body && body.code ? String(body.code).trim() : "";
-                const newAuthHash = body && body.newAuthHash ? body.newAuthHash.trim() : "";
-                const cardLast4 = body && body.cardLast4 ? String(body.cardLast4).trim() : "";
+                const email = body && body.email
+                    ? body.email.trim().toLowerCase()
+                    : "";
+                const code = body && body.code
+                    ? String(body.code).trim()
+                    : "";
+                const newAuthHash = body && body.newAuthHash
+                    ? body.newAuthHash.trim()
+                    : "";
+                const cardLast4 = body && body.cardLast4
+                    ? String(body.cardLast4).trim()
+                    : "";
 
                 if (!isValidEmail(email)) {
-                    return errorResponse("A valid email is required.", 400, request);
+                    return errorResponse(
+                        "A valid email is required.", 400, request
+                    );
                 }
                 if (!code || !/^\d{6}$/.test(code)) {
-                    return errorResponse("A 6-digit verification code is required.", 400, request);
+                    return errorResponse(
+                        "A 6-digit verification code is required.",
+                        400,
+                        request
+                    );
                 }
                 if (!newAuthHash || newAuthHash.length < 32) {
-                    return errorResponse("A valid authHash string is required.", 400, request);
+                    return errorResponse(
+                        "A valid authHash string is required.", 400, request
+                    );
                 }
 
                 const token = await env.DB.prepare(
-                    "SELECT * FROM password_reset_tokens WHERE email = ? AND status = 'active' ORDER BY created_at DESC LIMIT 1"
+                    "SELECT * FROM password_reset_tokens WHERE email = ? " +
+                    "AND status = 'active' ORDER BY created_at DESC LIMIT 1"
                 ).bind(email).first();
 
                 if (!token) {
-                    return errorResponse("No active reset request found. Please request a new verification code.", 400, request);
+                    return errorResponse(
+                        "No active reset request found. Please request a new " +
+                        "verification code.",
+                        400,
+                        request
+                    );
                 }
 
                 // Check expiration (15 minutes)
                 if (new Date(token.expires_at).getTime() < Date.now()) {
-                    await env.DB.prepare("UPDATE password_reset_tokens SET status = 'expired' WHERE id = ?").bind(token.id).run();
-                    return errorResponse("Verification code has expired. Please request a new code.", 400, request);
+                    await env.DB.prepare(
+                        "UPDATE password_reset_tokens SET status = 'expired' " +
+                        "WHERE id = ?"
+                    ).bind(token.id).run();
+                    return errorResponse(
+                        "Verification code has expired. Please request a " +
+                        "new code.",
+                        400,
+                        request
+                    );
                 }
 
                 // Helper for tracking failed attempts
                 const recordFailure = async (message) => {
-                    const newFailed = (Number(token.failed_attempts) || 0) + 1;
+                    const newFailed =
+                        (Number(token.failed_attempts) || 0) + 1;
                     if (newFailed >= 3) {
-                        await env.DB.prepare("UPDATE password_reset_tokens SET failed_attempts = ?, status = 'revoked' WHERE id = ?").bind(newFailed, token.id).run();
+                        await env.DB.prepare(
+                            "UPDATE password_reset_tokens SET " +
+                            "failed_attempts = ?, status = 'revoked' " +
+                            "WHERE id = ?"
+                        ).bind(newFailed, token.id).run();
                         return jsonResponse({
-                            error: "Too many failed verification attempts. This reset code has been revoked. Please request a new code.",
+                            error:
+                                "Too many failed verification attempts. " +
+                                "This reset code has been revoked. Please " +
+                                "request a new code.",
                             success: false,
                             revoked: true
                         }, 403, request);
                     } else {
-                        await env.DB.prepare("UPDATE password_reset_tokens SET failed_attempts = ? WHERE id = ?").bind(newFailed, token.id).run();
+                        await env.DB.prepare(
+                            "UPDATE password_reset_tokens SET " +
+                            "failed_attempts = ? WHERE id = ?"
+                        ).bind(newFailed, token.id).run();
                         const remaining = 3 - newFailed;
                         return jsonResponse({
-                            error: `${message} ${remaining} attempt${remaining === 1 ? '' : 's'} remaining.`,
+                            error:
+                                `${message} ${remaining} attempt` +
+                                `${remaining === 1 ? '' : 's'} remaining.`,
                             success: false,
                             attemptsRemaining: remaining
                         }, 401, request);
@@ -550,26 +792,39 @@ export default {
                 }
 
                 // 2. Fetch Account
-                const account = await env.DB.prepare("SELECT * FROM accounts WHERE email = ?").bind(email).first();
+                const account = await env.DB.prepare(
+                    "SELECT * FROM accounts WHERE email = ?"
+                ).bind(email).first();
                 if (!account) {
                     return errorResponse("Account not found.", 404, request);
                 }
 
-                // 3. Billing Challenge Verification for Pro accounts with Stripe
+                // 3. Billing Challenge Verification for Pro accounts
                 if (account.tier === 'pro' && account.stripe_customer_id) {
                     if (!/^\d{4}$/.test(cardLast4)) {
-                        return await recordFailure("Valid 4-digit card number required.");
+                        return await recordFailure(
+                            "Valid 4-digit card number required."
+                        );
                     }
-                    const actualLast4 = await getCustomerCardLast4(account.stripe_customer_id, env);
+                    const actualLast4 = await getCustomerCardLast4(
+                        account.stripe_customer_id, env
+                    );
                     if (!actualLast4 || actualLast4 !== cardLast4) {
-                        return await recordFailure("Card digits do not match the payment method on file.");
+                        return await recordFailure(
+                            "Card digits do not match the payment method " +
+                            "on file."
+                        );
                     }
                 }
 
                 // Verification successful - Mark token as used
-                await env.DB.prepare("UPDATE password_reset_tokens SET status = 'used' WHERE id = ?").bind(token.id).run();
+                await env.DB.prepare(
+                    "UPDATE password_reset_tokens SET status = 'used' " +
+                    "WHERE id = ?"
+                ).bind(token.id).run();
 
-                // Atomically wipe encrypted vault and recovery envelope, set new authHash, preserve subscription & metadata
+                // Atomically wipe encrypted vault and recovery envelope,
+                // set new authHash, preserve subscription & metadata
                 const nowIso = new Date().toISOString();
                 await env.DB.prepare(`
                     UPDATE accounts
@@ -589,15 +844,25 @@ export default {
 
                 await sendResetConfirmationEmail(email, env);
 
-                const updated = await env.DB.prepare("SELECT * FROM accounts WHERE email = ?").bind(email).first();
-                return jsonResponse(normalizeAccountRow(updated), 200, request);
+                const updated = await env.DB.prepare(
+                    "SELECT * FROM accounts WHERE email = ?"
+                ).bind(email).first();
+                return jsonResponse(
+                    normalizeAccountRow(updated), 200, request
+                );
             }
 
             // 404 for unknown endpoints
-            return errorResponse(`Endpoint not found: ${request.method} ${path}`, 404, request);
+            return errorResponse(
+                `Endpoint not found: ${request.method} ${path}`,
+                404,
+                request
+            );
         } catch (serverErr) {
             console.error("Worker unhandled error:", serverErr);
-            return errorResponse("Internal server error: " + serverErr.message, 500, request);
+            return errorResponse(
+                "Internal server error: " + serverErr.message, 500, request
+            );
         }
     }
 };

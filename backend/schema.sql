@@ -1,5 +1,6 @@
 -- Portfolio Rebalancer D1 Database Schema (Schema Version 2)
--- Forward-compatible schema supporting Zero-Knowledge Vaults, Recovery Envelopes, and Subscriptions
+-- Forward-compatible schema supporting Zero-Knowledge Vaults,
+-- Recovery Envelopes, and Subscriptions
 
 CREATE TABLE IF NOT EXISTS accounts (
     email TEXT PRIMARY KEY,
@@ -12,7 +13,8 @@ CREATE TABLE IF NOT EXISTS accounts (
     stripe_customer_id TEXT,
     subscription_status TEXT NOT NULL DEFAULT 'none',
     subscription_expires_at TEXT,
-    preferences TEXT NOT NULL DEFAULT '{"currency":"USD","theme":"auto","autoSync":true}',
+    preferences TEXT NOT NULL
+        DEFAULT '{"currency":"USD","theme":"auto","autoSync":true}',
     created_at TEXT NOT NULL,
     updated_at TEXT NOT NULL,
     last_login_at TEXT NOT NULL
@@ -33,6 +35,8 @@ CREATE TABLE IF NOT EXISTS password_reset_tokens (
     created_at TEXT NOT NULL
 );
 
-CREATE INDEX IF NOT EXISTS idx_reset_email_status ON password_reset_tokens(email, status);
-CREATE INDEX IF NOT EXISTS idx_reset_email_created ON password_reset_tokens(email, created_at);
+CREATE INDEX IF NOT EXISTS idx_reset_email_status
+    ON password_reset_tokens(email, status);
+CREATE INDEX IF NOT EXISTS idx_reset_email_created
+    ON password_reset_tokens(email, created_at);
 

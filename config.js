@@ -8,7 +8,8 @@
 
 (function (root, factory) {
     if (typeof module === 'object' && module.exports) {
-        // Node.js CommonJS environment (for automated test runners & CLI scripts)
+        // Node.js CommonJS environment
+        // (for automated test runners & CLI scripts)
         module.exports = factory();
     } else {
         // Browser global environment
@@ -27,18 +28,24 @@
             companyName: "Rebalance",
             websiteUrl: "https://rebalance-calculator.pages.dev/",
             disclaimerTitle: "Disclaimers",
-            disclaimerText: "Rebalance is a portfolio calculation tool for informational purposes only and does not provide financial advice."
+            disclaimerText:
+                "Rebalance is a portfolio calculation tool for " +
+                "informational purposes only and does not provide " +
+                "financial advice."
         },
 
         // --- API & Cloud Infrastructure ---
         api: {
-            // Default production edge backend for encrypted vault persistence & auth
-            productionUrl: "https://rebalance-api.portfolio-calculator.workers.dev",
+            // Default production edge backend for encrypted vault
+            // persistence & auth
+            productionUrl:
+                "https://rebalance-api.portfolio-calculator.workers.dev",
             
             // Staging or development endpoint (optional override)
             stagingUrl: "",
 
-            // Legacy endpoints that should be purged/ignored from localStorage migration
+            // Legacy endpoints that should be purged/ignored from
+            // localStorage migration
             legacyEndpoints: [
                 "https://portfolio-rebalancer.wbtulloch.workers.dev"
             ],
@@ -48,7 +55,8 @@
         },
 
         // --- Cryptographic Engine Defaults ---
-        // Internal domain salts for offline/guest key derivation (DO NOT CHANGE without migration plan)
+        // Internal domain salts for offline/guest key derivation
+        // (DO NOT CHANGE without migration plan)
         crypto: {
             defaultGuestSalt: "guest_backup@rebalance.local",
             defaultBackupSalt: "backup@rebalance.local",

@@ -279,11 +279,22 @@ node tests/run_all.js              # Executes complete end-to-end verification
 ## 7. Development Guidelines & Commitments
 
 1. **Strict 0-Diff Parity:**
-   Any change made to `GitHub/Rebalance/index.html` must be immediately mirrored to `c:\Users\willi\Desktop\Rebalancing\index.html` and verified via `fc.exe`.
+   Any change made to `GitHub/Rebalance/index.html` must be immediately
+   mirrored to `c:\Users\willi\Desktop\Rebalancing\index.html` and verified via
+   `fc.exe`.
 2. **Git Workflow:**
    * All active development occurs on branch `dev` or `main`.
-   * **NEVER push to remote git.** Local commits are made locally; the user controls when to push to GitHub.
+   * **NEVER push to remote git.** Local commits are made locally; the user
+     controls when to push to GitHub.
 3. **Testing Gate:**
-   No feature or refactor is considered complete until all 221 automated tests pass with 100% success.
+   No feature or refactor is considered complete until all 221 automated tests
+   pass with 100% success.
 4. **Client-Side Privacy:**
-   Document parsing (CSV, Excel, PDF) is executed entirely client-side using Web Streams and vanilla JS with zero external server dependencies.
+   Document parsing (CSV, Excel, PDF) is executed entirely client-side using
+   Web Streams and vanilla JS with zero external server dependencies.
+5. **Maximum Line Length (80 Characters):**
+   A strict hard rule mandates that any line of code must not exceed 80
+   characters. Any line exceeding 80 characters must wrap to the next line
+   while ensuring full functionality, string invariants, and syntax integrity
+   are preserved.
+
