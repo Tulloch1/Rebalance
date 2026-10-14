@@ -1,4 +1,4 @@
-# Pro Tier Specification & Monetization Blueprint
+1# Pro Tier Specification & Monetization Blueprint
 
 This document defines the product tiering, pricing strategy, economic modeling,
 and payment infrastructure for the Portfolio Rebalancer. It serves as the
