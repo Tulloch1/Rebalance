@@ -3808,6 +3808,557 @@ console.log("\n--- PART 4: Information Guide Modal & Chrome Tab Navigation ---")
         });
     }
 
+// =========================================================================
+// PART 15: FRACTIONAL SHARES & WHOLE SHARES MODE REBALANCE SUBSYSTEM
+// =========================================================================
+console.log(
+    "\n--- PART 15: Fractional Shares & Whole Shares Mode Rebalance ---"
+);
+
+{
+    const env = createTestEnv();
+
+    // 1. Default state: fractional shares is enabled
+    runTest(
+        "Fractional shares setting defaults to true (enabled)",
+        () => {
+            assert.strictEqual(env.isFractionalSharesEnabled(), true);
+        }
+    );
+
+    // 2. Toggle setting updates state and localStorage
+    runTest(
+        "onSettingFractionalSharesToggle updates state and storage",
+        () => {
+            env.onSettingFractionalSharesToggle(false);
+            assert.strictEqual(env.isFractionalSharesEnabled(), false);
+            env.onSettingFractionalSharesToggle(true);
+            assert.strictEqual(env.isFractionalSharesEnabled(), true);
+        }
+    );
+
+    // 3. Settings modal syncs toggle checkbox
+    runTest(
+        "openSettingsModal synchronizes settingFractionalSharesToggle",
+        () => {
+            env.onSettingFractionalSharesToggle(true);
+            env.openSettingsModal();
+            const toggle = env.getEl("settingFractionalSharesToggle");
+            assert.strictEqual(toggle.checked, true);
+
+            env.onSettingFractionalSharesToggle(false);
+            env.openSettingsModal();
+            assert.strictEqual(toggle.checked, false);
+        }
+    );
+
+    // 4. In Value mode, share pills and leftover elements are NOT displayed
+    runTest(
+        "In Value Mode, share quantity pills and leftover are not displayed",
+        () => {
+            env.onSettingInputModeToggle(false);
+            env.setInputs({ deposit: "500", minBuy: "0", complete: false });
+            env.setHoldings([
+                { t: "VGS", v: "1000", w: "50" },
+                { t: "VAS", v: "1000", w: "50" }
+            ]);
+            env.calculateRebalance();
+            const allocList = env.getEl("allocationList");
+            assert.strictEqual(
+                allocList.innerHTML.toLowerCase().includes("share"),
+                false
+            );
+            assert.strictEqual(
+                allocList.innerHTML.includes("leftover-tile"),
+                false
+            );
+            assert.strictEqual(
+                allocList.innerHTML.includes("shares-whole-warning"),
+                false
+            );
+        }
+    );
+
+    // 5. Fractional shares clean precision formatting
+    runTest(
+        "cleanShareQuantity and formatShareQuantity eliminate float errors",
+        () => {
+            assert.strictEqual(
+                env.cleanShareQuantity(0.30000000000000004),
+                0.3
+            );
+            assert.strictEqual(
+                env.cleanShareQuantity(1.9999999999999998),
+                2
+            );
+            assert.strictEqual(env.formatShareQuantity(5), "5");
+            assert.strictEqual(env.formatShareQuantity(1), "1");
+            assert.strictEqual(env.formatShareQuantity(2.5), "2.5");
+            assert.strictEqual(env.formatShareQuantity(1000), "1,000");
+        }
+    );
+
+    // 6. Shares mode with Fractional Shares ON: exact fractional quantities
+    runTest(
+        "Shares mode with Fractional ON displays exact fractional shares",
+        () => {
+            env.onSettingInputModeToggle(true);
+            env.onSettingFractionalSharesToggle(true);
+            env.setInputs({ deposit: "1000", minBuy: "0", complete: false });
+            env.setHoldings([
+                { t: "VOO", p: "400", q: "10", w: "100" }
+            ]);
+            env.calculateRebalance();
+            const allocList = env.getEl("allocationList");
+            assert.ok(
+                allocList.innerHTML.includes("+2.5 Shares"),
+                "Must display +2.5 Shares"
+            );
+            assert.strictEqual(
+                allocList.innerHTML.includes("leftover-tile"),
+                false,
+                "No leftover tile when fractional shares enabled"
+            );
+            assert.strictEqual(
+                allocList.innerHTML.includes("shares-whole-warning"),
+                false,
+                "No warning when fractional shares enabled"
+            );
+        }
+    );
+
+    // 7. Shares mode with Fractional Shares ON: singular share formatting
+    runTest(
+        "Shares mode with Fractional Shares ON uses singular 'share' for 1",
+        () => {
+            env.onSettingInputModeToggle(true);
+            env.onSettingFractionalSharesToggle(true);
+            env.setInputs({ deposit: "100", minBuy: "0", complete: false });
+            env.setHoldings([
+                { t: "VOO", p: "100", q: "10", w: "100" }
+            ]);
+            env.calculateRebalance();
+            const allocList = env.getEl("allocationList");
+            assert.ok(
+                allocList.innerHTML.includes("+1 Share"),
+                "Must display +1 Share (singular)"
+            );
+        }
+    );
+
+    // 8. Shares mode with Fractional Shares OFF: rounds down with leftover
+    runTest(
+        "Shares mode with Fractional OFF rounds down to whole shares",
+        () => {
+            env.onSettingInputModeToggle(true);
+            env.onSettingFractionalSharesToggle(false);
+            env.setInputs({ deposit: "1000", minBuy: "0", complete: false });
+            env.setHoldings([
+                { t: "VOO", p: "300", q: "10", w: "100" }
+            ]);
+            env.calculateRebalance();
+            const allocList = env.getEl("allocationList");
+            assert.ok(
+                allocList.innerHTML.includes("+3 Shares"),
+                "Must display +3 Shares"
+            );
+            assert.ok(
+                allocList.innerHTML.includes("leftover-tile"),
+                "Must render leftover tile"
+            );
+            assert.ok(
+                allocList.innerHTML.includes("$100.00"),
+                "Must display $100.00 leftover"
+            );
+            assert.ok(
+                allocList.innerHTML.includes("shares-whole-warning"),
+                "Must render whole shares warning note"
+            );
+            assert.ok(
+                allocList.innerHTML.includes(
+                    "Due to transactions being done in whole shares"
+                )
+            );
+            assert.ok(
+                allocList.innerHTML.includes("+$900.00"),
+                "Dollar badge must update to $900.00"
+            );
+        }
+    );
+
+    // 9. Shares mode with Fractional OFF: pools leftover into underweight
+    runTest(
+        "Shares mode with Fractional OFF puts leftover into underweight asset",
+        () => {
+            env.onSettingInputModeToggle(true);
+            env.onSettingFractionalSharesToggle(false);
+            env.setInputs({ deposit: "300", minBuy: "0", complete: false });
+            env.setHoldings([
+                { t: "STOCK_A", p: "100", q: "10", w: "50" },
+                { t: "STOCK_B", p: "40", q: "25", w: "50" }
+            ]);
+            env.calculateRebalance();
+            const allocList = env.getEl("allocationList");
+            assert.ok(
+                allocList.innerHTML.includes("+1 Share"),
+                "STOCK_A must buy 1 Share"
+            );
+            assert.ok(
+                allocList.innerHTML.includes("+5 Shares"),
+                "STOCK_B must buy 5 Shares (3 initial + 2 redistributed)"
+            );
+            assert.strictEqual(
+                allocList.innerHTML.includes("leftover-tile"),
+                false,
+                "No leftover tile when pool is fully absorbed"
+            );
+        }
+    );
+
+    // 10. Shares mode with Fractional Shares OFF: exact zero leftover
+    runTest(
+        "Shares mode with Fractional OFF hides leftover tile when 0 leftover",
+        () => {
+            env.onSettingInputModeToggle(true);
+            env.onSettingFractionalSharesToggle(false);
+            env.setInputs({ deposit: "200", minBuy: "0", complete: false });
+            env.setHoldings([
+                { t: "VOO", p: "100", q: "10", w: "100" }
+            ]);
+            env.calculateRebalance();
+            const allocList = env.getEl("allocationList");
+            assert.ok(allocList.innerHTML.includes("+2 Shares"));
+            assert.strictEqual(
+                allocList.innerHTML.includes("leftover-tile"),
+                false
+            );
+            assert.strictEqual(
+                allocList.innerHTML.includes("shares-whole-warning"),
+                false
+            );
+        }
+    );
+
+    // 11. Shares mode when deposit < lowest share price shows error
+    runTest(
+        "Deposit < lowest share price shows error & disables btn",
+        () => {
+            env.onSettingInputModeToggle(true);
+            env.onSettingFractionalSharesToggle(false);
+            env.setInputs({ deposit: "50", minBuy: "0", complete: false });
+            env.setHoldings([
+                { t: "VOO", p: "100", q: "10", w: "100" }
+            ]);
+            // Button is deactivated and error banner displayed immediately
+            assert.deepStrictEqual(env.getErrorMessages(), [
+                "Transaction amount less than lowest share price, " +
+                    "no transactions could be completed."
+            ]);
+            assert.strictEqual(env.getCalcButtonState().disabled, true);
+
+            // Modifying another field (like ticker) does NOT clear error
+            env.updateHolding(0, "t", "VOOG");
+            assert.deepStrictEqual(env.getErrorMessages(), [
+                "Transaction amount less than lowest share price, " +
+                    "no transactions could be completed."
+            ]);
+            assert.strictEqual(env.getCalcButtonState().disabled, true);
+
+            // Changing deposit >= lowest price clears error & re-enables btn
+            env.setInputs({ deposit: "150", minBuy: "0", complete: false });
+            assert.deepStrictEqual(env.getErrorMessages(), []);
+            assert.strictEqual(env.getCalcButtonState().disabled, false);
+
+            // Lowering deposit back < 100 reactivates error and deactivates btn
+            env.setInputs({ deposit: "50", minBuy: "0", complete: false });
+            assert.deepStrictEqual(env.getErrorMessages(), [
+                "Transaction amount less than lowest share price, " +
+                    "no transactions could be completed."
+            ]);
+            assert.strictEqual(env.getCalcButtonState().disabled, true);
+
+            // Lowering share price to 40 (<= 50) clears error & re-enables btn
+            env.updateHolding(0, "p", "40");
+            assert.deepStrictEqual(env.getErrorMessages(), []);
+            assert.strictEqual(env.getCalcButtonState().disabled, false);
+
+            // Restoring price to 100 reactivates error
+            env.updateHolding(0, "p", "100");
+            assert.deepStrictEqual(env.getErrorMessages(), [
+                "Transaction amount less than lowest share price, " +
+                    "no transactions could be completed."
+            ]);
+            assert.strictEqual(env.getCalcButtonState().disabled, true);
+
+            // Enabling fractional shares clears error & re-enables btn
+            env.onSettingFractionalSharesToggle(true);
+            assert.deepStrictEqual(env.getErrorMessages(), []);
+            assert.strictEqual(env.getCalcButtonState().disabled, false);
+        }
+    );
+
+    // 12. Complete Rebalance with Fractional ON displays SELL shares
+    runTest(
+        "Complete Rebalance mode displays SELL share quantities in red",
+        () => {
+            env.onSettingInputModeToggle(true);
+            env.onSettingFractionalSharesToggle(true);
+            env.setInputs({ deposit: "0", minBuy: "0", complete: true });
+            env.setHoldings([
+                { t: "VOO", p: "100", q: "20", w: "40" },
+                { t: "BND", p: "50", q: "20", w: "60" }
+            ]);
+            env.calculateRebalance();
+            const allocList = env.getEl("allocationList");
+            assert.ok(
+                allocList.innerHTML.includes("-8 Shares"),
+                "Must display -8 Shares to sell"
+            );
+            assert.ok(
+                allocList.innerHTML.includes("+16 Shares"),
+                "Must display +16 Shares to buy"
+            );
+        }
+    );
+
+    // 13. State persistence: serialize and deserialize include fractionalShares
+    runTest(
+        "Portfolio state serialization preserves fractionalShares",
+        () => {
+            env.onSettingFractionalSharesToggle(true);
+            const state = env.getCurrentPortfolioState();
+            assert.strictEqual(state.fractionalShares, true);
+
+            env.onSettingFractionalSharesToggle(false);
+            assert.strictEqual(env.isFractionalSharesEnabled(), false);
+
+            env.loadPortfolioFromState(state);
+            assert.strictEqual(env.isFractionalSharesEnabled(), true);
+        }
+    );
+
+    // 14. Pill ordering: shares pill appears before value pill
+    runTest(
+        "Shares quantity pill appears before value pill in breakdown",
+        () => {
+            env.onSettingInputModeToggle(true);
+            env.onSettingFractionalSharesToggle(true);
+            env.setInputs({ deposit: "1000", minBuy: "0", complete: false });
+            env.setHoldings([
+                { t: "VOO", p: "400", q: "10", w: "100" }
+            ]);
+            env.calculateRebalance();
+            const allocList = env.getEl("allocationList");
+            const shareIndex = allocList.innerHTML.indexOf("+2.5 Shares");
+            const valueIndex = allocList.innerHTML.indexOf("+$1000.00");
+            assert.ok(shareIndex !== -1, "Share pill must exist");
+            assert.ok(valueIndex !== -1, "Value pill must exist");
+            assert.ok(
+                shareIndex < valueIndex,
+                "Shares pill must appear before value pill"
+            );
+        }
+    );
+
+    // 15. Invalid entry field error disables Calculate Allocation button
+    runTest(
+        "Invalid entry field error disables Calculate Allocation button",
+        () => {
+            env.onSettingInputModeToggle(false);
+            env.setInputs({ deposit: "100", minBuy: "0", complete: false });
+            env.setHoldings([{ t: "", v: "100", w: "100" }]);
+            env.calculateRebalance();
+            assert.ok(env.getErrorMessages().length > 0);
+            assert.strictEqual(env.getCalcButtonState().disabled, true);
+        }
+    );
+
+    // 16. Modifying input clears error and re-enables Calculate Allocation
+    runTest(
+        "Modifying input clears error and re-enables Calculate Allocation",
+        () => {
+            env.updateHolding(0, "t", "AAPL");
+            assert.deepStrictEqual(env.getErrorMessages(), []);
+            assert.strictEqual(env.getCalcButtonState().disabled, false);
+        }
+    );
+
+    // 17. Fractional shares > 2 decimals displays compact with toggle expander
+    runTest(
+        "Fractional shares > 2 decimals displays compact with toggle expander",
+        () => {
+            env.onSettingInputModeToggle(true);
+            env.onSettingFractionalSharesToggle(true);
+            env.setInputs({ deposit: "1000", minBuy: "0", complete: false });
+            env.setHoldings([
+                { t: "VOO", p: "300", q: "10", w: "100" }
+            ]);
+            env.calculateRebalance();
+            const allocList = env.getEl("allocationList");
+            assert.ok(
+                allocList.innerHTML.includes("+3.33 Shares"),
+                "Must display compact 2-decimal +3.33 Shares"
+            );
+            assert.ok(
+                allocList.innerHTML.includes("share-expand-dots"),
+                "Must include expander dots element"
+            );
+            assert.ok(
+                allocList.innerHTML.includes("Exact: +3.333333 Shares"),
+                "Must include exact precision in tooltip"
+            );
+            assert.ok(
+                allocList.innerHTML.includes('data-compact="+3.33 Shares"'),
+                "Must store compact attribute"
+            );
+            assert.ok(
+                allocList.innerHTML.includes('data-full="+3.333333 Shares"'),
+                "Must store full attribute"
+            );
+
+            // Test toggleSharePillPrecision function directly
+            const textSpan = { innerText: "+3.33 Shares" };
+            const dotsSpan = { innerText: "⋮" };
+            const classes = new Set(["cut-badge", "share-pill-expandable"]);
+            let attrs = {
+                "data-expanded": "false",
+                "data-compact": "+3.33 Shares",
+                "data-full": "+3.333333 Shares"
+            };
+            const mockEl = {
+                getAttribute: (k) => attrs[k],
+                setAttribute: (k, v) => { attrs[k] = String(v); },
+                classList: {
+                    add: (c) => classes.add(c),
+                    remove: (c) => classes.delete(c),
+                    contains: (c) => classes.has(c)
+                },
+                querySelector: (sel) => {
+                    if (sel === ".share-qty-text") return textSpan;
+                    if (sel === ".share-expand-dots") return dotsSpan;
+                    return null;
+                }
+            };
+            env.toggleSharePillPrecision(mockEl);
+            assert.strictEqual(textSpan.innerText, "+3.333333 Shares");
+            assert.strictEqual(dotsSpan.innerText, "");
+            assert.strictEqual(attrs["data-expanded"], "true");
+            assert.strictEqual(classes.has("expanded"), true);
+
+            env.toggleSharePillPrecision(mockEl);
+            assert.strictEqual(textSpan.innerText, "+3.33 Shares");
+            assert.strictEqual(dotsSpan.innerText, "⋮");
+            assert.strictEqual(attrs["data-expanded"], "false");
+            assert.strictEqual(classes.has("expanded"), false);
+        }
+    );
+
+    // 18. Unified leftover tile renders with amber badge and embedded notice
+    runTest(
+        "Unified leftover tile renders with amber badge and embedded notice",
+        () => {
+            env.onSettingInputModeToggle(true);
+            env.onSettingFractionalSharesToggle(false);
+            env.setInputs({ deposit: "1000", minBuy: "0", complete: false });
+            env.setHoldings([
+                { t: "VOO", p: "300", q: "10", w: "100" }
+            ]);
+            env.calculateRebalance();
+            const allocList = env.getEl("allocationList");
+            assert.ok(
+                allocList.innerHTML.includes("leftover-tile"),
+                "Leftover tile must exist"
+            );
+            assert.ok(
+                allocList.innerHTML.includes("Cash Leftover"),
+                "Must include Cash Leftover title"
+            );
+            assert.ok(
+                allocList.innerHTML.includes("cut-badge leftover"),
+                "Must include styled leftover badge"
+            );
+            assert.ok(
+                allocList.innerHTML.includes("$100.00"),
+                "Must display $100.00 leftover"
+            );
+            assert.ok(
+                allocList.innerHTML.includes("shares-whole-warning"),
+                "Must embed whole shares warning note inside tile"
+            );
+        }
+    );
+
+    // 19. preventNegativeInput blocks minus and negative keys
+    runTest(
+        "preventNegativeInput blocks minus keys and allows valid characters",
+        () => {
+            let prevented = false;
+            const mockEvent = (key, code) => ({
+                key: key,
+                keyCode: code,
+                preventDefault() {
+                    prevented = true;
+                }
+            });
+
+            prevented = false;
+            env.preventNegativeInput(mockEvent("-", 189));
+            assert.strictEqual(prevented, true, "Must block '-' key");
+
+            prevented = false;
+            env.preventNegativeInput(mockEvent("Minus", 109));
+            assert.strictEqual(prevented, true, "Must block 'Minus' key");
+
+            prevented = false;
+            env.preventNegativeInput(mockEvent("5", 53));
+            assert.strictEqual(prevented, false, "Must permit '5' key");
+
+            prevented = false;
+            env.preventNegativeInput(mockEvent(".", 190));
+            assert.strictEqual(prevented, false, "Must permit '.' key");
+        }
+    );
+
+    // 20. onMinBuyInput sanitizes negative input and strips minus signs
+    runTest(
+        "onMinBuyInput strips minus sign and clamps to positive",
+        () => {
+            const minBuyEl = env.getEl("minBuy");
+            minBuyEl.value = "-50";
+            env.onMinBuyInput();
+            assert.strictEqual(
+                minBuyEl.value,
+                "50",
+                "Must strip minus from -50"
+            );
+
+            minBuyEl.value = "-0.25";
+            env.onMinBuyInput();
+            assert.strictEqual(
+                minBuyEl.value,
+                "0.25",
+                "Must strip minus from -0.25"
+            );
+
+            minBuyEl.value = "-";
+            env.onMinBuyInput();
+            assert.strictEqual(
+                minBuyEl.value,
+                "",
+                "Must strip solitary minus"
+            );
+
+            minBuyEl.value = "100";
+            env.onMinBuyInput();
+            assert.strictEqual(
+                minBuyEl.value,
+                "100",
+                "Must leave valid positive unchanged"
+            );
+        }
+    );
+}
+
     console.log(`\n=================================================`);
     console.log(` MASTER TEST SUITE COMPLETE: ${passedTests}/${totalTests} TESTS PASSED`);
     console.log(`=================================================\n`);

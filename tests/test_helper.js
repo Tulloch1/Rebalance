@@ -59,7 +59,16 @@ function createTestEnv() {
                 appendChild(child) {
                     this.children = this.children || [];
                     this.children.push(child);
-                    if (child.innerHTML) this.innerHTML += child.innerHTML;
+                    const tag = child.tagName || 'div';
+                    const cls = child.className
+                        ? ` class="${child.className}"`
+                        : '';
+                    const idAttr = child.id ? ` id="${child.id}"` : '';
+                    if (child.innerHTML) {
+                        this.innerHTML +=
+                            `<${tag}${idAttr}${cls}>` +
+                            `${child.innerHTML}</${tag}>`;
+                    }
                 },
                 scrollIntoView() {},
                 reset() {},
@@ -245,6 +254,13 @@ function createTestEnv() {
         applyWholeDollarRounding: sandbox.applyWholeDollarRounding,
         isSharesInputMode: sandbox.isSharesInputMode,
         onSettingInputModeToggle: sandbox.onSettingInputModeToggle,
+        isFractionalSharesEnabled: sandbox.isFractionalSharesEnabled,
+        onSettingFractionalSharesToggle:
+            sandbox.onSettingFractionalSharesToggle,
+        cleanShareQuantity: sandbox.cleanShareQuantity,
+        formatShareQuantity: sandbox.formatShareQuantity,
+        formatSharePillHtml: sandbox.formatSharePillHtml,
+        toggleSharePillPrecision: sandbox.toggleSharePillPrecision,
         renderTableHeaders: sandbox.renderTableHeaders,
         renderRows: sandbox.renderRows,
         onSortFieldChange: sandbox.onSortFieldChange,
@@ -272,6 +288,9 @@ function createTestEnv() {
                 _originalIndex: h._originalIndex !== undefined ? h._originalIndex : idx
             }));
             vm.runInContext(`holdingsData = ${JSON.stringify(formatted)};`, sandbox);
+            if (typeof sandbox.clearError === "function") {
+                sandbox.clearError();
+            }
         },
         getHoldings() {
             return vm.runInContext(`holdingsData;`, sandbox);
@@ -280,8 +299,20 @@ function createTestEnv() {
             getOrCreateElement("deposit").value = String(deposit);
             getOrCreateElement("minBuy").value = String(minBuy);
             getOrCreateElement("completeRebalance").checked = Boolean(complete);
-            sandbox.updateMinBuyState();
+            if (typeof sandbox.clearError === "function") {
+                sandbox.clearError();
+            } else {
+                sandbox.updateMinBuyState();
+            }
         },
+        clearError: sandbox.clearError,
+        showError: sandbox.showError,
+        getLowestSharePrice: sandbox.getLowestSharePrice,
+        updateLowestSharePriceCache: sandbox.updateLowestSharePriceCache,
+        checkLowestSharePriceCondition:
+            sandbox.checkLowestSharePriceCondition,
+        preventNegativeInput: sandbox.preventNegativeInput,
+        onMinBuyInput: sandbox.onMinBuyInput,
         getCalcButtonState() {
             const btn = getOrCreateElement("btnCalc");
             const notice = getOrCreateElement("calcNotice");

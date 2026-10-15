@@ -1117,6 +1117,43 @@ family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
             font-weight: 500;
         }
 
+        .cut-badge.leftover {
+            color: var(--warning);
+            background: var(--warning-bg);
+            border-color: var(--warning-border);
+        }
+
+        .cut-badge.share-pill-expandable {
+            cursor: pointer;
+            user-select: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.15s ease;
+        }
+
+        .cut-badge.share-pill-expandable:hover {
+            filter: brightness(1.15);
+            transform: translateY(-1px);
+        }
+
+        .share-expand-dots {
+            font-size: 13px;
+            line-height: 1;
+            opacity: 0.65;
+            margin-left: 2px;
+            transition: opacity 0.15s ease;
+            vertical-align: middle;
+        }
+
+        .cut-badge.share-pill-expandable:hover .share-expand-dots {
+            opacity: 1;
+        }
+
+        .cut-badge.expanded .share-expand-dots {
+            display: none;
+        }
+
         /* Comparative Progress in Results Breakdown */
         .allocation-progress-container {
             display: flex;
@@ -1228,6 +1265,84 @@ family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
             background: var(--accent-badge-bg);
             border: 1px solid var(--accent-badge-border);
             color: var(--text-primary);
+        }
+
+        .leftover-tile {
+            background: linear-gradient(90deg,
+                var(--warning-bg) 0%, var(--surface-input) 100%);
+            border: 1px solid var(--warning-border);
+            border-radius: var(--radius-card);
+            padding: 14px 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            transition: all 0.15s ease;
+        }
+
+        .leftover-tile:hover {
+            border-color: var(--warning);
+        }
+
+        .leftover-tile-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .leftover-identity {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .leftover-icon-wrap {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: var(--warning-bg);
+            border: 1px solid var(--warning-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--warning);
+            flex-shrink: 0;
+        }
+
+        .leftover-icon-wrap svg {
+            width: 17px;
+            height: 17px;
+        }
+
+        .leftover-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .leftover-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .leftover-sub {
+            font-size: 11px;
+            color: var(--text-secondary);
+            font-family: var(--font-mono);
+        }
+
+        .leftover-note.shares-whole-warning {
+            display: block;
+            border-top: 1px dashed var(--warning-border);
+            padding-top: 8px;
+            margin: 0;
+            font-size: 12px;
+            line-height: 1.45;
+            color: var(--text-secondary);
+        }
+
+        .leftover-note.shares-whole-warning strong {
+            color: var(--warning);
         }
 
         /* Collapsible ASCII Terminal Area */
@@ -2788,6 +2903,7 @@ family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
                                 placeholder="0"
                                 value="0"
                                 autocomplete="off"
+                                onkeydown="preventNegativeInput(event)"
                                 oninput="onMinBuyInput(); saveFormData()">
                         </div>
                     </div>
@@ -4237,6 +4353,35 @@ family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
                                 id="settingInputModeToggle"
                                 onchange="
                                     onSettingInputModeToggle(this.checked)">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <!-- Fractional Shares (Toggle Switch) -->
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <span
+                                class="setting-title"
+                            >
+                            Fractional Shares</span>
+                            <span
+                                class="setting-sub"
+                            >
+                            Allow purchasing fractional share quantities
+                            instead of whole shares</span>
+                        </div>
+                        <label
+                            class="toggle-switch"
+                            for="settingFractionalSharesToggle"
+                            title="Toggle Fractional Shares">
+                            <input
+                                type="checkbox"
+                                id="settingFractionalSharesToggle"
+                                checked
+                                onchange="
+                                    onSettingFractionalSharesToggle(
+                                        this.checked
+                                    )">
                             <span class="toggle-slider"></span>
                         </label>
                     </div>
@@ -5778,6 +5923,7 @@ function serializePortfolioState() {
                 : "0",
         completeRebalance: completeEl ? completeEl.checked : false,
         inputMode: isSharesInputMode() ? "shares" : "value",
+        fractionalShares: isFractionalSharesEnabled(),
         sortField:
             typeof currentSortField !== "undefined" ? currentSortField : "none",
         sortDirection:
@@ -5798,6 +5944,14 @@ function deserializePortfolioState(data) {
             );
         } catch (e) {}
     }
+    if (data.fractionalShares !== undefined) {
+        try {
+            localStorage.setItem(
+                "rebalancer_fractional_shares",
+                data.fractionalShares ? "true" : "false",
+            );
+        } catch (e) {}
+    }
     if (data.sortField && typeof currentSortField !== "undefined") {
         currentSortField = data.sortField;
     }
@@ -5809,9 +5963,13 @@ function deserializePortfolioState(data) {
     const completeEl = document.getElementById("completeRebalance");
 
     if (depositEl) depositEl.value = data.deposit || "";
-    if (minBuyEl)
-        minBuyEl.value =
-            data.minBuy !== undefined && data.minBuy !== "" ? data.minBuy : "0";
+    if (minBuyEl) {
+        const rawMb =
+            data.minBuy !== undefined && data.minBuy !== ""
+                ? String(data.minBuy).replace(/-/g, "")
+                : "0";
+        minBuyEl.value = rawMb;
+    }
     if (completeEl) completeEl.checked = Boolean(data.completeRebalance);
 
     if (Array.isArray(data.holdings) && data.holdings.length > 0) {
@@ -7116,6 +7274,35 @@ function isSharesInputMode() {
     }
 }
 
+function isFractionalSharesEnabled() {
+    try {
+        return (
+            typeof localStorage === "undefined" ||
+            localStorage.getItem("rebalancer_fractional_shares") !== "false"
+        );
+    } catch (e) {
+        return true;
+    }
+}
+
+function onSettingFractionalSharesToggle(isEnabled) {
+    try {
+        localStorage.setItem(
+            "rebalancer_fractional_shares",
+            isEnabled ? "true" : "false",
+        );
+    } catch (e) {}
+    clearError();
+    const resultsSection = document.getElementById("resultsSection");
+    if (
+        resultsSection &&
+        resultsSection.style.display !== "none" &&
+        typeof calculateRebalance === "function"
+    ) {
+        calculateRebalance();
+    }
+}
+
 let currentSortField = "none";
 let currentSortDirection = "desc";
 
@@ -7314,6 +7501,7 @@ function onSettingInputModeToggle(isShares) {
     }
 
     saveFormData();
+    clearError();
 }
 
 function renderTableHeaders() {
@@ -7494,6 +7682,13 @@ function openSettingsModal() {
         );
         if (inputModeToggle) {
             inputModeToggle.checked = isSharesInputMode();
+        }
+
+        const fracToggle = document.getElementById(
+            "settingFractionalSharesToggle",
+        );
+        if (fracToggle) {
+            fracToggle.checked = isFractionalSharesEnabled();
         }
 
         const syncInput = document.getElementById("settingSyncUrl");
@@ -11057,6 +11252,7 @@ function updateHolding(index, field, value) {
     }
     saveFormData();
     updateWeightSummary();
+    clearError();
 }
 
 function addHolding(
@@ -11084,6 +11280,7 @@ function addHolding(
     }
     renderRows();
     saveFormData();
+    clearError();
 }
 
 function removeHolding(index) {
@@ -11101,6 +11298,7 @@ function removeHolding(index) {
     }
     renderRows();
     saveFormData();
+    clearError();
 }
 
 function updateWeightSummary() {
@@ -11138,8 +11336,91 @@ function updateWeightSummary() {
     }
 }
 
+let cachedLowestSharePrice = null;
+
+function getLowestSharePrice() {
+    if (typeof holdingsData === "undefined" || !Array.isArray(holdingsData)) {
+        return null;
+    }
+    let minPrice = Infinity;
+    for (let i = 0; i < holdingsData.length; i++) {
+        const h = holdingsData[i];
+        if (!h) continue;
+        const rawP =
+            h.p !== undefined && h.p !== null ? String(h.p).trim() : "";
+        if (rawP === "") continue;
+        const p = parseFloat(rawP);
+        if (!isNaN(p) && p > 0) {
+            if (p < minPrice) minPrice = p;
+        }
+    }
+    return minPrice === Infinity ? null : minPrice;
+}
+
+function updateLowestSharePriceCache() {
+    cachedLowestSharePrice = getLowestSharePrice();
+    return cachedLowestSharePrice;
+}
+
+const LOWEST_PRICE_ERR_MSG =
+    "Transaction amount less than lowest share price, " +
+    "no transactions could be completed.";
+
+function checkLowestSharePriceCondition() {
+    updateLowestSharePriceCache();
+    const isShares = isSharesInputMode();
+    const isFractional = isFractionalSharesEnabled();
+    const isComplete = document.getElementById("completeRebalance")
+        ? document.getElementById("completeRebalance").checked
+        : false;
+    const depositInput = document.getElementById("deposit")
+        ? document.getElementById("deposit").value.trim()
+        : "";
+    const depositVal = parseFloat(depositInput);
+    const hasDeposit =
+        depositInput !== "" && !isNaN(depositVal) && depositVal !== 0;
+
+    const isViolated =
+        isShares &&
+        !isFractional &&
+        !isComplete &&
+        hasDeposit &&
+        cachedLowestSharePrice !== null &&
+        Math.abs(depositVal) < cachedLowestSharePrice;
+
+    return {
+        isViolated: isViolated,
+        lowestPrice: cachedLowestSharePrice,
+        depositVal: depositVal,
+    };
+}
+
+function preventNegativeInput(e) {
+    if (
+        e &&
+        (e.key === "-" ||
+            e.key === "Minus" ||
+            e.keyCode === 189 ||
+            e.keyCode === 109)
+    ) {
+        if (typeof e.preventDefault === "function") {
+            e.preventDefault();
+        }
+    }
+}
+
 function onMinBuyInput() {
-    updateMinBuyState();
+    const minBuyEl = document.getElementById("minBuy");
+    if (minBuyEl && typeof minBuyEl.value === "string") {
+        if (minBuyEl.value.includes("-")) {
+            minBuyEl.value = minBuyEl.value.replace(/-/g, "");
+        }
+        const val = parseFloat(minBuyEl.value);
+        if (!isNaN(val) && val < 0) {
+            minBuyEl.value = "0";
+        }
+    }
+    clearError();
 }
 
 function updateMinBuyState() {
@@ -11153,9 +11434,17 @@ function updateMinBuyState() {
     const isWithdrawal = !isNaN(depositVal) && depositVal < 0;
 
     const minBuyWell = document.getElementById("minBuyWell");
-    const minBuyInput = document.getElementById("minBuy")
-        ? document.getElementById("minBuy").value.trim()
-        : "";
+    const minBuyEl = document.getElementById("minBuy");
+    if (minBuyEl && typeof minBuyEl.value === "string") {
+        if (minBuyEl.value.includes("-")) {
+            minBuyEl.value = minBuyEl.value.replace(/-/g, "");
+        }
+        const val = parseFloat(minBuyEl.value);
+        if (!isNaN(val) && val < 0) {
+            minBuyEl.value = "0";
+        }
+    }
+    const minBuyInput = minBuyEl ? minBuyEl.value.trim() : "";
     const minBuyVal = parseFloat(minBuyInput);
     const depositEl = document.getElementById("deposit");
     const btnCalc = document.getElementById("btnCalc");
@@ -11163,6 +11452,33 @@ function updateMinBuyState() {
 
     if (minBuyWell) minBuyWell.classList.remove("disabled");
     if (depositEl) depositEl.placeholder = "0.00";
+
+    const errEl = document.getElementById("errorMessage");
+    const isShowingLowestPriceErr =
+        errEl &&
+        errEl.innerText &&
+        errEl.innerText.includes(
+            "Transaction amount less than lowest share price",
+        );
+
+    const lowestState = checkLowestSharePriceCondition();
+
+    if (lowestState.isViolated) {
+        showError(LOWEST_PRICE_ERR_MSG);
+        if (calcNotice) calcNotice.style.display = "none";
+        return;
+    } else if (isShowingLowestPriceErr) {
+        if (errEl) {
+            errEl.innerHTML = "";
+            errEl.style.display = "none";
+        }
+    }
+
+    const hasError =
+        errEl &&
+        errEl.style.display !== "none" &&
+        ((errEl.innerText && errEl.innerText.trim() !== "") ||
+            (errEl.innerHTML && errEl.innerHTML.trim() !== ""));
 
     // Calculate Allocation button validation:
     const absDeposit = !isNaN(depositVal) ? Math.abs(depositVal) : NaN;
@@ -11175,9 +11491,11 @@ function updateMinBuyState() {
         (isNaN(absDeposit) || absDeposit < minBuyVal);
 
     if (btnCalc) {
-        if (isDepositEmptyOrZero) {
-            // Priority 1: deposit is empty or zero when Complete Rebalance is
-            // OFF
+        if (hasError) {
+            btnCalc.classList.add("disabled");
+            btnCalc.disabled = true;
+            if (calcNotice) calcNotice.style.display = "none";
+        } else if (isDepositEmptyOrZero) {
             btnCalc.classList.add("disabled");
             btnCalc.disabled = true;
             if (calcNotice) {
@@ -11186,8 +11504,6 @@ function updateMinBuyState() {
                 calcNotice.style.display = "block";
             }
         } else if (isDepositLessThanMinBuy) {
-            // Priority 2: deposit is non-zero, but minimum transaction exceeds
-            // deposit/withdrawal
             btnCalc.classList.add("disabled");
             btnCalc.disabled = true;
             if (calcNotice) {
@@ -11205,12 +11521,12 @@ function updateMinBuyState() {
 }
 
 function onToggleCompleteRebalance() {
-    updateMinBuyState();
+    clearError();
     saveFormData();
 }
 
 function onDepositInput() {
-    updateMinBuyState();
+    clearError();
 }
 
 function saveFormData() {
@@ -11281,18 +11597,38 @@ function resetPage() {
 
 function showError(msg) {
     const errEl = document.getElementById("errorMessage");
-    if (Array.isArray(msg)) {
-        errEl.innerHTML = msg.map((m) => `<div>${m}</div>`).join("");
-    } else {
-        errEl.innerText = msg;
+    if (errEl) {
+        if (Array.isArray(msg)) {
+            errEl.innerHTML = msg.map((m) => `<div>${m}</div>`).join("");
+        } else {
+            errEl.innerText = msg;
+        }
+        errEl.style.display = "flex";
     }
-    errEl.style.display = "flex";
+    const resSec = document.getElementById("resultsSection");
+    if (resSec) {
+        resSec.style.display = "none";
+    }
+    const btnCalc = document.getElementById("btnCalc");
+    if (btnCalc) {
+        btnCalc.classList.add("disabled");
+        btnCalc.disabled = true;
+    }
 }
 
 function clearError() {
     const errEl = document.getElementById("errorMessage");
-    errEl.innerHTML = "";
-    errEl.style.display = "none";
+    const isShowingLowestPriceErr =
+        errEl &&
+        errEl.innerText &&
+        errEl.innerText.includes(
+            "Transaction amount less than lowest share price",
+        );
+    if (errEl && !isShowingLowestPriceErr) {
+        errEl.innerHTML = "";
+        errEl.style.display = "none";
+    }
+    updateMinBuyState();
 }
 
 function toggleTerminal() {
@@ -11358,6 +11694,86 @@ function copyFeedbackEmail(e) {
 
 const padLeft = (s, len) => String(s).padStart(len, " ");
 const padRight = (s, len) => String(s).padEnd(len, " ");
+
+function cleanShareQuantity(qty) {
+    if (typeof qty !== "number" || isNaN(qty) || !isFinite(qty)) {
+        return 0;
+    }
+    const clean = Math.round(qty * 1e8) / 1e8;
+    if (Math.abs(clean - Math.round(clean)) < 1e-6) {
+        return Math.round(clean);
+    }
+    return parseFloat(clean.toFixed(6));
+}
+
+function formatShareQuantity(qty) {
+    const clean = cleanShareQuantity(qty);
+    const parts = clean.toString().split(".");
+    parts[0] = Number(parts[0]).toLocaleString("en-US");
+    return parts.join(".");
+}
+
+function formatSharePillHtml(qty, isSell) {
+    const absQty = Math.abs(qty);
+    const clean = cleanShareQuantity(absQty);
+    const unit = absQty === 1 ? "Share" : "Shares";
+    const sign = isSell ? "-" : "+";
+    const fullFormatted = formatShareQuantity(clean);
+
+    const parts = clean.toString().split(".");
+    const hasMoreThan2Decimals = parts[1] && parts[1].length > 2;
+
+    if (!hasMoreThan2Decimals) {
+        const badgeClass = isSell ? "cut-badge sell" : "cut-badge";
+        return (
+            `<span class="${badgeClass}">` +
+            `${sign}${fullFormatted} ${unit}</span> `
+        );
+    }
+
+    const fixedStr = clean.toFixed(2);
+    const fp = fixedStr.split(".");
+    fp[0] = Number(fp[0]).toLocaleString("en-US");
+    const compactFormatted = fp.join(".");
+
+    const badgeClass = isSell
+        ? "cut-badge sell share-pill-expandable"
+        : "cut-badge share-pill-expandable";
+    const tooltip = `Exact: ${sign}${fullFormatted} ${unit}`;
+
+    return (
+        `<span class="${badgeClass}" title="${tooltip}" ` +
+        `onclick="toggleSharePillPrecision(this)" ` +
+        `data-full="${sign}${fullFormatted} ${unit}" ` +
+        `data-compact="${sign}${compactFormatted} ${unit}" ` +
+        `data-expanded="false">` +
+        `<span class="share-qty-text">` +
+        `${sign}${compactFormatted} ${unit}</span>` +
+        `<span class="share-expand-dots">⋮</span>` +
+        `</span> `
+    );
+}
+
+function toggleSharePillPrecision(el) {
+    if (!el) return;
+    const isExpanded = el.getAttribute("data-expanded") === "true";
+    const fullText = el.getAttribute("data-full");
+    const compactText = el.getAttribute("data-compact");
+    const textSpan = el.querySelector(".share-qty-text");
+    const dotsSpan = el.querySelector(".share-expand-dots");
+
+    if (isExpanded) {
+        el.setAttribute("data-expanded", "false");
+        if (textSpan) textSpan.innerText = compactText;
+        if (dotsSpan) dotsSpan.innerText = "⋮";
+        el.classList.remove("expanded");
+    } else {
+        el.setAttribute("data-expanded", "true");
+        if (textSpan) textSpan.innerText = fullText;
+        if (dotsSpan) dotsSpan.innerText = "";
+        el.classList.add("expanded");
+    }
+}
 
 // --- Core Algorithm (Ported directly from dynaReb.c with dynamic minBuy) ---
 function calculateRebalance() {
@@ -11569,12 +11985,256 @@ function calculateRebalance() {
         });
     }
 
+    if (isShares && !isFractionalSharesEnabled() && !isComplete) {
+        const validSharePrices = validHoldings
+            .map((h) => h.sharePrice)
+            .filter((p) => typeof p === "number" && !isNaN(p) && p > 0);
+        if (validSharePrices.length > 0) {
+            const lowestSharePrice = Math.min(...validSharePrices);
+            if (Math.abs(added) < lowestSharePrice) {
+                showError(
+                    "Transaction amount less than lowest share price, " +
+                        "no transactions could be completed.",
+                );
+                return;
+            }
+        }
+    }
+
     const res = isComplete
         ? runCompleteRebalanceAlgorithm(added, validHoldings, minBuy)
         : runDynaRebAlgorithm(added, validHoldings, minBuy);
 
     if (isWholeRoundingEnabled()) {
         applyWholeDollarRounding(res.assets, added, isComplete);
+    }
+
+    let leftoverCash = 0;
+    let hasWholeShareLeftover = false;
+
+    if (isShares) {
+        const isFrac = isFractionalSharesEnabled();
+        if (isFrac) {
+            res.assets.forEach((a) => {
+                if (a.sharePrice && a.sharePrice > 0) {
+                    if (a.cut > 0.005) {
+                        const rawShares = a.cut / a.sharePrice;
+                        a.shareQty = cleanShareQuantity(rawShares);
+                    } else if (a.cut < -0.005) {
+                        const rawShares = Math.abs(a.cut) / a.sharePrice;
+                        a.shareQty = -cleanShareQuantity(rawShares);
+                    } else {
+                        a.shareQty = 0;
+                    }
+                } else {
+                    a.shareQty = 0;
+                }
+            });
+        } else {
+            if (!isComplete && res.added < 0) {
+                // Case 1: Dynamic Withdrawal in Whole Shares Mode
+                let cashRaised = 0;
+                res.assets.forEach((a) => {
+                    if (a.sharePrice && a.sharePrice > 0 && a.cut < -0.005) {
+                        const whole = Math.floor(
+                            (Math.abs(a.cut) + 1e-7) / a.sharePrice
+                        );
+                        a.shareQty = -whole;
+                        a.cut = -Math.round(whole * a.sharePrice * 100) / 100;
+                        cashRaised += Math.abs(a.cut);
+                    } else {
+                        a.shareQty = 0;
+                        a.cut = 0;
+                    }
+                });
+
+                let poolNeeded = Math.round(
+                    (Math.abs(res.added) - cashRaised) * 100
+                ) / 100;
+
+                while (poolNeeded > 0.005) {
+                    const candidates = res.assets
+                        .filter(
+                            (a) =>
+                                a.sharePrice &&
+                                a.sharePrice > 0 &&
+                                poolNeeded >= a.sharePrice &&
+                                (a.shareQty || 0) +
+                                    Math.round(a.value / a.sharePrice) >= 1
+                        )
+                        .map((a) => {
+                            const cur = (a.value || 0) + (a.cut || 0);
+                            const targ =
+                                (a.targ_weight || 0) *
+                                (res.new_folio_value || 0);
+                            return { asset: a, surplus: cur - targ };
+                        })
+                        .sort((x, y) => y.surplus - x.surplus);
+
+                    if (candidates.length === 0) break;
+
+                    const best = candidates[0].asset;
+                    best.shareQty = (best.shareQty || 0) - 1;
+                    const price = best.sharePrice;
+                    best.cut =
+                        Math.round(((best.cut || 0) - price) * 100) / 100;
+                    poolNeeded = Math.round((poolNeeded - price) * 100) / 100;
+                }
+
+                leftoverCash = Math.max(0, poolNeeded);
+                if (leftoverCash > 0.005) {
+                    hasWholeShareLeftover = true;
+                }
+            } else if (isComplete) {
+                // Case 2: Complete Rebalance in Whole Shares Mode
+                let totalCashFromSells = 0;
+                res.assets.forEach((a) => {
+                    if (a.sharePrice && a.sharePrice > 0 && a.cut < -0.005) {
+                        const whole = Math.floor(
+                            (Math.abs(a.cut) + 1e-7) / a.sharePrice
+                        );
+                        a.shareQty = -whole;
+                        a.cut = -Math.round(whole * a.sharePrice * 100) / 100;
+                        totalCashFromSells += Math.abs(a.cut);
+                    } else if (a.cut <= 0.005) {
+                        a.shareQty = 0;
+                        a.cut = 0;
+                    }
+                });
+
+                let cashAvailableToBuy = Math.round(
+                    (res.added + totalCashFromSells) * 100
+                ) / 100;
+                let totalSpentOnBuys = 0;
+
+                res.assets.forEach((a) => {
+                    if (a.sharePrice && a.sharePrice > 0 && a.cut > 0.005) {
+                        if (cashAvailableToBuy <= 0) {
+                            a.shareQty = 0;
+                            a.cut = 0;
+                        } else {
+                            const maxSpend = Math.max(
+                                0,
+                                Math.min(
+                                    a.cut,
+                                    cashAvailableToBuy - totalSpentOnBuys
+                                )
+                            );
+                            const whole = Math.floor(
+                                (maxSpend + 1e-7) / a.sharePrice
+                            );
+                            a.shareQty = whole;
+                            a.cut =
+                                Math.round(whole * a.sharePrice * 100) / 100;
+                            totalSpentOnBuys += a.cut;
+                        }
+                    }
+                });
+
+                let poolLeftover = Math.max(
+                    0,
+                    Math.round(
+                        (cashAvailableToBuy - totalSpentOnBuys) * 100
+                    ) / 100
+                );
+
+                while (poolLeftover > 0.005) {
+                    const candidates = res.assets
+                        .filter(
+                            (a) =>
+                                a.sharePrice &&
+                                a.sharePrice > 0 &&
+                                poolLeftover >= a.sharePrice
+                        )
+                        .map((a) => {
+                            const cur = (a.value || 0) + (a.cut || 0);
+                            const targ =
+                                (a.targ_weight || 0) *
+                                (res.new_folio_value || 0);
+                            return { asset: a, deficit: targ - cur };
+                        })
+                        .sort((x, y) => y.deficit - x.deficit);
+
+                    if (candidates.length === 0) break;
+
+                    const best = candidates[0].asset;
+                    best.shareQty = (best.shareQty || 0) + 1;
+                    const price = best.sharePrice;
+                    best.cut =
+                        Math.round(((best.cut || 0) + price) * 100) / 100;
+                    poolLeftover =
+                        Math.round((poolLeftover - price) * 100) / 100;
+                }
+
+                leftoverCash = Math.max(0, poolLeftover);
+                if (leftoverCash > 0.005) {
+                    hasWholeShareLeftover = true;
+                }
+            } else {
+                // Case 3: Dynamic Deposit in Whole Shares Mode
+                let poolLeftover = 0;
+                res.assets.forEach((a) => {
+                    if (a.sharePrice && a.sharePrice > 0 && a.cut > 0.005) {
+                        const whole = Math.floor(
+                            (a.cut + 1e-7) / a.sharePrice
+                        );
+                        const spent =
+                            Math.round(whole * a.sharePrice * 100) / 100;
+                        poolLeftover =
+                            Math.round(
+                                (poolLeftover + (a.cut - spent)) * 100
+                            ) / 100;
+                        a.shareQty = whole;
+                        a.cut = spent;
+                    } else {
+                        a.shareQty = 0;
+                        a.cut = 0;
+                    }
+                });
+
+                while (poolLeftover > 0.005) {
+                    const candidates = res.assets
+                        .filter(
+                            (a) =>
+                                a.sharePrice &&
+                                a.sharePrice > 0 &&
+                                poolLeftover >= a.sharePrice
+                        )
+                        .map((a) => {
+                            const cur = (a.value || 0) + (a.cut || 0);
+                            const targ =
+                                (a.targ_weight || 0) *
+                                (res.new_folio_value || 0);
+                            return { asset: a, deficit: targ - cur };
+                        })
+                        .sort((x, y) => y.deficit - x.deficit);
+
+                    if (candidates.length === 0) break;
+
+                    const best = candidates[0].asset;
+                    best.shareQty = (best.shareQty || 0) + 1;
+                    const price = best.sharePrice;
+                    best.cut =
+                        Math.round(((best.cut || 0) + price) * 100) / 100;
+                    poolLeftover =
+                        Math.round((poolLeftover - price) * 100) / 100;
+                }
+
+                leftoverCash = Math.max(0, poolLeftover);
+                if (leftoverCash > 0.005) {
+                    hasWholeShareLeftover = true;
+                }
+            }
+
+            let actualAllocated = 0;
+            res.assets.forEach((a) => {
+                actualAllocated += a.cut;
+            });
+            actualAllocated = Math.round(actualAllocated * 100) / 100;
+            res.new_folio_value = Math.round(
+                (res.curr_folio_value + actualAllocated) * 100
+            ) / 100;
+        }
     }
 
     // Populate Graphical Dashboard
@@ -11692,12 +12352,23 @@ function calculateRebalance() {
 
         let badgeHtml = "";
         if (isSell) {
-            badgeHtml =
-                `<span class="cut-badge sell">SELL -${sym}${fmtCutStr}</span>`;
+            let sharePill = "";
+            if (isShares && a.shareQty && a.shareQty !== 0) {
+                sharePill = formatSharePillHtml(a.shareQty, true);
+            }
+            const moneyPill =
+                `<span class="cut-badge sell">` +
+                `SELL -${sym}${fmtCutStr}</span>`;
+            badgeHtml = sharePill + moneyPill;
         } else if (isBuy) {
-            badgeHtml =
+            let sharePill = "";
+            if (isShares && a.shareQty && a.shareQty > 0) {
+                sharePill = formatSharePillHtml(a.shareQty, false);
+            }
+            const moneyPill =
                 `<span class="cut-badge">${isComplete ? "BUY " : ""}` +
                 `+${sym}${fmtCutStr}</span>`;
+            badgeHtml = sharePill + moneyPill;
         } else {
             badgeHtml =
                 `<span class="cut-badge zero">${isComplete ? "HOLD " : ""}` +
@@ -11742,7 +12413,8 @@ function calculateRebalance() {
                                 title="Target: ${targPctFmt}%"></div>
                         </div>
                         <div class="allocation-progress-legend">
-                            <span>Before: <strong>${initPctFmt}%</strong> → ` +
+                            <span>Before: ` +
+                                `<strong>${initPctFmt}%</strong> → ` +
                                 `After: <strong style="color: ` +
                                 `${legendColor};">${newPctFmt}%` +
                                 `</strong></span>
@@ -11752,6 +12424,49 @@ function calculateRebalance() {
                 `;
         allocList.appendChild(item);
     });
+
+    if (isShares && !isFractionalSharesEnabled() && hasWholeShareLeftover) {
+        const leftoverTile = document.createElement("div");
+        leftoverTile.className = "allocation-item leftover-tile";
+        leftoverTile.id = "leftoverTile";
+        const leftoverSub =
+            res.added < 0 ? "Unallocated withdrawal" : "Unallocated deposit";
+        const leftoverWord = res.added < 0 ? "withdrawal" : "deposit";
+        leftoverTile.innerHTML = `
+            <div class="leftover-tile-top">
+                <div class="leftover-identity">
+                    <div class="leftover-icon-wrap">
+                        <svg viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <path
+                                d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8">
+                            </path>
+                            <path d="M12 18V6"></path>
+                        </svg>
+                    </div>
+                    <div class="leftover-meta">
+                        <span class="leftover-title">Cash Leftover</span>
+                        <span class="leftover-sub">${leftoverSub}</span>
+                    </div>
+                </div>
+                <div class="allocation-tag-wrap">
+                    <span class="cut-badge leftover">
+                        ${sym}${leftoverCash.toFixed(2)}
+                    </span>
+                </div>
+            </div>
+            <div class="leftover-note shares-whole-warning"
+                id="sharesWholeWarning">
+                <strong>Notice:</strong> Due to transactions being done in ` +
+                `whole shares, not all of the ${leftoverWord} ` +
+                `could be allocated.
+            </div>
+        `;
+        allocList.appendChild(leftoverTile);
+    }
 
     // Status Pills
     const isPortfolioBalanced =
@@ -11810,6 +12525,10 @@ function runCompleteRebalanceAlgorithm(added, holdings, minBuy = 0) {
                 h.raw_targ_weight !== undefined
                     ? h.raw_targ_weight
                     : h.targ_weight,
+            sharePrice:
+                typeof h.sharePrice === "number" && !isNaN(h.sharePrice)
+                    ? h.sharePrice
+                    : null,
             target_val: target_val,
             ideal_cut: ideal_cut,
             cut: 0,
@@ -12156,6 +12875,10 @@ function runDynaRebAlgorithm(added, holdings, minBuy = 0) {
         targ_weight: h.targ_weight,
         raw_targ_weight:
             h.raw_targ_weight !== undefined ? h.raw_targ_weight : h.targ_weight,
+        sharePrice:
+            typeof h.sharePrice === "number" && !isNaN(h.sharePrice)
+                ? h.sharePrice
+                : null,
         dollars_to_targ: 0,
         cut: 0,
     }));
@@ -12572,6 +13295,12 @@ if (typeof window !== "undefined") {
     window.applyWholeDollarRounding = applyWholeDollarRounding;
     window.isSharesInputMode = isSharesInputMode;
     window.onSettingInputModeToggle = onSettingInputModeToggle;
+    window.isFractionalSharesEnabled = isFractionalSharesEnabled;
+    window.onSettingFractionalSharesToggle = onSettingFractionalSharesToggle;
+    window.cleanShareQuantity = cleanShareQuantity;
+    window.formatShareQuantity = formatShareQuantity;
+    window.formatSharePillHtml = formatSharePillHtml;
+    window.toggleSharePillPrecision = toggleSharePillPrecision;
     window.renderTableHeaders = renderTableHeaders;
     window.renderRows = renderRows;
     window.onSortFieldChange = onSortFieldChange;
@@ -12584,6 +13313,14 @@ if (typeof window !== "undefined") {
     window.addHolding = addHolding;
     window.removeHolding = removeHolding;
     window.calculateRebalance = calculateRebalance;
+    window.clearError = clearError;
+    window.showError = showError;
+    window.getLowestSharePrice = getLowestSharePrice;
+    window.updateLowestSharePriceCache = updateLowestSharePriceCache;
+    window.checkLowestSharePriceCondition =
+        checkLowestSharePriceCondition;
+    window.preventNegativeInput = preventNegativeInput;
+    window.onMinBuyInput = onMinBuyInput;
     window.openCsvModal = openCsvModal;
     window.closeCsvModal = closeCsvModal;
     window.handleCsvBackdropClick = handleCsvBackdropClick;
