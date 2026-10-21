@@ -4359,6 +4359,281 @@ console.log(
     );
 }
 
+// =========================================================================
+// PART 16: PORTFOLIO ALLOCATION DONUT VISUALIZER SUBSYSTEM
+// =========================================================================
+console.log("--- PART 16: Portfolio Allocation Donut Visualizer Subsystem ---");
+
+{
+    const env = createTestEnv();
+
+    // 1. Visualizer DOM Elements Scaffolding
+    runTest(
+        "Visualizer section and donut chart DOM containers are present",
+        () => {
+            const visSec = env.getEl("visualizerSection");
+            assert.ok(visSec, "visualizerSection container must exist");
+            const beforeSvg = env.getEl("donutBeforeSvg");
+            assert.ok(beforeSvg, "donutBeforeSvg must exist");
+            const afterSvg = env.getEl("donutAfterSvg");
+            assert.ok(afterSvg, "donutAfterSvg must exist");
+            const beforeVal = env.getEl("donutBeforeVal");
+            assert.ok(beforeVal, "donutBeforeVal must exist");
+            const afterVal = env.getEl("donutAfterVal");
+            assert.ok(afterVal, "donutAfterVal must exist");
+            const tipEl = env.getEl("donutTooltipInfo");
+            assert.ok(tipEl, "donutTooltipInfo must exist");
+            const legendEl = env.getEl("donutLegend");
+            assert.ok(legendEl, "donutLegend must exist");
+        }
+    );
+
+    // 2. Deterministic Color Assignment (getHoldingColor)
+    runTest(
+        "getHoldingColor deterministically maps holdings across 12 palette colors",
+        () => {
+            const expectedColors = [
+                "#3B82F6", "#10B981", "#F59E0B", "#8B5CF6",
+                "#06B6D4", "#EC4899", "#6366F1", "#14B8A6",
+                "#F97316", "#64748B", "#84CC16", "#A855F7"
+            ];
+            expectedColors.forEach((color, idx) => {
+                assert.strictEqual(
+                    env.getHoldingColor(idx),
+                    color,
+                    `Color at index ${idx} must be ${color}`
+                );
+            });
+            // Modulo wrap-around at 12
+            assert.strictEqual(env.getHoldingColor(12), expectedColors[0]);
+            assert.strictEqual(env.getHoldingColor(13), expectedColors[1]);
+        }
+    );
+
+    // 3. Polar Trigonometry Math (getPolarPoint)
+    runTest(
+        "getPolarPoint calculates clock positions clockwise from 12 o'clock",
+        () => {
+            const cx = 80, cy = 80, r = 70;
+            // 0 deg -> 12 o'clock (x=80, y=10)
+            const p0 = env.getPolarPoint(cx, cy, r, 0);
+            assert.strictEqual(Math.round(p0.x), 80);
+            assert.strictEqual(Math.round(p0.y), 10);
+
+            // 90 deg -> 3 o'clock (x=150, y=80)
+            const p90 = env.getPolarPoint(cx, cy, r, 90);
+            assert.strictEqual(Math.round(p90.x), 150);
+            assert.strictEqual(Math.round(p90.y), 80);
+
+            // 180 deg -> 6 o'clock (x=80, y=150)
+            const p180 = env.getPolarPoint(cx, cy, r, 180);
+            assert.strictEqual(Math.round(p180.x), 80);
+            assert.strictEqual(Math.round(p180.y), 150);
+
+            // 270 deg -> 9 o'clock (x=10, y=80)
+            const p270 = env.getPolarPoint(cx, cy, r, 270);
+            assert.strictEqual(Math.round(p270.x), 10);
+            assert.strictEqual(Math.round(p270.y), 80);
+        }
+    );
+
+    // 4. Donut Slice SVG Path Construction
+    runTest(
+        "buildDonutSlicePath constructs valid annular sector SVG path string",
+        () => {
+            const pathData = env.buildDonutSlicePath(80, 80, 70, 46, 0, 90);
+            assert.ok(pathData.startsWith("M "), "Must start with MoveTo (M)");
+            assert.ok(pathData.includes("A 70 70"), "Must have outer arc");
+            assert.ok(pathData.includes("A 46 46"), "Must have inner arc");
+            assert.ok(pathData.endsWith("Z"), "Must close path with Z");
+        }
+    );
+
+    // 5. Full 360-Degree Single-Slice Arc Handling
+    runTest(
+        "buildDonutSlicePath handles 360-degree span without zero-arc collapse",
+        () => {
+            const fullPath = env.buildDonutSlicePath(80, 80, 70, 46, 0, 360);
+            assert.ok(fullPath.includes("A 70 70"), "Must include outer radius");
+            assert.ok(fullPath.includes("A 46 46"), "Must include inner radius");
+            // Must contain two closed subpaths (split arcs)
+            assert.strictEqual((fullPath.match(/Z/g) || []).length, 2);
+        }
+    );
+
+    // 6. Zero Value Fallback Rendering in renderDonutSvg
+    runTest(
+        "renderDonutSvg renders empty track ring when total portfolio value is 0",
+        () => {
+            const svg = env.getEl("testSvgZero");
+            env.renderDonutSvg(svg, [], 0, 80, 80, 70, 46);
+            assert.ok(
+                svg.children && svg.children.length === 1,
+                "Should append 1 fallback track circle"
+            );
+            assert.strictEqual(
+                svg.children[0].getAttribute("stroke"),
+                "var(--track-bg)"
+            );
+        }
+    );
+
+    // 7. Single Holding Full-Circle Rendering
+    runTest(
+        "renderDonutSvg renders full colored ring when only 1 positive asset",
+        () => {
+            const svg = env.getEl("testSvgSingle");
+            const items = [{
+                index: 0,
+                ticker: "AAPL",
+                val: 1000,
+                color: "#3B82F6",
+                targetWeight: 100
+            }];
+            env.renderDonutSvg(svg, items, 1000, 80, 80, 70, 46);
+            assert.ok(
+                svg.children && svg.children.length === 1,
+                "Should append 1 single-slice circle"
+            );
+            assert.strictEqual(
+                svg.children[0].getAttribute("stroke"),
+                "#3B82F6"
+            );
+            assert.strictEqual(
+                svg.children[0].getAttribute("data-asset-idx"),
+                "0"
+            );
+        }
+    );
+
+    // 8. Multi-Holding Slice Path Generation
+    runTest(
+        "renderDonutSvg generates distinct SVG slice paths for multiple assets",
+        () => {
+            const svg = env.getEl("testSvgMulti");
+            const items = [
+                { index: 0, ticker: "AAPL", val: 600, color: "#3B82F6" },
+                { index: 1, ticker: "MSFT", val: 400, color: "#10B981" }
+            ];
+            env.renderDonutSvg(svg, items, 1000, 80, 80, 70, 46);
+            assert.strictEqual(
+                svg.children.length,
+                2,
+                "Must generate 2 slice paths"
+            );
+            assert.strictEqual(
+                svg.children[0].getAttribute("fill"),
+                "#3B82F6"
+            );
+            assert.strictEqual(
+                svg.children[1].getAttribute("fill"),
+                "#10B981"
+            );
+        }
+    );
+
+    // 9. Interactive Legend Generation (renderDonutLegend)
+    runTest(
+        "renderDonutLegend generates interactive pills with colored dots",
+        () => {
+            const legendEl = env.getEl("donutLegend");
+            const items = [
+                { index: 0, ticker: "VAS", val: 500, color: "#3B82F6" },
+                { index: 1, ticker: "VGS", val: 500, color: "#10B981" }
+            ];
+            env.renderDonutLegend(legendEl, items);
+            assert.strictEqual(
+                legendEl.children.length,
+                2,
+                "Must generate 2 legend pills"
+            );
+            assert.ok(
+                legendEl.innerHTML.includes("VAS"),
+                "Must contain VAS ticker"
+            );
+            assert.ok(
+                legendEl.innerHTML.includes("VGS"),
+                "Must contain VGS ticker"
+            );
+            assert.ok(
+                legendEl.innerHTML.includes("#3B82F6"),
+                "Must contain VAS color"
+            );
+        }
+    );
+
+    // 10. Hover & Tap Highlight State Machine
+    runTest(
+        "highlightDonutAsset and resetDonutHighlight toggle active state classes",
+        () => {
+            env.highlightDonutAsset(0);
+            const rowWrap = env.getEl("donutChartsRow");
+            assert.ok(
+                rowWrap.classList.contains("has-hover"),
+                "Must add has-hover class to chart row"
+            );
+
+            env.resetDonutHighlight();
+            assert.strictEqual(
+                rowWrap.classList.contains("has-hover"),
+                false,
+                "Must remove has-hover class from chart row"
+            );
+        }
+    );
+
+    // 11. Tooltip Banner Dynamic Content Formatting
+    runTest(
+        "updateDonutTooltip populates ticker, current value, and target weight",
+        () => {
+            env.setInputs({ deposit: "500", minBuy: "0", complete: false });
+            env.setHoldings([
+                { t: "AAPL", v: "500", w: "50" },
+                { t: "MSFT", v: "500", w: "50" }
+            ]);
+            env.calculateRebalance();
+            env.updateDonutTooltip(0);
+            const tipEl = env.getEl("donutTooltipInfo");
+            assert.ok(
+                tipEl.innerHTML.includes("donut-tooltip-ticker"),
+                "Tooltip must contain ticker element"
+            );
+            assert.ok(
+                tipEl.innerHTML.includes("Current:"),
+                "Tooltip must display Current allocation"
+            );
+            assert.ok(
+                tipEl.innerHTML.includes("Target:"),
+                "Tooltip must display Target weight"
+            );
+        }
+    );
+
+    // 12. End-to-End Rebalance Execution Updates Visualizer
+    runTest(
+        "calculateRebalance updates donut metrics and After allocation chart",
+        () => {
+            env.setInputs({ deposit: "1000", minBuy: "0", complete: false });
+            env.setHoldings([
+                { t: "AAPL", v: "1000", w: "50" },
+                { t: "MSFT", v: "1000", w: "50" }
+            ]);
+            env.calculateRebalance();
+            const afterValEl = env.getEl("donutAfterVal");
+            assert.notStrictEqual(
+                afterValEl.innerText,
+                "",
+                "After total value metric must be populated"
+            );
+            const afterSvg = env.getEl("donutAfterSvg");
+            assert.ok(
+                afterSvg.children && afterSvg.children.length > 0,
+                "After SVG must render slices"
+            );
+        }
+    );
+}
+
     console.log(`\n=================================================`);
     console.log(` MASTER TEST SUITE COMPLETE: ${passedTests}/${totalTests} TESTS PASSED`);
     console.log(`=================================================\n`);

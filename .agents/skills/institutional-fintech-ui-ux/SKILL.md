@@ -26,14 +26,16 @@ these tropes destroy user trust and willingness to pay.
 ### Explicit Prohibitions:
 * **No Web3 / Crypto-DEX Styling:**
   * Ban saturated neon accents (e.g. radioactive mint `#24DBA1` on `#0B0C0E`).
-  * Ban radial blur glows and neon outline halos (`box-shadow: 0 0 12px var(--accent-glow)`).
+  * Ban radial blur glows and neon outline halos
+    (`box-shadow: 0 0 12px var(--accent-glow)`).
   * Ban dark-mode-only exclusivity. A first-class, high-contrast Light Mode is
     mandatory for serious self-directed investors.
 * **No Fidget-Spinner Micro-Animations:**
   * Ban spinning gear icons (`rotate(45deg)` on hover), tilting info buttons
     (`rotate(15deg)`), and bouncing transforms (`scale(1.05)`).
   * Hover states must be calm, instantaneous, and purposeful: subtle background
-    tint shifts, 1px border highlight, or slight opacity transitions ($\le 120$ms).
+    tint shifts, 1px border highlight, or slight opacity transitions
+    ($\le 120$ms).
 * **No Hacker-Terminal / ASCII Gimmicks:**
   * Ban matrix-green ASCII terminal receipts in production financial tools.
   * Replace with a structured, copyable **Broker Order Ticket Slip** that
@@ -42,10 +44,15 @@ these tropes destroy user trust and willingness to pay.
   * Zero tolerance for placeholder text left in production dialogs (e.g.
     `<h3>Hello World!</h3>` in guide tabs).
   * Zero tolerance for mangled, unclosed, or inverted SVG tags.
-* **No Structural Pill Bloat:**
+* **No Structural Pill Bloat & Clean Borderless Pill Aesthetic:**
   * Ban `border-radius: 9999px` (pills) on structural elements, inputs, tables,
     and cards.
-  * Restrict pill shapes exclusively to compact status indicators and tags.
+  * Restrict pill shapes exclusively to compact status indicators, tags,
+    and badges.
+  * **Borderless Pill Rule:** All pills, tags, and badges must strictly have
+    a clean, borderless aesthetic (`border: none;` or `border: 0;`). Never
+    apply hairline outlines around rounded pill shapes; distinguish them
+    purely through disciplined background tints and high-contrast typography.
   * Card and input border-radii must adhere to a disciplined `6px`–`8px` grid.
 * **No Modal Overload:**
   * Do not force users into a full-screen backdrop modal for simple preference
@@ -126,8 +133,8 @@ flowchart TD
      the 1-click Broker Order Slip.
 3. **Reactive Calculation:**
    * Rebalance calculations run reactively on input with an 80ms debounce.
-   * Eliminates the sudden, jarring vertical jump caused by clicking an old-style
-     `Calculate` button.
+   * Eliminates the sudden, jarring vertical jump caused by clicking an
+     old-style `Calculate` button.
 
 ### B. Mobile Specification (`max-width: 639px`)
 1. **Adaptive Card Transformation (No Table Squeeze):**
@@ -142,7 +149,7 @@ flowchart TD
      **at least `16px`** on mobile screens. (Font sizes $< 16\text{px}$ trigger
      automatic viewport zooming on Apple iOS Safari).
 3. **Floating Bottom Order Drawer:**
-   * Instead of hiding rebalance results off-screen at the bottom of 10 holdings,
+   * Instead of hiding rebalance results off-screen below a long holding list,
      render a sticky floating summary bar at the bottom of the viewport:
      `[ $1,000 Allocated • 3 Buys Needed   View Ticket ▲ ]`.
    * Tapping opens a smooth slide-up bottom sheet showing the proposed orders.
@@ -164,9 +171,10 @@ When implementing front-end refactors under this skill:
      `#statNewTotal`, `#thresholdWarning`, and `#normNotice`.
 3. **Zero Framework Policy:** All styling must execute via standard CSS Custom
    Properties without introducing external libraries or bloated build steps.
-4. **Parity Enforcement:** Any modification to `GitHub/Rebalance/index.html` must
-   be mirrored byte-for-byte to `c:\Users\willi\Desktop\Rebalancing\index.html`
-   and verified with `fc.exe /b`.
+4. **Parity Enforcement:** Any modification to `GitHub/Rebalance/index.html`
+   must be mirrored byte-for-byte to
+   `c:\Users\willi\Desktop\Rebalancing\index.html` and verified
+   with `fc.exe /b`.
 5. **Deterministic Testing:** Run `node tests/run_all.js` before completing any
    task. All 239 tests and 3,000 fuzz simulations must pass.
 

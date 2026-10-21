@@ -139,7 +139,9 @@ function createTestEnv() {
                 const fns = documentListeners[event.type] || [];
                 fns.forEach(fn => fn(event));
             },
-            createElement: () => getOrCreateElement('temp_' + Math.random())
+            createElement: () => getOrCreateElement('temp_' + Math.random()),
+            createElementNS: (ns, tag) =>
+                getOrCreateElement('temp_' + Math.random())
         },
         REBALANCE_CONFIG: appConfig,
         window: {
@@ -374,9 +376,19 @@ function createTestEnv() {
                 innerText: el.innerText || ''
             };
         },
-        getStagedCsvHoldings: () => vm.runInContext('stagedCsvHoldings', sandbox),
+        getStagedCsvHoldings: () =>
+            vm.runInContext('stagedCsvHoldings', sandbox),
         getStagedCsvMode: () => vm.runInContext('stagedCsvMode', sandbox),
-        handleGridKeyNavigation: (e) => sandbox.handleGridKeyNavigation(e)
+        handleGridKeyNavigation: (e) => sandbox.handleGridKeyNavigation(e),
+        renderDonutCharts: sandbox.renderDonutCharts,
+        renderDonutSvg: sandbox.renderDonutSvg,
+        renderDonutLegend: sandbox.renderDonutLegend,
+        getHoldingColor: sandbox.getHoldingColor,
+        highlightDonutAsset: sandbox.highlightDonutAsset,
+        resetDonutHighlight: sandbox.resetDonutHighlight,
+        updateDonutTooltip: sandbox.updateDonutTooltip,
+        buildDonutSlicePath: sandbox.buildDonutSlicePath,
+        getPolarPoint: sandbox.getPolarPoint
     };
 }
 

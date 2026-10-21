@@ -18,39 +18,39 @@ family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
            ================================================================= */
 
         :root[data-theme="dark"] {
-            --bg-base: #0B0C0E;
-            --surface-card: #141619;
-            --surface-elevated: #1B1E22;
-            --surface-input: #101215;
+            --bg-base: #0F1115;
+            --surface-card: #181B20;
+            --surface-elevated: #1F232B;
+            --surface-input: #121418;
             
-            --border-subtle: rgba(255, 255, 255, 0.07);
-            --border-hover: rgba(255, 255, 255, 0.16);
-            --border-focus: #24DBA1;
+            --border-subtle: rgba(255, 255, 255, 0.08);
+            --border-hover: rgba(255, 255, 255, 0.18);
+            --border-focus: #10B981;
             
             --text-primary: #F4F5F7;
             --text-secondary: #8E95A2;
             --text-muted: #575E6A;
             
-            --primary: #24DBA1;
-            --accent: #24DBA1;
-            --accent-hover: #1fca94;
-            --accent-glow: rgba(36, 219, 161, 0.15);
-            --accent-badge-bg: rgba(36, 219, 161, 0.08);
-            --accent-badge-border: rgba(36, 219, 161, 0.25);
-            --accent-on-text: #051A12;
+            --primary: #10B981;
+            --accent: #10B981;
+            --accent-hover: #059669;
+            --accent-glow: rgba(16, 185, 129, 0.10);
+            --accent-badge-bg: rgba(16, 185, 129, 0.12);
+            --accent-badge-border: transparent;
+            --accent-on-text: #FFFFFF;
             
-            --danger: #F87171;
-            --danger-bg: rgba(248, 113, 113, 0.08);
-            --danger-border: rgba(248, 113, 113, 0.2);
+            --danger: #EF4444;
+            --danger-bg: rgba(239, 68, 68, 0.10);
+            --danger-border: transparent;
             
-            --warning: #FBBF24;
-            --warning-bg: rgba(251, 191, 36, 0.08);
-            --warning-border: rgba(251, 191, 36, 0.25);
+            --warning: #F59E0B;
+            --warning-bg: rgba(245, 158, 11, 0.10);
+            --warning-border: transparent;
 
             --track-bg: rgba(255, 255, 255, 0.06);
             --card-shadow:
-                0 20px 40px -15px rgba(0, 0, 0, 0.5),
-                0 1px 2px rgba(255, 255, 255, 0.03) inset;
+                0 4px 16px rgba(0, 0, 0, 0.25),
+                0 1px 2px rgba(255, 255, 255, 0.02) inset;
         }
 
         :root[data-theme="light"] {
@@ -59,47 +59,61 @@ family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
             --surface-elevated: #F1F3F5;
             --surface-input: #F8F9FA;
             
-            --border-subtle: #E9ECEF;
-            --border-hover: #CED4DA;
-            --border-focus: #14B881;
+            --border-subtle: #E2E8F0;
+            --border-hover: #CBD5E1;
+            --border-focus: #059669;
             
-            --text-primary: #111317;
-            --text-secondary: #5A6270;
-            --text-muted: #8E95A2;
+            --text-primary: #0F172A;
+            --text-secondary: #475569;
+            --text-muted: #64748B;
             
-            --primary: #14B881;
-            --accent: #14B881;
-            --accent-hover: #0FA070;
-            --accent-glow: rgba(20, 184, 129, 0.18);
-            --accent-badge-bg: rgba(20, 184, 129, 0.1);
-            --accent-badge-border: rgba(20, 184, 129, 0.28);
+            --primary: #059669;
+            --accent: #059669;
+            --accent-hover: #047857;
+            --accent-glow: rgba(5, 150, 105, 0.10);
+            --accent-badge-bg: rgba(5, 150, 105, 0.10);
+            --accent-badge-border: transparent;
             --accent-on-text: #FFFFFF;
             
-            --danger: #EF4444;
-            --danger-bg: #FEF2F2;
-            --danger-border: #FCA5A5;
+            --danger: #DC2626;
+            --danger-bg: rgba(220, 38, 38, 0.08);
+            --danger-border: transparent;
             
             --warning: #D97706;
-            --warning-bg: #FFFBEB;
-            --warning-border: #FCD34D;
+            --warning-bg: rgba(217, 119, 6, 0.08);
+            --warning-border: transparent;
 
             --track-bg: rgba(0, 0, 0, 0.06);
             --card-shadow:
-                0 10px 25px -5px rgba(0, 0, 0, 0.05),
-                0 1px 3px rgba(0, 0, 0, 0.03);
+                0 2px 8px rgba(0, 0, 0, 0.05),
+                0 1px 2px rgba(0, 0, 0, 0.03);
         }
 
         :root {
-            --radius-outer: 24px;
-            --radius-card: 18px;
-            --radius-input: 12px;
-            --radius-btn: 12px;
-            --radius-sm: 18px;
+            --radius-outer: 8px;
+            --radius-card: 8px;
+            --radius-input: 6px;
+            --radius-btn: 6px;
+            --radius-sm: 6px;
             --radius-pill: 9999px;
             
             --font-sans: 'Plus Jakarta Sans', -apple-system,
                 BlinkMacSystemFont, sans-serif;
             --font-mono: 'JetBrains Mono', monospace;
+
+            /* Institutional Categorical Chart Palette */
+            --chart-c1: #3B82F6;
+            --chart-c2: #10B981;
+            --chart-c3: #F59E0B;
+            --chart-c4: #8B5CF6;
+            --chart-c5: #06B6D4;
+            --chart-c6: #EC4899;
+            --chart-c7: #6366F1;
+            --chart-c8: #14B8A6;
+            --chart-c9: #F97316;
+            --chart-c10: #64748B;
+            --chart-c11: #84CC16;
+            --chart-c12: #A855F7;
         }
 
         * {
@@ -158,9 +172,9 @@ family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
         .brand-icon {
             width: 36px;
             height: 36px;
-            border-radius: 10px;
+            border-radius: 8px;
             background: var(--accent-badge-bg);
-            border: 1px solid var(--accent-badge-border);
+            border: none;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -193,7 +207,7 @@ family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
             text-transform: uppercase;
             color: var(--accent);
             background: var(--accent-badge-bg);
-            border: 1px solid var(--accent-badge-border);
+            border: none;
             padding: 4px 10px;
             border-radius: var(--radius-pill);
         }
@@ -204,7 +218,7 @@ family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
         .info-btn {
             width: 34px;
             height: 34px;
-            border-radius: var(--radius-pill);
+            border-radius: var(--radius-btn);
             background: var(--surface-card);
             border: 1px solid var(--border-subtle);
             color: var(--text-secondary);
@@ -212,20 +226,8 @@ family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            backface-visibility: hidden;
-            -webkit-backface-visibility: hidden;
-            transition: all 0.25s ease;
-        }
-
-        .settings-btn,
-        .info-btn {
-            transform: translateY(0) rotate(0deg) translateZ(0);
-            transform-origin: center center;
-        }
-
-        .account-btn {
-            position: relative;
-            transform: translateY(0) translateZ(0);
+            transition: background 0.1s ease, color 0.1s ease,
+                border-color 0.1s ease;
         }
 
         .settings-btn svg,
@@ -241,41 +243,24 @@ family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
         .account-btn:hover,
         .info-btn:hover,
         .account-btn.logged-in {
-            color: var(--accent);
-            border-color: var(--accent-badge-border);
-            background: var(--accent-badge-bg);
+            color: var(--text-primary);
+            border-color: var(--border-hover);
+            background: var(--surface-elevated);
         }
 
-        .settings-btn:hover {
-            transform: translateY(-2px) rotate(45deg) translateZ(0);
-        }
-
-        .info-btn:hover {
-            transform: translateY(-2px) rotate(15deg) translateZ(0);
-        }
-
-        .account-btn:hover,
-        .account-btn:hover svg {
-            transform: translateY(-2px) translateZ(0);
-        }
-
-        .account-btn svg {
-            transform: translateY(0) translateZ(0);
-            backface-visibility: hidden;
-            -webkit-backface-visibility: hidden;
-            transition: transform 0.25s ease;
+        .account-btn {
+            position: relative;
         }
 
         .account-btn.logged-in::after {
             content: '';
             position: absolute;
-            top: 2px;
-            right: 2px;
-            width: 7px;
-            height: 7px;
+            top: 4px;
+            right: 4px;
+            width: 6px;
+            height: 6px;
             border-radius: var(--radius-pill);
             background: var(--accent);
-            box-shadow: 0 0 6px var(--accent);
         }
 
         /* Card Container */
@@ -306,7 +291,7 @@ family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
         .min-buy-well:focus-within,
         .setting-select:focus {
             border-color: var(--accent);
-            box-shadow: 0 0 0 3px var(--accent-glow);
+            box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
         }
 
         .deposit-label-wrap,
@@ -354,6 +339,7 @@ family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
             padding: 10px 14px 10px 28px;
             color: var(--text-primary);
             font-family: var(--font-mono);
+            font-variant-numeric: tabular-nums;
             font-size: 16px;
             font-weight: 600;
             text-align: right;
@@ -522,6 +508,7 @@ family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
             padding: 5px 8px 5px 20px;
             color: var(--text-primary);
             font-family: var(--font-mono);
+            font-variant-numeric: tabular-nums;
             font-size: 13px;
             font-weight: 600;
             text-align: right;
@@ -578,7 +565,7 @@ family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
         }
 
         .holding-row:focus-within {
-            border-color: rgba(36, 219, 161, 0.4);
+            border-color: rgba(16, 185, 129, 0.4);
         }
 
         /* Holdings Table Sort By Control */
@@ -595,15 +582,15 @@ family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
             right: 0;
             display: inline-flex;
             align-items: center;
-            background: var(--surface-card);
-            border: 1px solid var(--border-subtle);
+            background: var(--surface-elevated);
+            border: none;
             border-radius: var(--radius-pill);
-            padding: 1px 4px 1px 6px;
+            padding: 2px 5px 2px 7px;
             height: 23px;
             gap: 2px;
             white-space: nowrap;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-            transition: all 0.15s ease;
+            box-shadow: none;
+            transition: background 0.12s ease;
             z-index: 2;
         }
 
@@ -614,7 +601,8 @@ family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
 
         .sort-pill-container.active,
         .sort-pill-container.active:hover {
-            border-color: var(--accent);
+            background: var(--accent-badge-bg);
+            border: none;
         }
 
         .sort-select {
@@ -719,6 +707,7 @@ family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
             border-radius: var(--radius-input);
             color: var(--text-primary);
             font-family: var(--font-mono);
+            font-variant-numeric: tabular-nums;
             font-size: 13px;
             padding: 8px 10px;
             outline: none;
@@ -733,7 +722,7 @@ family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
         .clean-input:focus {
             background: var(--surface-elevated);
             border-color: var(--accent);
-            box-shadow: 0 0 0 2px var(--accent-glow);
+            box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
         }
 
         .clean-input:-webkit-autofill,
@@ -794,24 +783,39 @@ family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
             transform: scale(0.90) translateZ(0);
         }
 
-        /* Target Weight Meter */
+        /* Integrated Target Weight Table Footer */
         .weight-meter-wrap {
-            margin: 16px 0 24px 0;
+            margin: 8px 0 20px 0;
             background: var(--surface-input);
             border: 1px solid var(--border-subtle);
             border-radius: var(--radius-card);
-            padding: 12px 16px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .weight-meter-content {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 16px;
+            padding: 8px 12px;
+            width: 100%;
+        }
+
+        .weight-meter-title {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
         }
 
         .weight-meter-bar-bg {
-            flex: 1;
-            height: 6px;
+            width: 100%;
+            height: 4px;
             background: var(--track-bg);
-            border-radius: var(--radius-pill);
+            border-radius: 0;
             overflow: hidden;
             position: relative;
         }
@@ -819,32 +823,32 @@ family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
         .weight-meter-bar-fill {
             height: 100%;
             background: var(--accent);
-            border-radius: var(--radius-pill);
+            border-radius: 0;
             transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1),
                 background-color 0.2s ease;
-            box-shadow: 0 0 8px var(--accent-glow);
+            box-shadow: none;
         }
 
         .weight-meter-bar-fill.warning {
             background: var(--warning);
-            box-shadow: 0 0 8px rgba(251, 191, 36, 0.2);
+            box-shadow: none;
         }
 
         .weight-meter-bar-fill.danger {
             background: var(--danger);
-            box-shadow: 0 0 8px rgba(248, 113, 113, 0.2);
+            box-shadow: none;
         }
 
         .weight-meter-label {
             font-family: var(--font-mono);
             font-size: 12px;
-            font-weight: 500;
+            font-weight: 600;
             color: var(--text-secondary);
             white-space: nowrap;
         }
 
         .weight-meter-label span {
-            font-weight: 600;
+            font-weight: 700;
             color: var(--accent);
         }
 
@@ -934,13 +938,13 @@ family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
         .btn-calc {
             background: var(--accent);
             color: var(--accent-on-text);
-            box-shadow: 0 4px 14px var(--accent-glow);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
         }
 
         .btn-calc:hover {
             background: var(--accent-hover);
             transform: translateY(-1px) translateZ(0);
-            box-shadow: 0 6px 20px var(--accent-glow);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
         }
 
         .btn-calc:active,
@@ -1095,32 +1099,33 @@ family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
 
         .cut-badge {
             font-family: var(--font-mono);
+            font-variant-numeric: tabular-nums;
             font-size: 14px;
             font-weight: 700;
             color: var(--accent);
             background: var(--accent-badge-bg);
-            border: 1px solid var(--accent-badge-border);
+            border: none;
             padding: 6px 12px;
             border-radius: var(--radius-pill);
         }
 
         .cut-badge.sell {
-            color: #FF5C5C;
-            background: rgba(255, 92, 92, 0.12);
-            border-color: rgba(255, 92, 92, 0.3);
+            color: #EF4444;
+            background: rgba(239, 68, 68, 0.12);
+            border: none;
         }
 
         .cut-badge.zero {
             color: var(--text-muted);
-            background: transparent;
-            border-color: var(--border-subtle);
+            background: var(--track-bg);
+            border: none;
             font-weight: 500;
         }
 
         .cut-badge.leftover {
             color: var(--warning);
             background: var(--warning-bg);
-            border-color: var(--warning-border);
+            border: none;
         }
 
         .cut-badge.share-pill-expandable {
@@ -1173,7 +1178,7 @@ family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
 
         .alloc-bar-start {
             height: 100%;
-            background: rgba(36, 219, 161, 0.4);
+            background: rgba(16, 185, 129, 0.35);
             border-radius: var(--radius-pill) 0 0 var(--radius-pill);
             position: absolute;
             left: 0;
@@ -1229,8 +1234,8 @@ family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            background: var(--surface-input);
-            border: 1px solid var(--border-subtle);
+            background: var(--surface-elevated);
+            border: none;
             color: var(--text-secondary);
         }
 
@@ -1239,7 +1244,7 @@ family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
         }
 
         .info-pill.balanced {
-            border-color: var(--accent-badge-border);
+            border: none;
             color: var(--accent);
             background: var(--accent-badge-bg);
         }
@@ -1280,7 +1285,8 @@ family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
         }
 
         .leftover-tile:hover {
-            border-color: var(--warning);
+            border-color: var(--warning-border);
+            box-shadow: none;
         }
 
         .leftover-tile-top {
@@ -1378,42 +1384,47 @@ family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
             position: relative;
             padding: 16px;
             border-top: 1px solid var(--border-subtle);
-            background: #090A0C;
+            background: var(--surface-card);
         }
 
         pre#outputArea {
             font-family: var(--font-mono);
+            font-variant-numeric: tabular-nums;
             font-size: 12px;
-            line-height: 1.45;
-            color: var(--accent);
+            line-height: 1.5;
+            color: var(--text-primary);
             white-space: pre;
             overflow-x: auto;
             margin: 0;
+            padding: 10px 12px;
+            background: var(--surface-input);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-input);
         }
 
         .btn-copy-raw {
             position: absolute;
-            top: 12px;
-            right: 12px;
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            color: #F4F5F7;
+            top: 24px;
+            right: 24px;
+            background: var(--surface-elevated);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-primary);
             padding: 4px 10px;
-            border-radius: 6px;
+            border-radius: var(--radius-btn);
             font-size: 11px;
-            font-weight: 500;
+            font-weight: 600;
             cursor: pointer;
-            transform: scale(1) translateZ(0);
-            backface-visibility: hidden;
-            transition: all 0.15s ease;
+            transition: all 0.12s ease;
         }
 
         .btn-copy-raw:hover {
-            background: rgba(255, 255, 255, 0.18);
+            background: var(--accent-badge-bg);
+            border-color: var(--accent);
+            color: var(--accent);
         }
 
         .btn-copy-raw:active {
-            transform: scale(0.95) translateZ(0);
+            transform: scale(0.96) translateZ(0);
         }
 
         /* Feedback Footer */
@@ -1440,7 +1451,7 @@ family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
             font-weight: 600;
             text-decoration: underline;
             text-underline-offset: 3px;
-            text-decoration-color: rgba(36, 219, 161, 0.4);
+            text-decoration-color: var(--accent);
             transition: all 0.2s ease;
             user-select: all;
             word-break: break-all;
@@ -1520,7 +1531,7 @@ family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
             cursor: pointer;
             text-decoration: underline;
             text-underline-offset: 2px;
-            text-decoration-color: rgba(36, 219, 161, 0.4);
+            text-decoration-color: var(--accent);
             transition: all 0.2s ease;
         }
 
@@ -2076,57 +2087,441 @@ family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
             transform: translateY(-1px) translateZ(0);
         }
 
-        @media (max-width: 500px) {
+        /* Workspace Two-Pane & Responsive Architecture */
+        .workspace-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 100%;
+        }
+
+        .workspace-left {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 100%;
+        }
+
+        .workspace-right {
+            width: 100%;
+        }
+
+        /* Portfolio Allocation Donut Visualizer */
+        .visualizer-section {
+            background: var(--surface-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-card);
+            padding: 20px;
+            box-shadow: var(--card-shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .visualizer-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-subtle);
+            padding-bottom: 12px;
+        }
+
+        .visualizer-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.01em;
+        }
+
+        .visualizer-subtitle {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .donut-charts-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            gap: 12px;
+            position: relative;
+        }
+
+        .donut-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+            min-width: 130px;
+        }
+
+        .donut-title-badge {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+        }
+
+        .donut-stage {
+            position: relative;
+            width: 160px;
+            height: 160px;
+        }
+
+        .donut-svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .donut-slice {
+            cursor: pointer;
+            transition: opacity 0.15s ease, filter 0.15s ease;
+        }
+
+        .donut-slice:hover {
+            opacity: 1 !important;
+            filter: brightness(1.15);
+        }
+
+        .donut-charts-row.has-hover .donut-slice:not(.active) {
+            opacity: 0.35;
+        }
+
+        .donut-center-metric {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            pointer-events: none;
+            width: 86px;
+        }
+
+        .donut-center-val {
+            font-family: var(--font-mono);
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-primary);
+            font-variant-numeric: tabular-nums;
+            line-height: 1.2;
+        }
+
+        .donut-center-sub {
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .donut-flow-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border-radius: var(--radius-btn);
+            background: var(--surface-input);
+            color: var(--text-muted);
+            flex-shrink: 0;
+        }
+
+        /* Tabular Interactive Tooltip Banner */
+        .donut-tooltip-banner {
+            background: var(--surface-input);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-input);
+            padding: 8px 12px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            min-height: 38px;
+            transition: all 0.15s ease;
+        }
+
+        .donut-tooltip-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            width: 100%;
+        }
+
+        .donut-tooltip-ticker {
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+
+        .donut-tooltip-stat {
+            font-family: var(--font-mono);
+            font-variant-numeric: tabular-nums;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        /* Donut Legend */
+        .donut-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            align-items: center;
+            justify-content: center;
+            padding-top: 4px;
+        }
+
+        .legend-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: var(--surface-input);
+            padding: 3px 8px;
+            border-radius: var(--radius-pill);
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            border: none;
+            cursor: pointer;
+            transition: all 0.12s ease;
+        }
+
+        .legend-pill:hover,
+        .legend-pill.active {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text-primary);
+        }
+
+        .legend-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            border: none;
+            display: inline-block;
+        }
+
+        .holding-color-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 6px;
+            vertical-align: middle;
+            flex-shrink: 0;
+            border: none;
+        }
+
+        .results-placeholder {
+            display: none;
+            padding: 36px 24px;
+            text-align: center;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 12px;
+            min-height: 280px;
+            background: var(--surface-card);
+            border: 1px dashed var(--border-subtle);
+            border-radius: var(--radius-card);
+        }
+
+        .placeholder-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 8px;
+            background: var(--surface-input);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            margin: 0 auto 4px auto;
+        }
+
+        .placeholder-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .placeholder-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+
+        @media (min-width: 900px) {
+            .container {
+                max-width: 1080px;
+            }
+            .workspace-grid {
+                display: grid;
+                grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+                gap: 24px;
+                align-items: start;
+            }
+            .workspace-right {
+                position: static;
+            }
+            .workspace-right .results-section {
+                margin-top: 0;
+            }
+            .results-placeholder {
+                display: flex;
+            }
+        }
+
+        @media (max-width: 899px) {
+            .results-placeholder {
+                display: none !important;
+            }
+        }
+
+        @media (max-width: 639px) {
             body {
                 padding: 16px 8px;
             }
             .card {
                 padding: 16px;
-                border-radius: 18px;
+                border-radius: var(--radius-card);
             }
             .table-headers {
-                grid-template-columns: 24px 1.2fr 1fr 1fr 30px;
-                gap: 6px;
-                padding: 6px 9px;
+                display: flex;
+                justify-content: flex-end;
+                align-items: center;
+                padding: 4px 6px;
+                margin-bottom: 6px;
+            }
+            .table-headers > div:not(.sort-header-cell) {
+                display: none;
+            }
+            .table-headers .sort-header-cell {
+                display: flex;
+                width: auto;
             }
             .holding-row {
-                grid-template-columns: 24px 1.2fr 1fr 1fr 30px;
-                gap: 6px;
-                padding: 6px 8px;
+                display: grid;
+                grid-template-columns: 28px 1fr 1fr 34px;
+                grid-template-rows: auto auto;
+                gap: 8px;
+                padding: 10px 12px;
+                border-radius: var(--radius-card);
             }
-            .table-headers.mode-shares,
+            .holding-row .row-index {
+                grid-column: 1;
+                grid-row: 1;
+                align-self: center;
+                font-size: 13px;
+            }
+            .holding-row .input-group:nth-child(2) {
+                grid-column: 2 / 4;
+                grid-row: 1;
+            }
+            .holding-row .btn-remove {
+                grid-column: 4;
+                grid-row: 1;
+                justify-self: end;
+                width: 34px;
+                height: 34px;
+            }
+            /* Value Mode (5 items in row: #, ticker, val, weight, remove) */
+            .holding-row:not(.mode-shares) .input-group:nth-child(3) {
+                grid-column: 1 / 3;
+                grid-row: 2;
+            }
+            .holding-row:not(.mode-shares) .input-group:nth-child(4) {
+                grid-column: 3 / 5;
+                grid-row: 2;
+            }
+            /* Shares Mode (6 items in row: #, ticker, p, q, w, remove) */
             .holding-row.mode-shares {
-                grid-template-columns: 20px 1.05fr 1fr 0.85fr 1.15fr 28px;
-                gap: 4px;
-                padding: 6px 7px;
+                grid-template-columns: 28px 1.2fr 1fr 1fr 34px;
+                grid-template-rows: auto auto;
             }
-            .mode-shares .clean-input {
-                padding: 6px 6px;
-                font-size: 11px;
+            .holding-row.mode-shares .row-index {
+                grid-column: 1;
+                grid-row: 1;
             }
-            .mode-shares .input-price {
-                padding-left: 16px;
+            .holding-row.mode-shares .input-group:nth-child(2) {
+                grid-column: 2 / 5;
+                grid-row: 1;
             }
-            .mode-shares .input-weight {
-                padding-right: 16px;
+            .holding-row.mode-shares .btn-remove {
+                grid-column: 5;
+                grid-row: 1;
             }
-            .mode-shares .input-prefix {
-                left: 6px;
-                font-size: 11px;
+            .holding-row.mode-shares .input-group:nth-child(3) {
+                grid-column: 1 / 3;
+                grid-row: 2;
             }
-            .mode-shares .input-suffix {
-                right: 6px;
-                font-size: 11px;
+            .holding-row.mode-shares .input-group:nth-child(4) {
+                grid-column: 3 / 4;
+                grid-row: 2;
             }
-            .sort-pill-container {
-                height: 22px;
-                padding: 1px 3px 1px 5px;
+            .holding-row.mode-shares .input-group:nth-child(5) {
+                grid-column: 4 / 6;
+                grid-row: 2;
             }
-            .sort-select {
-                font-size: 10px;
+
+            /* Touch ergonomics & iOS Safari auto-zoom prevention */
+            .clean-input,
+            .deposit-input,
+            .min-buy-input {
+                min-height: 42px;
+                font-size: 16px !important;
+            }
+            .clean-input {
+                padding: 10px 10px;
+            }
+            .input-prefix {
+                font-size: 15px;
+            }
+            .input-suffix {
+                font-size: 15px;
             }
             .stat-grid {
                 grid-template-columns: 1fr;
+            }
+            .deposit-well {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+            .deposit-input {
+                width: 100%;
+            }
+            .deposit-input-wrapper {
+                width: 100%;
+            }
+            .actions-bar {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 10px;
+            }
+            .btn-left-group {
+                width: 100%;
+            }
+            .btn-left-group .btn {
+                flex: 1;
+                justify-content: center;
+            }
+            .calc-btn-container {
+                width: 100%;
+            }
+            .btn-calc {
+                width: 100%;
+                justify-content: center;
+                min-height: 44px;
             }
         }
 
@@ -2220,7 +2615,7 @@ family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
             border: 1px solid var(--border-subtle);
             color: var(--text-primary);
             padding: 8px 16px;
-            border-radius: var(--radius-pill);
+            border-radius: var(--radius-btn);
             font-size: 0.82rem;
             font-weight: 600;
             cursor: pointer;
@@ -2242,7 +2637,7 @@ family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
             border: 1px solid var(--border-subtle);
             color: var(--text-secondary);
             padding: 4px 12px;
-            border-radius: var(--radius-pill);
+            border-radius: var(--radius-btn);
             font-size: 0.76rem;
             font-weight: 600;
             cursor: pointer;
@@ -2253,7 +2648,7 @@ family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
 
         .btn-setting-ping:hover {
             color: var(--accent);
-            border-color: var(--accent-badge-border);
+            border-color: var(--border-hover);
             transform: translateY(-1px) translateZ(0);
         }
 
@@ -2261,7 +2656,7 @@ family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
             background: var(--accent);
             color: var(--accent-on-text);
             border: 1px solid var(--accent);
-            border-radius: var(--radius-pill);
+            border-radius: var(--radius-btn);
             padding: 7px 18px;
             font-size: 0.82rem;
             font-weight: 600;
@@ -2273,7 +2668,7 @@ family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
             transform: translateY(0) translateZ(0);
             backface-visibility: hidden;
             transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-            box-shadow: 0 2px 8px var(--accent-glow);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
             white-space: nowrap;
             user-select: none;
         }
@@ -2282,12 +2677,12 @@ family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
             background: var(--accent-hover);
             border-color: var(--accent-hover);
             transform: translateY(-1px) translateZ(0);
-            box-shadow: 0 4px 14px var(--accent-glow);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
         }
 
         .btn-setting-pill:active {
             transform: translateY(0) translateZ(0);
-            box-shadow: 0 2px 6px var(--accent-glow);
+            box-shadow: none;
         }
 
         .btn-setting-pill:disabled {
@@ -2386,19 +2781,19 @@ family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
 
         .sync-status-badge.connected {
             background: var(--accent-badge-bg);
-            border: 1px solid var(--accent-badge-border);
+            border: none;
             color: var(--accent);
         }
 
         .sync-status-badge.offline {
             background: var(--track-bg);
-            border: 1px solid var(--border-subtle);
+            border: none;
             color: var(--text-muted);
         }
 
         .sync-status-badge.error {
             background: var(--danger-bg);
-            border: 1px solid var(--danger-border);
+            border: none;
             color: var(--danger);
         }
 
@@ -2412,7 +2807,7 @@ family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
         .csv-upload-btn {
             width: 28px;
             height: 28px;
-            border-radius: var(--radius-pill);
+            border-radius: var(--radius-btn);
             background: var(--surface-card);
             border: 1px solid var(--border-subtle);
             color: var(--text-secondary);
@@ -2420,17 +2815,14 @@ family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            transform: translateY(0) translateZ(0);
-            backface-visibility: hidden;
-            transition: all 0.2s ease;
+            transition: all 0.12s ease;
             padding: 0;
         }
 
         .csv-upload-btn:hover {
-            color: var(--accent);
-            border-color: var(--accent-badge-border);
-            background: var(--accent-badge-bg);
-            transform: translateY(-1.5px) translateZ(0);
+            color: var(--text-primary);
+            border-color: var(--border-hover);
+            background: var(--surface-elevated);
         }
 
         /* CSV Import Modal */
@@ -2510,15 +2902,14 @@ family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
             border-style: solid;
             border-color: var(--accent);
             background: var(--accent-badge-bg);
-            box-shadow: 0 0 0 3px rgba(36, 219, 161, 0.35),
-                0 0 12px rgba(36, 219, 161, 0.25);
+            box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.25);
             transform: scale(1.01);
         }
 
         .csv-drop-zone.has-file {
             border-style: solid;
             border-color: var(--accent-badge-border);
-            background: rgba(36, 219, 161, 0.04);
+            background: var(--accent-badge-bg);
             padding: 18px;
         }
 
@@ -2660,7 +3051,7 @@ family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
             font-weight: 600;
             color: var(--accent);
             background: var(--accent-badge-bg);
-            border: 1px solid var(--accent-badge-border);
+            border: none;
             padding: 4px 12px;
             border-radius: var(--radius-pill);
             margin-top: 10px;
@@ -2818,8 +3209,11 @@ family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
             </div>
         </header>
 
-        <!-- Main Form Card -->
-        <div class="card">
+        <!-- Workspace Grid (Desktop 2-Pane Split / Mobile Stack) -->
+        <main class="workspace-grid">
+            <div class="workspace-left">
+                <!-- Main Form Card -->
+                <div class="card">
             
             <!-- Deposit Well -->
             <div class="deposit-well">
@@ -2938,13 +3332,14 @@ family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
                             title="Select a variable to sort"
                             disabled
                             aria-label="Toggle sort direction">
-                            <polygon points="1,3 9,3 5,8" fill="currentColor"/>
-                            </svg>
                             <svg
                                 viewBox="0 0 10 10"
                                 width="8"
                                 height="8"
                                 aria-hidden="true">
+                                <polygon points="1,3 9,3 5,8"
+                                    fill="currentColor"/>
+                            </svg>
                         </button>
                     </div>
                 </div>
@@ -2954,18 +3349,20 @@ family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
                 <!-- Holding rows injected dynamically -->
             </div>
 
-            <!-- Target Weight Meter -->
+            <!-- Target Weight Table Footer Bar -->
             <div class="weight-meter-wrap">
+                <div class="weight-meter-content">
+                    <span class="weight-meter-title">Target Weight Total</span>
+                    <div class="weight-meter-label" id="meterLabel">
+                        Target Sum: <span>0%</span> / 100%
+                    </div>
+                </div>
                 <div class="weight-meter-bar-bg">
                     <div
                         id="meterFill"
                         class="weight-meter-bar-fill"
                         style="width: 0%;"
-                    >
-                    </div>
-                </div>
-                <div class="weight-meter-label" id="meterLabel">
-                    Target Sum: <span>0%</span> / 100%
+                    ></div>
                 </div>
             </div>
 
@@ -3021,81 +3418,202 @@ family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
             </div>
         </div>
 
-        <!-- Modern Result Dashboard -->
-        <div id="resultsSection" class="results-section card">
-            
-            <div class="section-header">
-                <span class="section-title">Rebalance Breakdown</span>
-            </div>
-
-            <!-- Stat Grid -->
-            <div class="stat-grid">
-                <div class="stat-box">
-                    <span class="stat-label">Initial Value</span>
-                    <span class="stat-value" id="statInitial">$0.00</span>
+        <!-- Allocation Donut Visualizer Card -->
+        <div id="visualizerSection" class="visualizer-section card">
+            <div class="visualizer-header">
+                <div>
+                    <span class="visualizer-title">Allocation Drift</span>
                 </div>
-                <div class="stat-box">
-                    <span
-                        class="stat-label"
-                        id="statDepositLabel"
-                    >
-                    Deposit</span>
-                    <span class="stat-value" id="statDeposit">$0.00</span>
-                </div>
-                <div class="stat-box highlight">
-                    <span class="stat-label">New Total Value</span>
-                    <span class="stat-value" id="statNewTotal">$0.00</span>
+                <div>
+                    <span class="visualizer-subtitle">Current vs Target</span>
                 </div>
             </div>
 
-            <!-- Purchase Threshold Warning (Low Deposit) -->
-            <div id="thresholdWarning" class="threshold-warning">
-                <!-- Dynamically populated with minBuy amount -->
-            </div>
-
-            <!-- Proportional Normalization Notice (when weights < 100%) -->
-            <div id="normNotice" class="norm-notice">
-                <!-- Dynamically populated with normalization summary -->
-            </div>
-
-            <!-- Dynamic Allocation List with Comparative Progress Bars -->
-            <div id="allocationList" class="allocation-list">
-                <!-- Allocation items injected dynamically -->
-            </div>
-
-            <!-- Status Pills -->
-            <div class="info-pill-container">
-                <div class="info-pill" id="pillUnderweight">
-                    <span>Most Underweight:</span> <strong
-                    id="valUnderweight">-</strong>
+            <div class="donut-charts-row" id="donutChartsRow">
+                <!-- Before (Current) Donut -->
+                <div class="donut-card">
+                    <span class="donut-title-badge">Current</span>
+                    <div class="donut-stage">
+                        <svg
+                            id="donutBeforeSvg"
+                            class="donut-svg"
+                            viewBox="0 0 160 160"
+                            aria-label="Current Portfolio Allocation Chart"
+                        ></svg>
+                        <div class="donut-center-metric">
+                            <span class="donut-center-sub">Initial</span>
+                            <span
+                                class="donut-center-val"
+                                id="donutBeforeVal"
+                            >$0.00</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="info-pill" id="pillOverweight">
-                    <span>Most Overweight:</span> <strong
-                    id="valOverweight">-</strong>
+
+                <!-- Directional Flow Indicator -->
+                <div class="donut-flow-indicator" aria-hidden="true">
+                    <svg
+                        viewBox="0 0 24 24"
+                        width="16"
+                        height="16"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2.2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                        <polyline points="12 5 19 12 12 19"></polyline>
+                    </svg>
                 </div>
-                <div class="info-pill" id="pillBalanced">
-                    <span>-</span>
+
+                <!-- After (Rebalanced) Donut -->
+                <div class="donut-card">
+                    <span class="donut-title-badge">Target</span>
+                    <div class="donut-stage">
+                        <svg
+                            id="donutAfterSvg"
+                            class="donut-svg"
+                            viewBox="0 0 160 160"
+                            aria-label="Target Rebalanced Allocation Chart"
+                        ></svg>
+                        <div class="donut-center-metric">
+                            <span class="donut-center-sub">Rebalanced</span>
+                            <span
+                                class="donut-center-val"
+                                id="donutAfterVal"
+                            >$0.00</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Collapsible Raw Terminal Output -->
-            <div class="terminal-accordion">
-                <button class="terminal-toggle" onclick="toggleTerminal()">
-                    <span>Terminal ASCII Receipt</span>
-                    <span id="toggleIcon">▼ View</span>
-                </button>
-                <div id="terminalContent" class="terminal-content">
-                    <button
-                        class="btn-copy-raw"
-                        id="btnCopyRaw"
-                        onclick="copyOutput()"
-                    >
-                    Copy</button>
-                    <pre id="outputArea"></pre>
+            <!-- Tabular Interactive Tooltip Banner -->
+            <div id="donutTooltip" class="donut-tooltip-banner">
+                <div class="donut-tooltip-info" id="donutTooltipInfo">
+                    <span>Hover or tap a slice to inspect drift</span>
                 </div>
             </div>
 
+            <!-- Compact Legend -->
+            <div id="donutLegend" class="donut-legend"></div>
         </div>
+    </div>
+
+    <!-- Workspace Right (Sticky Analytics & Order Ticket) -->
+    <div class="workspace-right">
+                <!-- Desktop Results Placeholder -->
+                <div id="resultsPlaceholder" class="results-placeholder card">
+                    <div class="placeholder-icon">
+                        <svg
+                            viewBox="0 0 24 24"
+                            width="28"
+                            height="28"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round">
+                            <line x1="18" y1="20" x2="18" y2="10"></line>
+                            <line x1="12" y1="20" x2="12" y2="4"></line>
+                            <line x1="6" y1="20" x2="6" y2="14"></line>
+                        </svg>
+                    </div>
+                    <div class="placeholder-title">
+                        Rebalance Target Analytics
+                    </div>
+                    <div class="placeholder-desc">
+                        Enter your portfolio holdings and capital, then click
+                        Calculate to generate allocation targets and broker
+                        order tickets.
+                    </div>
+                </div>
+
+                <!-- Modern Result Dashboard -->
+                <div id="resultsSection" class="results-section card">
+                    
+                    <div class="section-header">
+                        <span class="section-title">Rebalance Breakdown</span>
+                    </div>
+
+                    <!-- Stat Grid -->
+                    <div class="stat-grid">
+                        <div class="stat-box">
+                            <span class="stat-label">Initial Value</span>
+                            <span
+                                class="stat-value"
+                                id="statInitial"
+                            >$0.00</span>
+                        </div>
+                        <div class="stat-box">
+                            <span
+                                class="stat-label"
+                                id="statDepositLabel"
+                            >Deposit</span>
+                            <span
+                                class="stat-value"
+                                id="statDeposit"
+                            >$0.00</span>
+                        </div>
+                        <div class="stat-box highlight">
+                            <span class="stat-label">New Total Value</span>
+                            <span
+                                class="stat-value"
+                                id="statNewTotal"
+                            >$0.00</span>
+                        </div>
+                    </div>
+
+                    <!-- Purchase Threshold Warning (Low Deposit) -->
+                    <div id="thresholdWarning" class="threshold-warning">
+                        <!-- Dynamically populated with minBuy amount -->
+                    </div>
+
+                    <!-- Proportional Normalization Notice (weights < 100%) -->
+                    <div id="normNotice" class="norm-notice">
+                        <!-- Populated with normalization summary -->
+                    </div>
+
+                    <!-- Dynamic Allocation List with Comparative Bars -->
+                    <div id="allocationList" class="allocation-list">
+                        <!-- Allocation items injected dynamically -->
+                    </div>
+
+                    <!-- Status Pills -->
+                    <div class="info-pill-container">
+                        <div class="info-pill" id="pillUnderweight">
+                            <span>Most Underweight:</span> <strong
+                            id="valUnderweight">-</strong>
+                        </div>
+                        <div class="info-pill" id="pillOverweight">
+                            <span>Most Overweight:</span> <strong
+                            id="valOverweight">-</strong>
+                        </div>
+                        <div class="info-pill" id="pillBalanced">
+                            <span>-</span>
+                        </div>
+                    </div>
+
+                    <!-- Collapsible Broker Order Ticket Slip -->
+                    <div class="terminal-accordion">
+                        <button class="terminal-toggle"
+                            onclick="toggleTerminal()">
+                            <span>Broker Order Ticket Slip</span>
+                            <span id="toggleIcon">▼ View</span>
+                        </button>
+                        <div id="terminalContent" class="terminal-content">
+                            <button
+                                class="btn-copy-raw"
+                                id="btnCopyRaw"
+                                onclick="copyOutput()"
+                            >
+                            Copy Ticket</button>
+                            <pre id="outputArea"></pre>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </main>
 
         <!-- Feedback Footer -->
         <footer class="feedback-footer">
@@ -3455,8 +3973,7 @@ family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
                                     id="accTierBadge"
                                     style="display: none; margin: 0;
                                         background: var(--accent-badge-bg);
-                                        border-color:
-                                            var(--accent-badge-border);
+                                        border: none;
                                         color: var(--accent);"
                                 >
                                 Free Plan</span>
@@ -11113,10 +11630,16 @@ function renderRows() {
         const holdW = holding.w !== undefined && holding.w !== null
             ? holding.w : "";
         const curSym = getCurrencySymbol();
+        const holdColor = getHoldingColor(index);
+        const indexDotHtml =
+            `<span class="holding-color-dot" ` +
+            `style="background: ${holdColor};"></span>`;
 
         if (isShares) {
             row.innerHTML = `
-                        <div class="row-index">${rowNum}</div>
+                        <div class="row-index">
+                            ${indexDotHtml}${rowNum}
+                        </div>
                         <div class="input-group">
                             <input type="text"
                                 class="clean-input input-ticker"
@@ -11173,7 +11696,9 @@ function renderRows() {
                     `;
         } else {
             row.innerHTML = `
-                        <div class="row-index">${rowNum}</div>
+                        <div class="row-index">
+                            ${indexDotHtml}${rowNum}
+                        </div>
                         <div class="input-group">
                             <input type="text"
                                 class="clean-input input-ticker"
@@ -11223,6 +11748,7 @@ function renderRows() {
     });
 
     updateWeightSummary();
+    renderDonutCharts();
 }
 
 function updateHolding(index, field, value) {
@@ -11253,6 +11779,7 @@ function updateHolding(index, field, value) {
     saveFormData();
     updateWeightSummary();
     clearError();
+    scheduleReactiveCalculation();
 }
 
 function addHolding(
@@ -11334,6 +11861,7 @@ function updateWeightSummary() {
             `Target Sum: <span style="color: var(--warning);">${rounded}%` +
             `</span> / 100%`;
     }
+    renderDonutCharts();
 }
 
 let cachedLowestSharePrice = null;
@@ -11421,6 +11949,7 @@ function onMinBuyInput() {
         }
     }
     clearError();
+    scheduleReactiveCalculation();
 }
 
 function updateMinBuyState() {
@@ -11523,10 +12052,14 @@ function updateMinBuyState() {
 function onToggleCompleteRebalance() {
     clearError();
     saveFormData();
+    scheduleReactiveCalculation();
+    renderDonutCharts();
 }
 
 function onDepositInput() {
     clearError();
+    scheduleReactiveCalculation();
+    renderDonutCharts();
 }
 
 function saveFormData() {
@@ -11587,10 +12120,13 @@ function resetPage() {
     }
     onToggleCompleteRebalance();
     document.getElementById("resultsSection").style.display = "none";
+    const resPh = document.getElementById("resultsPlaceholder");
+    if (resPh) resPh.style.display = "";
     document.getElementById("errorMessage").style.display = "none";
     const normNotice = document.getElementById("normNotice");
     if (normNotice) normNotice.style.display = "none";
     localStorage.removeItem("rebalancer_state");
+    lastComputedRebalanceResult = null;
     initDefaultHoldings();
     renderRows();
 }
@@ -11775,6 +12311,410 @@ function toggleSharePillPrecision(el) {
     }
 }
 
+// --- Portfolio Allocation Donut Visualizer Subsystem ---
+const CHART_PALETTE = [
+    "#3B82F6", "#10B981", "#F59E0B", "#8B5CF6",
+    "#06B6D4", "#EC4899", "#6366F1", "#14B8A6",
+    "#F97316", "#64748B", "#84CC16", "#A855F7"
+];
+
+let activeDonutHoverIndex = null;
+let lastComputedRebalanceResult = null;
+
+function getHoldingColor(index) {
+    const idx = typeof index === "number" ? Math.abs(index) : 0;
+    return CHART_PALETTE[idx % CHART_PALETTE.length];
+}
+
+function getPolarPoint(cx, cy, r, deg) {
+    const rad = (deg * Math.PI) / 180;
+    return {
+        x: cx + r * Math.sin(rad),
+        y: cy - r * Math.cos(rad)
+    };
+}
+
+function buildDonutSlicePath(cx, cy, R, r, a1, a2) {
+    const span = a2 - a1;
+    if (span >= 359.99) {
+        const mid = a1 + 180;
+        const p1 = getPolarPoint(cx, cy, R, a1);
+        const p2 = getPolarPoint(cx, cy, R, mid);
+        const p3 = getPolarPoint(cx, cy, r, mid);
+        const p4 = getPolarPoint(cx, cy, r, a1);
+        const p5 = getPolarPoint(cx, cy, R, a2);
+        const p6 = getPolarPoint(cx, cy, r, a2);
+        const d1 = `M ${p1.x.toFixed(2)} ${p1.y.toFixed(2)} ` +
+            `A ${R} ${R} 0 0 1 ${p2.x.toFixed(2)} ${p2.y.toFixed(2)} ` +
+            `L ${p3.x.toFixed(2)} ${p3.y.toFixed(2)} ` +
+            `A ${r} ${r} 0 0 0 ${p4.x.toFixed(2)} ${p4.y.toFixed(2)} Z`;
+        const d2 = `M ${p2.x.toFixed(2)} ${p2.y.toFixed(2)} ` +
+            `A ${R} ${R} 0 0 1 ${p5.x.toFixed(2)} ${p5.y.toFixed(2)} ` +
+            `L ${p6.x.toFixed(2)} ${p6.y.toFixed(2)} ` +
+            `A ${r} ${r} 0 0 0 ${p3.x.toFixed(2)} ${p3.y.toFixed(2)} Z`;
+        return d1 + " " + d2;
+    }
+
+    const gap = span > 4 ? 1.2 : 0;
+    const sa = a1 + gap / 2;
+    const ea = a2 - gap / 2;
+    const isLarge = (ea - sa) > 180 ? 1 : 0;
+
+    const oStart = getPolarPoint(cx, cy, R, sa);
+    const oEnd = getPolarPoint(cx, cy, R, ea);
+    const iEnd = getPolarPoint(cx, cy, r, ea);
+    const iStart = getPolarPoint(cx, cy, r, sa);
+
+    return `M ${oStart.x.toFixed(2)} ${oStart.y.toFixed(2)} ` +
+        `A ${R} ${R} 0 ${isLarge} 1 ` +
+        `${oEnd.x.toFixed(2)} ${oEnd.y.toFixed(2)} ` +
+        `L ${iEnd.x.toFixed(2)} ${iEnd.y.toFixed(2)} ` +
+        `A ${r} ${r} 0 ${isLarge} 0 ` +
+        `${iStart.x.toFixed(2)} ${iStart.y.toFixed(2)} Z`;
+}
+
+function formatCompactCurrency(val) {
+    if (isNaN(val) || val <= 0) return "0.00";
+    if (val >= 1000000) {
+        return (val / 1000000).toFixed(2) + "M";
+    }
+    if (val >= 10000) {
+        return (val / 1000).toFixed(1) + "k";
+    }
+    return val.toLocaleString("en-US", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
+}
+
+function renderDonutSvg(svgEl, items, totalVal, cx, cy, R, r) {
+    if (!svgEl) return;
+    svgEl.innerHTML = "";
+
+    const createSvgEl = (tag) => {
+        return (typeof document !== "undefined" && document.createElementNS)
+            ? document.createElementNS("http://www.w3.org/2000/svg", tag)
+            : document.createElement(tag);
+    };
+
+    const positive = items.filter((it) => it.val > 0.0001);
+    if (totalVal <= 0 || positive.length === 0) {
+        const circle = createSvgEl("circle");
+        circle.setAttribute("cx", String(cx));
+        circle.setAttribute("cy", String(cy));
+        circle.setAttribute("r", "58");
+        circle.setAttribute("fill", "none");
+        circle.setAttribute("stroke", "var(--track-bg)");
+        circle.setAttribute("stroke-width", "24");
+        svgEl.appendChild(circle);
+        return;
+    }
+
+    if (positive.length === 1) {
+        const p = positive[0];
+        const circle = createSvgEl("circle");
+        circle.setAttribute("cx", String(cx));
+        circle.setAttribute("cy", String(cy));
+        circle.setAttribute("r", "58");
+        circle.setAttribute("fill", "none");
+        circle.setAttribute("stroke", p.color);
+        circle.setAttribute("stroke-width", "24");
+        circle.setAttribute("class", `donut-slice slice-asset-${p.index}`);
+        circle.setAttribute("data-asset-idx", String(p.index));
+        circle.onmouseenter = () => highlightDonutAsset(p.index);
+        circle.onmouseleave = () => resetDonutHighlight();
+        svgEl.appendChild(circle);
+        return;
+    }
+
+    let curAngle = 0;
+    positive.forEach((item) => {
+        const frac = item.val / totalVal;
+        const sliceAngle = frac * 360;
+        const endAngle = curAngle + sliceAngle;
+        const pathData = buildDonutSlicePath(
+            cx, cy, R, r, curAngle, endAngle
+        );
+
+        const path = createSvgEl("path");
+        path.setAttribute("d", pathData);
+        path.setAttribute("fill", item.color);
+        path.setAttribute("class", `donut-slice slice-asset-${item.index}`);
+        path.setAttribute("data-asset-idx", String(item.index));
+        path.onmouseenter = () => highlightDonutAsset(item.index);
+        path.onmouseleave = () => resetDonutHighlight();
+        svgEl.appendChild(path);
+
+        curAngle = endAngle;
+    });
+}
+
+function renderDonutLegend(legendEl, beforeItems) {
+    if (!legendEl) return;
+    legendEl.innerHTML = "";
+    beforeItems.forEach((b) => {
+        const pill = document.createElement("button");
+        pill.type = "button";
+        pill.className = "legend-pill";
+        pill.setAttribute("data-asset-idx", String(b.index));
+        pill.setAttribute("aria-label", `Highlight ${b.ticker}`);
+        pill.innerHTML =
+            `<span class="legend-dot" ` +
+            `style="background: ${b.color};"></span>` +
+            `<span>${b.ticker}</span>`;
+        pill.onmouseenter = () => highlightDonutAsset(b.index);
+        pill.onmouseleave = () => resetDonutHighlight();
+        pill.onclick = () => {
+            if (activeDonutHoverIndex === b.index) {
+                resetDonutHighlight();
+            } else {
+                highlightDonutAsset(b.index);
+            }
+        };
+        legendEl.appendChild(pill);
+    });
+}
+
+function highlightDonutAsset(idx) {
+    activeDonutHoverIndex = idx;
+    const rowWrap = document.getElementById("donutChartsRow");
+    if (rowWrap) rowWrap.classList.add("has-hover");
+
+    document.querySelectorAll(".donut-slice").forEach((el) => {
+        if (el.getAttribute("data-asset-idx") === String(idx)) {
+            el.classList.add("active");
+        } else {
+            el.classList.remove("active");
+        }
+    });
+
+    document.querySelectorAll(".legend-pill").forEach((el) => {
+        if (el.getAttribute("data-asset-idx") === String(idx)) {
+            el.classList.add("active");
+        } else {
+            el.classList.remove("active");
+        }
+    });
+
+    updateDonutTooltip(idx);
+}
+
+function resetDonutHighlight() {
+    activeDonutHoverIndex = null;
+    const rowWrap = document.getElementById("donutChartsRow");
+    if (rowWrap) rowWrap.classList.remove("has-hover");
+
+    document.querySelectorAll(".donut-slice").forEach((el) => {
+        el.classList.remove("active");
+    });
+    document.querySelectorAll(".legend-pill").forEach((el) => {
+        el.classList.remove("active");
+    });
+
+    const tip = document.getElementById("donutTooltipInfo");
+    if (tip) {
+        tip.innerHTML = `<span>Hover or tap a slice to inspect drift</span>`;
+    }
+}
+
+function updateDonutTooltip(idx) {
+    const tip = document.getElementById("donutTooltipInfo");
+    if (!tip || !holdingsData || !holdingsData[idx]) return;
+
+    const sym = getCurrencySymbol();
+    const h = holdingsData[idx];
+    const ticker = (h.t || "").trim() || `Asset ${idx + 1}`;
+    const color = getHoldingColor(idx);
+    let currVal = parseFloat(h.v) || 0;
+    if (currVal <= 0 && isSharesInputMode()) {
+        const p = parseFloat(h.p) || 0;
+        const q = parseFloat(h.q) || 0;
+        if (p > 0 && q > 0) currVal = p * q;
+    }
+    const targetW = parseFloat(h.w) || 0;
+
+    let totalCurr = 0;
+    holdingsData.forEach((it) => {
+        let v = parseFloat(it.v);
+        if ((isNaN(v) || v <= 0) && isSharesInputMode()) {
+            const p = parseFloat(it.p) || 0;
+            const q = parseFloat(it.q) || 0;
+            if (p > 0 && q > 0) v = p * q;
+        }
+        if (!isNaN(v) && v > 0) totalCurr += v;
+    });
+
+    const currPct = totalCurr > 0
+        ? ((currVal / totalCurr) * 100).toFixed(1)
+        : "0.0";
+
+    let deltaHtml = "";
+    const res = lastComputedRebalanceResult;
+    if (res && Array.isArray(res.assets)) {
+        const a = res.assets.find((item, itemIdx) => {
+            const matchIdx = item.origIndex !== undefined
+                ? item.origIndex
+                : itemIdx;
+            return matchIdx === idx;
+        });
+        if (a) {
+            const cut = a.cut || 0;
+            if (cut > 0.005) {
+                deltaHtml = ` <strong style="color: var(--accent);">` +
+                    `+${sym}${cut.toFixed(2)} BUY</strong>`;
+            } else if (cut < -0.005) {
+                deltaHtml = ` <strong style="color: var(--danger);">` +
+                    `-${sym}${Math.abs(cut).toFixed(2)} SELL</strong>`;
+            } else {
+                deltaHtml = ` <strong style="color: ` +
+                    `var(--text-muted);">HOLD</strong>`;
+            }
+        }
+    }
+
+    tip.innerHTML =
+        `<span class="legend-dot" style="background: ${color};"></span>` +
+        `<span class="donut-tooltip-ticker">${ticker}</span>` +
+        `<span class="donut-tooltip-stat">` +
+        `Current: ${sym}${currVal.toFixed(2)} (${currPct}%) ` +
+        `→ Target: ${targetW.toFixed(1)}%${deltaHtml}</span>`;
+}
+
+function renderDonutCharts(resultData) {
+    if (resultData) {
+        lastComputedRebalanceResult = resultData;
+    }
+    const beforeSvg = document.getElementById("donutBeforeSvg");
+    const afterSvg = document.getElementById("donutAfterSvg");
+    const beforeValEl = document.getElementById("donutBeforeVal");
+    const afterValEl = document.getElementById("donutAfterVal");
+    const legendEl = document.getElementById("donutLegend");
+    if (!beforeSvg || !afterSvg) return;
+
+    const sym = getCurrencySymbol();
+    const cx = 80, cy = 80, R = 70, r = 46;
+
+    let beforeItems = [];
+    let totalBeforeVal = 0;
+    if (Array.isArray(holdingsData)) {
+        holdingsData.forEach((h, idx) => {
+            let v = parseFloat(h.v);
+            if ((isNaN(v) || v <= 0) && isSharesInputMode()) {
+                const p = parseFloat(h.p) || 0;
+                const q = parseFloat(h.q) || 0;
+                if (p > 0 && q > 0) v = p * q;
+            }
+            const val = (!isNaN(v) && v > 0) ? v : 0;
+            const ticker = (h.t || "").trim() || `Asset ${idx + 1}`;
+            const color = getHoldingColor(idx);
+            beforeItems.push({
+                index: idx,
+                ticker,
+                val,
+                color,
+                targetWeight: parseFloat(h.w) || 0
+            });
+            totalBeforeVal += val;
+        });
+    }
+
+    let afterItems = [];
+    let totalAfterVal = 0;
+    const res = lastComputedRebalanceResult;
+
+    if (res && Array.isArray(res.assets) && res.assets.length > 0) {
+        totalAfterVal = res.new_folio_value || 0;
+        res.assets.forEach((a, idx) => {
+            const initialVal = a.value !== undefined ? a.value : (a.val || 0);
+            const finalVal = Math.max(0, initialVal + (a.cut || 0));
+            const assetIdx = a.origIndex !== undefined ? a.origIndex : idx;
+            const color = getHoldingColor(assetIdx);
+            const rawTarget = a.raw_targ_weight !== undefined
+                ? a.raw_targ_weight
+                : (a.targ_weight || 0);
+            afterItems.push({
+                index: assetIdx,
+                ticker: a.name || `Asset ${assetIdx + 1}`,
+                val: finalVal,
+                color,
+                targetWeight: rawTarget * 100,
+                cut: a.cut || 0
+            });
+        });
+    } else {
+        const depEl = document.getElementById("deposit");
+        const dep = depEl ? parseFloat(depEl.value) || 0 : 0;
+        totalAfterVal = Math.max(0, totalBeforeVal + dep);
+        let sumTargetW = 0;
+        beforeItems.forEach((b) => { sumTargetW += b.targetWeight; });
+
+        beforeItems.forEach((b) => {
+            const normW = sumTargetW > 0 ? (b.targetWeight / sumTargetW) : 0;
+            const projectedVal = totalAfterVal * normW;
+            afterItems.push({
+                index: b.index,
+                ticker: b.ticker,
+                val: projectedVal,
+                color: b.color,
+                targetWeight: b.targetWeight,
+                cut: projectedVal - b.val
+            });
+        });
+    }
+
+    if (beforeValEl) {
+        beforeValEl.innerText =
+            `${sym}${formatCompactCurrency(totalBeforeVal)}`;
+    }
+    if (afterValEl) {
+        afterValEl.innerText =
+            `${sym}${formatCompactCurrency(totalAfterVal)}`;
+    }
+
+    renderDonutSvg(beforeSvg, beforeItems, totalBeforeVal, cx, cy, R, r);
+    renderDonutSvg(afterSvg, afterItems, totalAfterVal, cx, cy, R, r);
+    renderDonutLegend(legendEl, beforeItems);
+}
+
+let reactiveCalcTimer = null;
+
+function scheduleReactiveCalculation() {
+    if (typeof window === "undefined" || window.innerWidth < 900) return;
+    if (reactiveCalcTimer) {
+        clearTimeout(reactiveCalcTimer);
+        reactiveCalcTimer = null;
+    }
+    reactiveCalcTimer = setTimeout(() => {
+        const depEl = document.getElementById("deposit");
+        if (!depEl) return;
+        const depStr = depEl.value.trim();
+        const compEl = document.getElementById("completeRebalance");
+        const isComplete = compEl ? compEl.checked : false;
+        if (!isComplete && depStr === "") return;
+        const depVal = parseFloat(depStr);
+        if (!isComplete && (isNaN(depVal) || depVal === 0)) return;
+
+        let totalWeight = 0;
+        if (Array.isArray(holdingsData)) {
+            holdingsData.forEach((h) => {
+                const w = parseFloat(h.w);
+                if (!isNaN(w) && w > 0) totalWeight += w;
+            });
+        }
+        if (totalWeight <= 0) return;
+
+        const btnCalc = document.getElementById("btnCalc");
+        if (
+            btnCalc &&
+            (btnCalc.disabled || btnCalc.classList.contains("disabled"))
+        ) {
+            return;
+        }
+
+        calculateRebalance();
+    }, 80);
+}
+
 // --- Core Algorithm (Ported directly from dynaReb.c with dynamic minBuy) ---
 function calculateRebalance() {
     const btnCalc = document.getElementById("btnCalc");
@@ -11886,6 +12826,7 @@ function calculateRebalance() {
         }
 
         if (invalidFields.length > 0) {
+            /* Disabled for now: holding unfilled/invalid error messages
             let fieldMsg = "";
             if (invalidFields.length === 1) {
                 fieldMsg =
@@ -11903,6 +12844,7 @@ function calculateRebalance() {
                     `values for holding #${i + 1}.`;
             }
             holdingErrors.push(fieldMsg);
+            */
             continue;
         }
 
@@ -11914,6 +12856,7 @@ function calculateRebalance() {
             targ_weight: weight / 100.0,
             sharePrice: isShares ? price : parseFloat(h.p) || null,
             currentShares: isShares ? qty : parseFloat(h.q) || null,
+            origIndex: i,
         });
     }
 
@@ -11925,9 +12868,11 @@ function calculateRebalance() {
                 `${roundedWeight}%). Please adjust weights to 100%.`,
         );
     }
+    /* Disabled for now:
     if (holdingErrors.length > 0) {
         allErrors.push(...holdingErrors);
     }
+    */
 
     if (allErrors.length > 0) {
         showError(allErrors);
@@ -11935,6 +12880,7 @@ function calculateRebalance() {
     }
 
     if (validHoldings.length === 0) {
+        /* Disabled for now:
         showError(
             isShares
                 ? "Please add at least one holding with ticker, share price," +
@@ -11942,6 +12888,7 @@ function calculateRebalance() {
                 : "Please add at least one holding with ticker, value, and" +
                     " target weight.",
         );
+        */
         return;
     }
 
@@ -12313,7 +13260,51 @@ function calculateRebalance() {
     // Allocation Cards with Comparative Progress Bars
     const allocList = document.getElementById("allocationList");
     allocList.innerHTML = "";
-    res.assets.forEach((a) => {
+
+    if (isShares && !isFractionalSharesEnabled() && hasWholeShareLeftover) {
+        const leftoverTile = document.createElement("div");
+        leftoverTile.className = "allocation-item leftover-tile";
+        leftoverTile.id = "leftoverTile";
+        const leftoverSub =
+            res.added < 0 ? "Unallocated withdrawal" : "Unallocated deposit";
+        const leftoverWord = res.added < 0 ? "withdrawal" : "deposit";
+        leftoverTile.innerHTML = `
+            <div class="leftover-tile-top">
+                <div class="leftover-identity">
+                    <div class="leftover-icon-wrap">
+                        <svg viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <path
+                                d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8">
+                            </path>
+                            <path d="M12 18V6"></path>
+                        </svg>
+                    </div>
+                    <div class="leftover-meta">
+                        <span class="leftover-title">Cash Leftover</span>
+                        <span class="leftover-sub">${leftoverSub}</span>
+                    </div>
+                </div>
+                <div class="allocation-tag-wrap">
+                    <span class="cut-badge leftover">
+                        ${sym}${leftoverCash.toFixed(2)}
+                    </span>
+                </div>
+            </div>
+            <div class="leftover-note shares-whole-warning"
+                id="sharesWholeWarning">
+                <strong>Notice:</strong> Due to transactions being done in ` +
+                `whole shares, not all of the ${leftoverWord} ` +
+                `could be allocated.
+            </div>
+        `;
+        allocList.appendChild(leftoverTile);
+    }
+
+    res.assets.forEach((a, aIdx) => {
         const item = document.createElement("div");
         const isSell = a.cut < -0.005;
         const isBuy = a.cut > 0.005;
@@ -12385,10 +13376,19 @@ function calculateRebalance() {
         const sellBg =
             isSell ? "background: rgba(255, 92, 92, 0.35);" : "";
 
+        const dotColor = getHoldingColor(
+            a.origIndex !== undefined ? a.origIndex : aIdx
+        );
+        const dotHtml =
+            `<span class="holding-color-dot" ` +
+            `style="background: ${dotColor};"></span>`;
+
         item.innerHTML = `
                     <div class="allocation-item-top">
                         <div class="asset-identity">
-                            <span class="ticker-badge">${a.name}</span>
+                            <span class="ticker-badge">
+                                ${dotHtml}${a.name}
+                            </span>
                             <div class="asset-details">
                                 <span class="asset-val-preview">
                                     ${sym}${fmtInitStr} →
@@ -12425,49 +13425,6 @@ function calculateRebalance() {
         allocList.appendChild(item);
     });
 
-    if (isShares && !isFractionalSharesEnabled() && hasWholeShareLeftover) {
-        const leftoverTile = document.createElement("div");
-        leftoverTile.className = "allocation-item leftover-tile";
-        leftoverTile.id = "leftoverTile";
-        const leftoverSub =
-            res.added < 0 ? "Unallocated withdrawal" : "Unallocated deposit";
-        const leftoverWord = res.added < 0 ? "withdrawal" : "deposit";
-        leftoverTile.innerHTML = `
-            <div class="leftover-tile-top">
-                <div class="leftover-identity">
-                    <div class="leftover-icon-wrap">
-                        <svg viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2"
-                            stroke-linecap="round"
-                            stroke-linejoin="round">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <path
-                                d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8">
-                            </path>
-                            <path d="M12 18V6"></path>
-                        </svg>
-                    </div>
-                    <div class="leftover-meta">
-                        <span class="leftover-title">Cash Leftover</span>
-                        <span class="leftover-sub">${leftoverSub}</span>
-                    </div>
-                </div>
-                <div class="allocation-tag-wrap">
-                    <span class="cut-badge leftover">
-                        ${sym}${leftoverCash.toFixed(2)}
-                    </span>
-                </div>
-            </div>
-            <div class="leftover-note shares-whole-warning"
-                id="sharesWholeWarning">
-                <strong>Notice:</strong> Due to transactions being done in ` +
-                `whole shares, not all of the ${leftoverWord} ` +
-                `could be allocated.
-            </div>
-        `;
-        allocList.appendChild(leftoverTile);
-    }
-
     // Status Pills
     const isPortfolioBalanced =
         !res.isThresholdWarning && (isComplete || res.next_deposit <= 0.005);
@@ -12497,12 +13454,21 @@ function calculateRebalance() {
             `<span>Needed to Balance:</span> <strong>${sym}${balAmt}</strong>`;
     }
 
-    // Raw ASCII Output
+    // Broker Order Ticket & Results Display
     document.getElementById("outputArea").innerText = res.rawOutput;
-    document.getElementById("resultsSection").style.display = "block";
-    document
-        .getElementById("resultsSection")
-        .scrollIntoView({ behavior: "smooth", block: "start" });
+    const resSec = document.getElementById("resultsSection");
+    if (resSec) resSec.style.display = "block";
+    const resPh = document.getElementById("resultsPlaceholder");
+    if (resPh) resPh.style.display = "none";
+    if (
+        typeof window !== "undefined" &&
+        window.innerWidth < 900 &&
+        resSec &&
+        resSec.scrollIntoView
+    ) {
+        resSec.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+    renderDonutCharts(res);
 }
 
 function runCompleteRebalanceAlgorithm(added, holdings, minBuy = 0) {
@@ -12514,7 +13480,7 @@ function runCompleteRebalanceAlgorithm(added, holdings, minBuy = 0) {
 
     let new_folio_value = curr_folio_value + added;
 
-    let assets = holdings.map((h) => {
+    let assets = holdings.map((h, hIdx) => {
         const target_val = h.targ_weight * new_folio_value;
         const ideal_cut = target_val - h.value;
         return {
@@ -12533,6 +13499,7 @@ function runCompleteRebalanceAlgorithm(added, holdings, minBuy = 0) {
             ideal_cut: ideal_cut,
             cut: 0,
             action: "HOLD",
+            origIndex: h.origIndex !== undefined ? h.origIndex : hIdx,
         };
     });
 
@@ -12782,69 +13749,64 @@ function runCompleteRebalanceAlgorithm(added, holdings, minBuy = 0) {
     }
 
     let out = "";
-    out += "___________________________________\n";
-    out += "       Complete Rebalance\n";
-    out += "___________________________________\n";
-    out += `Initial Portfolio Value: ` +
-        `${padLeft(curr_folio_value.toFixed(2), 10)}|\n`;
+    out += "----------------------------------------\n";
+    out += "      PROPOSED ORDERS: COMPLETE REBALANCE\n";
+    out += "----------------------------------------\n";
+    out += `Initial Portfolio Value:  ` +
+        `$${padLeft(curr_folio_value.toFixed(2), 10)}\n`;
     if (added < 0) {
-        out += `Withdrawal Value:        ` +
-            `${padLeft(Math.abs(added).toFixed(2), 10)}|\n`;
+        out += `Withdrawal Value:         ` +
+            `$${padLeft(Math.abs(added).toFixed(2), 10)}\n`;
     } else {
-        out += `Deposit Value:           ${padLeft(added.toFixed(2), 10)}|\n`;
+        out += `Deposit Value:            ` +
+            `$${padLeft(added.toFixed(2), 10)}\n`;
     }
-    out += `Proceeds from Sells:     ${padLeft(total_sold.toFixed(2), 10)}|\n`;
+    out += `Proceeds from Sells:      ` +
+        `$${padLeft(total_sold.toFixed(2), 10)}\n`;
     if (added < 0) {
-        out += `Re-Allocated to Buys:    ` +
-            `${padLeft(total_bought.toFixed(2), 10)}|\n`;
+        out += `Re-Allocated to Buys:     ` +
+            `$${padLeft(total_bought.toFixed(2), 10)}\n`;
     } else {
-        out += `Total Funds Allocated:   ` +
-            `${padLeft(total_bought.toFixed(2), 10)}|\n`;
+        out += `Total Funds Allocated:    ` +
+            `$${padLeft(total_bought.toFixed(2), 10)}\n`;
     }
-    out += `New Portfolio Value:     ` +
-        `${padLeft(new_folio_value.toFixed(2), 10)}|\n`;
-    out += "___________________________________|\n";
-    out += "Rebalance Orders:                  |\n";
+    out += `New Portfolio Value:      ` +
+        `$${padLeft(new_folio_value.toFixed(2), 10)}\n`;
+    out += "----------------------------------------\n";
+    out += "Rebalance Orders:\n";
 
     if (isThresholdWarning) {
-        out += "                                   |\n";
-        out += "-----------------------------------|\n";
-        out += "             WARNING:              |\n";
-        out += "Purchase Threshold Active.         |\n";
-        out += "Allocations adjusted to closest    |\n";
-        out += "possible balance.                  |\n";
-        out += "-----------------------------------|\n";
-        out += "                                   |\n";
+        out += "\n";
+        out += "  [WARNING] Purchase Threshold Active.\n";
+        out += "  Allocations adjusted to closest balance.\n";
+        out += "\n";
     }
 
     for (let a of assets) {
         if (a.action === "SELL") {
             out +=
-                `${padRight(a.name, 4)}: SELL     $` +
-                `${padLeft(Math.abs(a.cut).toFixed(2), 8)}           |\n`;
+                `  ${padRight(a.name, 6)}  SELL    $` +
+                `${padLeft(Math.abs(a.cut).toFixed(2), 8)}\n`;
         } else if (a.action === "BUY") {
             out +=
-                `${padRight(a.name, 4)}: BUY      $` +
-                `${padLeft(a.cut.toFixed(2), 8)}           |\n`;
+                `  ${padRight(a.name, 6)}  BUY     $` +
+                `${padLeft(a.cut.toFixed(2), 8)}\n`;
         } else {
             out +=
-                `${padRight(a.name, 4)}: HOLD     $` +
-                `${padLeft("0.00", 8)}           |\n`;
+                `  ${padRight(a.name, 6)}  HOLD    $` +
+                `${padLeft("0.00", 8)}\n`;
         }
     }
 
-    out += "-----------------------------------|\n";
+    out += "----------------------------------------\n";
     if (isThresholdWarning && next_deposit > 0.005) {
-        out += `Most Underweight Holding: ${underweight.name}     |\n`;
-        out += `Most Overweight Holding: ${overweight.name}       |\n`;
-        out += "Amount Needed to be Balanced:      |\n";
-        out += `               $` +
-            `${padLeft(next_deposit.toFixed(2), 8)}           |\n`;
+        out += `Most Underweight:  ${underweight.name}\n`;
+        out += `Most Overweight:   ${overweight.name}\n`;
+        out += `Needed to Balance: $${next_deposit.toFixed(2)}\n`;
     } else {
-        out += "Portfolio is Balanced              |\n";
-        out += "                                   |\n";
+        out += "Portfolio Status:  Balanced\n";
     }
-    out += "-----------------------------------\n";
+    out += "----------------------------------------\n";
 
     return {
         isComplete: true,
@@ -12869,7 +13831,7 @@ function runDynaRebAlgorithm(added, holdings, minBuy = 0) {
     const MIN_BUY = typeof minBuy === "number" && !isNaN(minBuy) ? minBuy : 0;
     const NEWLINE = "                                   |\n";
 
-    let assets = holdings.map((h) => ({
+    let assets = holdings.map((h, hIdx) => ({
         name: h.name,
         value: h.value,
         targ_weight: h.targ_weight,
@@ -12881,6 +13843,7 @@ function runDynaRebAlgorithm(added, holdings, minBuy = 0) {
                 : null,
         dollars_to_targ: 0,
         cut: 0,
+        origIndex: h.origIndex !== undefined ? h.origIndex : hIdx,
     }));
 
     let curr_folio_value = 0;
@@ -13005,50 +13968,46 @@ function runDynaRebAlgorithm(added, holdings, minBuy = 0) {
         }
 
         let out = "";
-        out += "___________________________________\n";
-        out += "       Rebalancing Calculator\n";
-        out += "___________________________________\n";
-        out += `Initial Portfolio Value: ` +
-            `${padLeft(curr_folio_value.toFixed(2), 10)}|\n`;
-        out += `Withdrawal Value:        ${padLeft(W.toFixed(2), 10)}|\n`;
-        out += `New Portfolio Value:     ` +
-            `${padLeft(new_folio_value.toFixed(2), 10)}|\n`;
-        out += "___________________________________|\n";
-        out += "Withdrawal Orders:                 |\n";
+        out += "----------------------------------------\n";
+        out += "     PROPOSED ORDERS: WITHDRAWAL\n";
+        out += "----------------------------------------\n";
+        out += `Initial Portfolio Value:  ` +
+            `$${padLeft(curr_folio_value.toFixed(2), 10)}\n`;
+        out += `Withdrawal Value:         ` +
+            `$${padLeft(W.toFixed(2), 10)}\n`;
+        out += `New Portfolio Value:      ` +
+            `$${padLeft(new_folio_value.toFixed(2), 10)}\n`;
+        out += "----------------------------------------\n";
+        out += "Withdrawal Orders:\n";
 
         if (isWithdrawalThresholdWarning) {
-            out += NEWLINE;
-            out += "-----------------------------------|\n";
-            out += "             WARNING:              |\n";
-            out += "All Sells Below Transaction        |\n";
-            out += "Threshold. Entire Withdrawal Taken |\n";
-            out += "From Most Overweight Holding.      |\n";
+            out += "\n";
+            out += "  [WARNING] All Sells Below Threshold.\n";
+            out += "  Entire Withdrawal Taken From Most Overweight.\n";
+            out += "\n";
         }
 
         for (let a of assets) {
             if (a.cut < -0.005) {
                 out +=
-                    `${padRight(a.name, 4)}: SELL     $` +
-                    `${padLeft(Math.abs(a.cut).toFixed(2), 8)}           |\n`;
+                    `  ${padRight(a.name, 6)}  SELL    $` +
+                    `${padLeft(Math.abs(a.cut).toFixed(2), 8)}\n`;
             } else {
                 out +=
-                    `${padRight(a.name, 4)}: HOLD     $` +
-                    `${padLeft("0.00", 8)}           |\n`;
+                    `  ${padRight(a.name, 6)}  HOLD    $` +
+                    `${padLeft("0.00", 8)}\n`;
             }
         }
 
-        out += "-----------------------------------|\n";
+        out += "----------------------------------------\n";
         if (next_deposit > 0.005) {
-            out += `Most Underweight Holding: ${min_holding.name}     |\n`;
-            out += `Most Overweight Holding: ${max_holding.name}       |\n`;
-            out += "Amount Needed to be Balanced:      |\n";
-            out += `               $` +
-                `${padLeft(next_deposit.toFixed(2), 8)}           |\n`;
+            out += `Most Underweight:  ${min_holding.name}\n`;
+            out += `Most Overweight:   ${max_holding.name}\n`;
+            out += `Needed to Balance: $${next_deposit.toFixed(2)}\n`;
         } else {
-            out += "Portfolio is Balanced              |\n";
-            out += NEWLINE;
+            out += "Portfolio Status:  Balanced\n";
         }
-        out += "-----------------------------------\n";
+        out += "----------------------------------------\n";
 
         return {
             assets,
@@ -13185,50 +14144,45 @@ function runDynaRebAlgorithm(added, holdings, minBuy = 0) {
         added < MIN_BUY;
 
     let out = "";
-    out += "___________________________________\n";
-    out += "       Rebalancing Calculator\n";
-    out += "___________________________________\n";
-    out += `Initial Portfolio Value: ` +
-        `${padLeft(curr_folio_value.toFixed(2), 10)}|\n`;
-    out += `Deposit Value:           ${padLeft(added.toFixed(2), 10)}|\n`;
-    out += `New Portfolio Value:     ` +
-        `${padLeft(new_folio_value.toFixed(2), 10)}|\n`;
-    out += "___________________________________|\n";
-    out += "Deposit Allocation:                |\n";
+    out += "----------------------------------------\n";
+    out += "       PROPOSED ORDERS: DEPOSIT\n";
+    out += "----------------------------------------\n";
+    out += `Initial Portfolio Value:  ` +
+        `$${padLeft(curr_folio_value.toFixed(2), 10)}\n`;
+    out += `Deposit Value:            ` +
+        `$${padLeft(added.toFixed(2), 10)}\n`;
+    out += `New Portfolio Value:      ` +
+        `$${padLeft(new_folio_value.toFixed(2), 10)}\n`;
+    out += "----------------------------------------\n";
+    out += "Deposit Allocation:\n";
 
     if (isThresholdWarning) {
-        out += NEWLINE;
-        out += "-----------------------------------|\n";
-        out += "             WARNING:              |\n";
-        out += "All Holdings Below Purchase        |\n";
-        out += `Threshold. Allocate $` +
-            `${underweight.cut.toFixed(2)} To: ${underweight.name}|\n`;
-        out += "-----------------------------------|\n";
-        out += NEWLINE;
+        out += "\n";
+        out += "  [WARNING] All Holdings Below Threshold.\n";
+        out += `  Allocate $${underweight.cut.toFixed(2)} ` +
+            `To: ${underweight.name}\n`;
+        out += "\n";
     }
 
     for (let a of assets) {
         out +=
-            `${padRight(a.name, 4)}: allocate $` +
-            `${padLeft(a.cut.toFixed(2), 8)}           |\n`;
+            `  ${padRight(a.name, 6)}  BUY     $` +
+            `${padLeft(a.cut.toFixed(2), 8)}\n`;
     }
 
-    out += "-----------------------------------|\n";
-    out += `Most Underweight Holding: ${underweight.name}     |\n`;
-    out += `Most Overweight Holding: ${overweight.name}       |\n`;
+    out += "----------------------------------------\n";
+    out += `Most Underweight:  ${underweight.name}\n`;
+    out += `Most Overweight:   ${overweight.name}\n`;
 
     let max_holding = overweight;
     let next_deposit =
         max_holding.value / max_holding.targ_weight - new_folio_value;
     if (next_deposit > 0) {
-        out += "Amount Extra Needed to be Balanced:| \n";
-        out += `               $` +
-            `${padLeft(next_deposit.toFixed(2), 8)}           |\n`;
+        out += `Needed to Balance: $${next_deposit.toFixed(2)}\n`;
     } else {
-        out += "Portfolio is Balanced              |\n";
-        out += NEWLINE;
+        out += "Portfolio Status:  Balanced\n";
     }
-    out += "-----------------------------------\n";
+    out += "----------------------------------------\n";
 
     return {
         assets,
@@ -13312,6 +14266,7 @@ if (typeof window !== "undefined") {
     window.updateHolding = updateHolding;
     window.addHolding = addHolding;
     window.removeHolding = removeHolding;
+    window.scheduleReactiveCalculation = scheduleReactiveCalculation;
     window.calculateRebalance = calculateRebalance;
     window.clearError = clearError;
     window.showError = showError;
@@ -13352,6 +14307,15 @@ if (typeof window !== "undefined") {
     window.extractPdfTextNative = extractPdfTextNative;
     window.parsePdfToCsv = parsePdfToCsv;
     window.decompressPdfBytes = decompressPdfBytes;
+    window.renderDonutCharts = renderDonutCharts;
+    window.renderDonutSvg = renderDonutSvg;
+    window.renderDonutLegend = renderDonutLegend;
+    window.getHoldingColor = getHoldingColor;
+    window.highlightDonutAsset = highlightDonutAsset;
+    window.resetDonutHighlight = resetDonutHighlight;
+    window.updateDonutTooltip = updateDonutTooltip;
+    window.buildDonutSlicePath = buildDonutSlicePath;
+    window.getPolarPoint = getPolarPoint;
 }
 </script>
 </body>
