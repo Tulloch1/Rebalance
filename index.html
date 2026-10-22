@@ -1680,9 +1680,11 @@ family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
         .info-modal-body {
             padding: 24px;
             overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
             color: var(--text-secondary);
             font-size: 14px;
             line-height: 1.6;
+            min-height: 0;
         }
 
         /* Unified Modal Sidebar Layout System */
@@ -1753,6 +1755,10 @@ family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
         }
 
         #accountModalOverlay .info-modal-body {
+            flex: 1;
+            min-height: 0;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
             padding: 20px 24px 24px 24px;
         }
 
@@ -1826,8 +1832,10 @@ family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
             display: flex;
             flex-direction: column;
             min-width: 0;
+            min-height: 0;
             position: relative;
             background: var(--surface-card);
+            overflow: hidden;
         }
 
         .modal-content-header {
@@ -1835,22 +1843,35 @@ family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
             justify-content: flex-end;
             align-items: center;
             padding: 12px 14px 0 14px;
+            flex-shrink: 0;
         }
 
         #infoModalOverlay .info-modal-body,
         #settingsModalOverlay .info-modal-body {
             flex: 1;
+            min-height: 0;
             padding: 8px 28px 28px 28px;
             overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
         /* Responsive Collapse for Mobile Screens */
         @media (max-width: 640px) {
+            .modal-overlay {
+                padding: 12px 8px;
+            }
+
             #infoModalOverlay .info-modal-card,
             #settingsModalOverlay .info-modal-card {
                 flex-direction: column;
                 min-height: auto;
-                max-height: 88vh;
+                max-height: 90vh;
+                max-height: 90dvh;
+            }
+
+            #accountModalOverlay .info-modal-card {
+                max-height: 90vh;
+                max-height: 90dvh;
             }
 
             .modal-sidebar {
@@ -1858,6 +1879,7 @@ family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
                 border-right: none;
                 border-bottom: 1px solid var(--border-subtle);
                 padding: 10px 10px 6px 10px;
+                flex-shrink: 0;
             }
 
             .modal-sidebar-header {
@@ -1872,6 +1894,7 @@ family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
                 -ms-overflow-style: none;
                 margin-top: 0;
                 padding-bottom: 4px;
+                -webkit-overflow-scrolling: touch;
             }
 
             .modal-sidebar-tabs::-webkit-scrollbar {
@@ -1883,6 +1906,13 @@ family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
                 padding: 7px 12px;
                 font-size: 12px;
                 border-radius: 8px;
+                flex-shrink: 0;
+            }
+
+            .modal-content-container {
+                flex: 1;
+                min-height: 0;
+                overflow: hidden;
             }
 
             .modal-content-header {
@@ -1893,13 +1923,26 @@ family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
                 padding: 0;
             }
 
+            .modal-pane-header,
+            .tab-pane > h3:first-child {
+                padding-right: 36px;
+            }
+
             #infoModalOverlay .info-modal-body,
             #settingsModalOverlay .info-modal-body {
-                padding: 18px 20px 20px 20px;
+                flex: 1;
+                min-height: 0;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+                padding: 16px 16px 32px 16px;
             }
 
             #accountModalOverlay .info-modal-body {
-                padding: 16px 18px 20px 18px;
+                flex: 1;
+                min-height: 0;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+                padding: 16px 18px 24px 18px;
             }
 
             .account-tab {
@@ -8174,6 +8217,11 @@ function formatMoney(amount, showSign = false) {
 
 function openSettingsModal() {
     ModalManager.open("settingsModalOverlay", () => {
+        const bodyEl = document.querySelector(
+            "#settingsModalOverlay .info-modal-body",
+        );
+        if (bodyEl) bodyEl.scrollTop = 0;
+
         const themeToggle = document.getElementById("settingThemeToggle");
         if (themeToggle) {
             const currentTheme =
@@ -8256,7 +8304,13 @@ function switchSettingsTab(tabId) {
         activeTabId: tabId,
         btnPrefix: "tab-btn-set-",
         panePrefix: "tab-pane-set-",
-        onSwitch: () => hideFeedback("settingSyncFeedback"),
+        onSwitch: () => {
+            hideFeedback("settingSyncFeedback");
+            const bodyEl = document.querySelector(
+                "#settingsModalOverlay .info-modal-body",
+            );
+            if (bodyEl) bodyEl.scrollTop = 0;
+        },
     });
 }
 
